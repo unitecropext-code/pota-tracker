@@ -503,6 +503,7 @@ tbody tr:hover .row-actions{opacity:1;}
 
 /* MISC */
 .divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+@media(max-width:480px){.hide-xs{display:none;}}
 .section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
 .section-header h2{font-size:18px;font-weight:800;}
 .section-header p{font-size:12px;color:var(--text2);}
@@ -1231,8 +1232,8 @@ function showSection(id) {
   if (id==='map')          { initMap(); }
   if (id==='growers')      { renderGrowersTable(); populateFilterLocality(); }
   if (id==='plantation')   { renderPlantationTable(); }
-  if (id==='pests')        { renderPestTable(); }
-  if (id==='yield-assess') { renderYieldTable(); }
+  if (id==='pests')        { populateSelects(); renderPestTable(); }
+  if (id==='yield-assess') { populateSelects(); renderYieldTable(); }
   if (id==='trends')       { renderTrends(); }
   if (id==='production')   { renderProduction(); }
   if (id==='settings')     { renderSettings(); }
@@ -1333,9 +1334,7 @@ async function saveGrower() {
   document.getElementById('g-zone').value='';
   document.getElementById('g-locality').innerHTML='<option value="">Select Zone first</option>';
   if(GAS_URL){
-    const btn=event?.target; if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Saving…';}
     const r=await callGAS('saveGrower',{Grower_Name:name,Zone:zone,Locality:locality,Contact:contact,Registration_Date:new Date().toISOString().split('T')[0],Status:'Active',Notes:notes});
-    if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-save"></i> Save Grower';}
     if(r.success) toast('Synced to Google Sheets ✓','success');
     else if(r.error) toast('Sheets sync failed: '+r.error,'warning');
   }
@@ -1464,7 +1463,7 @@ function renderPlantationTable() {
       <td><div style="font-weight:700;">${r.grower}</div></td>
       <td><span style="display:inline-block;background:${zc}20;color:${zc};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">${r.zone}</span></td>
       <td>${r.locality}</td>
-      <td>${r.variety||<span style="color:var(--text3)">—</span>}</td>
+      <td>${r.variety||'—'}</td>
       <td>${r.datePlanted||'—'}</td>
       <td><strong>${r.area}</strong></td>
       <td>${r.estYield?r.estYield+' T/ha':'—'}</td>
@@ -1718,7 +1717,7 @@ function deleteYield(id) {
 }
 
 function clearYieldForm() {
-  ['ya-grower','ya-zone','ya-area','ya-comments'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['ya-grower','ya-zone','ya-area','ya-comments','ya-stage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('ya-locality').innerHTML='<option value="">Select Zone first</option>';
   document.getElementById('ya-variety').value='';
   document.getElementById('ya-season').value='Season 1';
@@ -2186,7 +2185,7 @@ async function syncToSheets() {
   toast('Syncing to Google Sheets…','info');
   let ok=0,fail=0;
   for(const g of STATE.growers){
-    const r=await callGAS('saveGrower',{Grower_Name:g.name,Locality:g.locality,Contact:g.contact,Registration_Date:g.registrationDate||new Date().toISOString().split('T')[0],Status:'Active',Notes:g.notes||''});
+    const r=await callGAS('saveGrower',{Grower_Name:g.name,Zone:g.zone||'',Locality:g.locality,Contact:g.contact||'',Registration_Date:g.registrationDate||new Date().toISOString().split('T')[0],Status:'Active',Notes:g.notes||''});
     r.success?ok++:fail++;
   }
   for(const p of STATE.plantation){
@@ -2198,7 +2197,7 @@ async function syncToSheets() {
     r.success?ok++:fail++;
   }
   for(const y of STATE.yieldAssessments){
-    const r=await callGAS('saveYieldAssessment',{Grower_Name:y.grower,Locality:y.locality,Assessment_Date:y.date,Area_Sqm:y.area,Sample1_Kg_Sqm:y.samples[0]||0,Sample2_Kg_Sqm:y.samples[1]||0,Sample3_Kg_Sqm:y.samples[2]||0,Sample4_Kg_Sqm:y.samples[3]||0,Sample5_Kg_Sqm:y.samples[4]||0,Officer_Comments:y.comments||''});
+    const r=await callGAS('saveYieldAssessment',{Grower_Name:y.grower,Locality:y.locality,Variety:y.variety||'',Assessment_Date:y.date,Area_Sqm:y.area,Sample1_Kg_Sqm:y.samples[0]||0,Sample2_Kg_Sqm:y.samples[1]||0,Sample3_Kg_Sqm:y.samples[2]||0,Sample4_Kg_Sqm:y.samples[3]||0,Sample5_Kg_Sqm:y.samples[4]||0,Officer_Comments:y.comments||''});
     r.success?ok++:fail++;
   }
   document.getElementById('sync-label').textContent='Ready to sync';
