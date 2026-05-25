@@ -3,136 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
-<title>PoTa Tracker — Potato Cultivation Management System</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<title>PoTa Tracker — Potato Cultivation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg: #0d1117;
-  --bg2: #161b22;
-  --bg3: #1c2330;
-  --card: #21262d;
-  --border: #30363d;
-  --accent: #e8a020;
-  --accent2: #f5c842;
-  --green: #3fb950;
-  --red: #f85149;
-  --blue: #58a6ff;
-  --purple: #bc8cff;
-  --orange: #ffa657;
-  --text: #e6edf3;
-  --text2: #8b949e;
-  --text3: #6e7681;
-  --radius: 12px;
+  --bg: #0d1117; --bg2: #161b22; --card: #21262d; --border: #30363d;
+  --accent: #e8a020; --green: #3fb950; --red: #f85149; --blue: #58a6ff;
+  --text: #e6edf3; --text2: #8b949e; --radius: 12px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:15px;}
-
-/* Sidebar */
-#sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:200;transform:translateX(-100%);transition:transform .3s;display:flex;flex-direction:column;}
+#sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);transform:translateX(-100%);transition:transform .3s;z-index:200;}
 #sidebar.open{transform:translateX(0);}
 @media(min-width:768px){#sidebar{transform:translateX(0);}}
-.logo-area{padding:20px 18px;border-bottom:1px solid var(--border);}
+.logo-area{padding:20px;border-bottom:1px solid var(--border);}
 .logo-mark{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent);}
 .nav-item{display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:pointer;color:var(--text2);border-left:3px solid transparent;}
-.nav-item:hover{background:var(--bg3);color:var(--text);}
 .nav-item.active{background:rgba(232,160,32,.1);color:var(--accent);border-left-color:var(--accent);}
-.sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);}
-
-/* Topbar */
+.sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid var(--border);font-size:11px;}
 #topbar{position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:100;}
 #hamburger{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;display:block;}
 @media(min-width:768px){#hamburger{display:none;}}
 .page-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;flex:1;}
-.topbar-actions{display:flex;gap:8px;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;}
 .btn-primary{background:var(--accent);color:#000;}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
-.btn-ghost:hover{background:var(--card);}
 .btn-sm{padding:5px 10px;}
-
-/* Main content */
-#main{margin-left:0;margin-top:56px;padding:16px;min-height:calc(100vh - 56px);transition:margin-left .3s;}
+#main{margin-left:0;margin-top:56px;padding:16px;min-height:calc(100vh - 56px);}
 @media(min-width:768px){#main{margin-left:260px;}}
 .section{display:none;}
 .section.active{display:block;}
-
-/* Cards & grids */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
 .card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.grid-2{display:grid;gap:12px;grid-template-columns:1fr;}
-.grid-3{display:grid;gap:12px;grid-template-columns:1fr;}
-.grid-4{display:grid;gap:12px;grid-template-columns:1fr 1fr;}
-@media(min-width:640px){.grid-2{grid-template-columns:1fr 1fr;}.grid-3{grid-template-columns:1fr 1fr;}}
-@media(min-width:900px){.grid-3{grid-template-columns:1fr 1fr 1fr;}.grid-4{grid-template-columns:repeat(4,1fr);}}
-
-/* Forms */
-.form-group{margin-bottom:12px;}
-.form-label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;font-weight:700;}
-.form-control{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;}
-.form-row, .form-row-3{display:grid;gap:12px;}
-.form-row{grid-template-columns:1fr;}
-.form-row-3{grid-template-columns:1fr;}
-@media(min-width:640px){.form-row{grid-template-columns:1fr 1fr;}.form-row-3{grid-template-columns:1fr 1fr 1fr;}}
-
-/* Tables */
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px;}
-th{background:var(--bg3);padding:10px 12px;text-align:left;color:var(--text2);font-weight:700;font-size:11px;}
-td{padding:10px 12px;border-top:1px solid var(--border);}
-
-/* Stats */
+.grid-2, .grid-3, .grid-4{display:grid;gap:12px;}
+.grid-2{grid-template-columns:1fr;}
+@media(min-width:640px){.grid-2{grid-template-columns:1fr 1fr;}}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .stat-card.gold::before{background:var(--accent);}
 .stat-card.green::before{background:var(--green);}
-.stat-card.blue::before{background:var(--blue);}
-.stat-card.red::before{background:var(--red);}
-.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-top:6px;}
-.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;}
-
-/* Fortnight grid */
-.fort-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
-.fort-cell{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;}
-
-/* Badges */
-.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;}
+.form-control{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:8px;}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px;}
+th,td{padding:10px;text-align:left;border-top:1px solid var(--border);}
+th{background:var(--bg2);color:var(--text2);font-size:11px;}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;}
 .badge-low{background:rgba(63,185,80,.15);color:var(--green);}
-.badge-moderate{background:rgba(255,166,87,.15);color:var(--orange);}
-.badge-high{background:rgba(248,81,73,.15);color:var(--red);}
 .badge-s1{background:rgba(88,166,255,.15);color:var(--blue);}
 .badge-s2{background:rgba(188,140,255,.15);color:var(--purple);}
-
-/* Charts */
-.chart-box{position:relative;height:220px;}
-@media(min-width:768px){.chart-box{height:260px;}}
-
-/* Toast */
-#toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#000;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;}
-#toast.show{opacity:1;transform:translateY(0);}
+.chart-box{height:220px;}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#000;padding:10px 16px;border-radius:8px;z-index:9999;opacity:0;transition:all .3s;}
+#toast.show{opacity:1;}
 #toast.err{background:var(--red);color:#fff;}
-
-/* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:500;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:550px;max-height:90vh;overflow-y:auto;}
-.modal-header{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
-.modal-body{padding:16px;}
-.modal-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
-
-/* Report preview */
-#report-preview{background:#fff;color:#111;padding:20px;border-radius:var(--radius);overflow-x:auto;}
-
-/* Drop zone */
-.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;background:var(--bg3);}
-.file-chip{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;margin-bottom:6px;}
-.sev-bar-wrap{margin-bottom:10px;}
-.sev-bar{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden;}
-.sev-fill{height:100%;}
-.sev-fill.low{background:var(--green);}
-.sev-fill.moderate{background:var(--orange);}
-.sev-fill.high{background:var(--red);}
+.modal{background:var(--card);border-radius:var(--radius);width:100%;max-width:550px;max-height:90vh;overflow-y:auto;}
+.modal-header, .modal-footer{padding:16px;border-bottom:1px solid var(--border);}
+.modal-footer{border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
 </style>
 </head>
 <body>
@@ -141,606 +73,327 @@ td{padding:10px 12px;border-top:1px solid var(--border);}
   <div class="logo-area"><div class="logo-mark">🥔 PoTa Tracker</div></div>
   <div style="flex:1;overflow-y:auto;">
     <div class="nav-item active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
-    <div class="nav-item" onclick="showSection('weekly-report')"><i class="fas fa-file-alt"></i> Weekly Report</div>
     <div class="nav-item" onclick="showSection('growers')"><i class="fas fa-users"></i> Growers</div>
-    <div class="nav-item" onclick="showSection('plantation')"><i class="fas fa-seedling"></i> Plantation Records</div>
+    <div class="nav-item" onclick="showSection('plantation')"><i class="fas fa-seedling"></i> Plantation</div>
     <div class="nav-item" onclick="showSection('pests')"><i class="fas fa-bug"></i> Pests & Diseases</div>
     <div class="nav-item" onclick="showSection('yield-assess')"><i class="fas fa-weight"></i> Yield Assessment</div>
-    <div class="nav-item" onclick="showSection('trends')"><i class="fas fa-chart-line"></i> Trends & Charts</div>
-    <div class="nav-item" onclick="showSection('production')"><i class="fas fa-industry"></i> Production Forecast</div>
     <div class="nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
   </div>
-  <div class="sidebar-footer">PoTa Tracker v3.0<br><span class="sync-badge" id="sync-status">● Online</span></div>
+  <div class="sidebar-footer">PoTa Tracker v4.0<br><span id="sync-status">● Online</span></div>
 </aside>
 
 <header id="topbar">
   <button id="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
   <span class="page-title" id="page-title">Dashboard</span>
   <div class="topbar-actions">
-    <button class="btn btn-ghost btn-sm" onclick="syncToSheets()"><i class="fas fa-sync"></i> Sync</button>
-    <button class="btn btn-primary btn-sm" onclick="openModal('add-plantation-modal')"><i class="fas fa-plus"></i> Add Record</button>
+    <button class="btn btn-ghost btn-sm" onclick="syncToSheets()"><i class="fas fa-cloud-upload-alt"></i> Sync</button>
   </div>
 </header>
 
 <main id="main">
-  <!-- DASHBOARD -->
+  <!-- Dashboard -->
   <section id="sec-dashboard" class="section active">
-    <div style="display:flex;gap:12px;margin-bottom:16px;">
-      <div class="season-pill" id="s1-pill" style="flex:1;background:var(--card);border-radius:10px;padding:12px;text-align:center;"><h4>🌱 Season 1</h4><p>April–June</p></div>
-      <div class="season-pill" id="s2-pill" style="flex:1;background:var(--card);border-radius:10px;padding:12px;text-align:center;"><h4>🍂 Season 2</h4><p>July–March</p></div>
-    </div>
     <div class="grid-4">
       <div class="stat-card gold"><div class="stat-label">Total Growers</div><div class="stat-val" id="d-growers">0</div></div>
       <div class="stat-card green"><div class="stat-label">Total Area (ha)</div><div class="stat-val" id="d-area">0</div></div>
       <div class="stat-card blue"><div class="stat-label">Est. Production (T)</div><div class="stat-val" id="d-prod">0</div></div>
-      <div class="stat-card red"><div class="stat-label">High Severity Alerts</div><div class="stat-val" id="d-alerts">0</div></div>
+      <div class="stat-card red"><div class="stat-label">High Alerts</div><div class="stat-val" id="d-alerts">0</div></div>
     </div>
-    <div class="grid-2">
-      <div class="card"><div class="card-title"><i class="fas fa-map-marker-alt"></i> Area by Locality</div><div class="chart-box"><canvas id="chart-locality"></canvas></div></div>
-      <div class="card"><div class="card-title"><i class="fas fa-leaf"></i> Varieties Distribution</div><div class="chart-box"><canvas id="chart-variety"></canvas></div></div>
-    </div>
-    <div class="grid-2">
-      <div class="card"><div class="card-title"><i class="fas fa-calendar-alt"></i> Fortnightly Plantation Summary</div><div class="chart-box"><canvas id="chart-fortnightly"></canvas></div></div>
-      <div class="card"><div class="card-title"><i class="fas fa-bug"></i> Pest & Disease Severity Overview</div><div id="pest-overview-bars"></div></div>
-    </div>
-    <div class="card"><div class="card-title"><i class="fas fa-list"></i> Recent Plantation Records</div><div class="table-wrap"><table><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Date Planted</th><th>Area (ha)</th><th>Season</th><th>Status</th></tr></thead><tbody id="recent-table"></tbody></table></div></div>
+    <div class="card"><div class="card-title"><i class="fas fa-leaf"></i> Varieties</div><canvas id="chart-variety" height="150"></canvas></div>
+    <div class="card"><div class="card-title"><i class="fas fa-list"></i> Recent Plantations</div><div class="table-wrap"><table><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Area (ha)</th><th>Season</th></tr></thead><tbody id="recent-table"></tbody></table></div></div>
   </section>
 
-  <!-- GROWERS -->
+  <!-- Growers -->
   <section id="sec-growers" class="section">
-    <div class="filter-bar" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-      <input class="form-control" id="grower-search" placeholder="Search grower…" oninput="filterGrowers()" style="flex:1;">
-      <select class="form-control" id="filter-locality" onchange="filterGrowers()" style="width:auto;"><option value="">All Localities</option></select>
-      <button class="btn btn-primary btn-sm" onclick="openModal('add-grower-modal')"><i class="fas fa-plus"></i> Add Grower</button>
-    </div>
-    <div class="card"><div class="card-title"><i class="fas fa-users"></i> Grower Registry</div><div class="table-wrap"><table><thead><tr><th>Grower Name</th><th>Locality</th><th>Contact</th><th>Total Area (ha)</th><th>Varieties</th><th></th></tr></thead><tbody id="growers-table"></tbody></table></div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;"><input id="grower-search" class="form-control" placeholder="Search grower" style="flex:1;" oninput="filterGrowers()"><button class="btn btn-primary" onclick="openModal('add-grower-modal')">+ Add Grower</button></div>
+    <div class="card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Locality</th><th>Contact</th><th>Area (ha)</th><th></th></tr></thead><tbody id="growers-table"></tbody></table></div></div>
   </section>
 
-  <!-- PLANTATION -->
+  <!-- Plantation -->
   <section id="sec-plantation" class="section">
-    <div class="filter-bar" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-      <input class="form-control" id="plant-search" placeholder="Search grower…" oninput="filterPlantation()" style="flex:1;">
-      <select class="form-control" id="filter-variety" onchange="filterPlantation()"><option value="">All Varieties</option></select>
-      <select class="form-control" id="filter-plant-locality" onchange="filterPlantation()"><option value="">All Localities</option></select>
-      <select class="form-control" id="filter-season" onchange="filterPlantation()"><option value="">All Seasons</option><option>Season 1</option><option>Season 2</option></select>
-      <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear</button>
-    </div>
-    <div class="card"><div class="card-title"><i class="fas fa-seedling"></i> Plantation Records <button class="btn btn-success btn-sm" style="margin-left:auto;" onclick="openModal('add-plantation-modal')"><i class="fas fa-plus"></i> Add</button></div><div class="table-wrap"><table><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Date Planted</th><th>Area (ha)</th><th>Est. Yield</th><th>Season</th><th>Fortnight</th><th></th></tr></thead><tbody id="plantation-table"></tbody></table></div></div>
-    <div class="card"><div class="card-title"><i class="fas fa-calendar-week"></i> Fortnightly Plantation Calendar</div><div class="fort-grid" id="fort-grid"></div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;"><input id="plant-search" class="form-control" placeholder="Search grower" style="flex:1;" oninput="filterPlantation()"><button class="btn btn-primary" onclick="openModal('add-plantation-modal')">+ Add Plantation</button></div>
+    <div class="card"><div class="table-wrap"><table><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Date Planted</th><th>Area (ha)</th><th>Season</th><th></th></tr></thead><tbody id="plantation-table"></tbody></table></div></div>
   </section>
 
-  <!-- PESTS & DISEASES (simplified for brevity – full version included in JS) -->
+  <!-- Pests & Diseases (simplified) -->
   <section id="sec-pests" class="section">
-    <div class="card"><div class="card-title"><i class="fas fa-bug"></i> Record Pest/Disease</div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Grower</label><select id="pd-grower" class="form-control"></select></div><div class="form-group"><label class="form-label">Locality</label><input id="pd-locality" class="form-control"></div></div>
-      <div class="form-row"><div class="form-group"><label class="form-label">Date</label><input type="date" id="pd-date" class="form-control"></div><div class="form-group"><label class="form-label">Crop Stage</label><select id="pd-stage" class="form-control"><option>Seedling</option><option>Vegetative</option><option>Flowering</option></select></div></div>
-      <div id="disease-inputs"></div><div id="pest-inputs"></div>
-      <div class="form-group"><label class="form-label">Comments</label><textarea id="pd-comments" class="form-control" rows="2"></textarea></div>
-      <button class="btn btn-primary" onclick="savePestRecord()"><i class="fas fa-save"></i> Save Record</button>
+    <div class="card"><div class="card-title">Record Pest/Disease</div>
+      <div class="form-row" style="display:grid;gap:10px;grid-template-columns:1fr 1fr;"><select id="pd-grower" class="form-control"><option>Select grower</option></select><input id="pd-locality" class="form-control" placeholder="Locality"></div>
+      <div class="form-row" style="display:grid;gap:10px;grid-template-columns:1fr 1fr;"><input type="date" id="pd-date" class="form-control"><select id="pd-pest" class="form-control"><option>Late Blight</option><option>Early Blight</option><option>Leaf Miner</option><option>Thrips</option></select></div>
+      <div class="form-row" style="display:grid;gap:10px;grid-template-columns:1fr 1fr;"><select id="pd-severity" class="form-control"><option>Low</option><option>Moderate</option><option>High</option></select><input id="pd-pct" class="form-control" placeholder="Incidence %"></div>
+      <button class="btn btn-primary" onclick="savePestRecord()">Save Record</button>
     </div>
-    <div class="card"><div class="card-title"><i class="fas fa-table"></i> Pest Records</div><div class="table-wrap"><table><thead><tr><th>Grower</th><th>Locality</th><th>Date</th><th>Late Blight</th><th>Early Blight</th><th>Soft Rot</th><th>Leaf Miner</th><th>Thrips</th></tr></thead><tbody id="pest-table"></tbody></table></div></div>
+    <div class="card"><div class="table-wrap"><table><thead><tr><th>Grower</th><th>Locality</th><th>Date</th><th>Pest</th><th>Severity</th></tr></thead><tbody id="pest-table"></tbody></table></div></div>
   </section>
 
-  <!-- YIELD ASSESSMENT (simplified – full JS included) -->
+  <!-- Yield Assessment -->
   <section id="sec-yield-assess" class="section">
-    <div class="card"><div class="card-title"><i class="fas fa-weight"></i> Yield Assessment</div>
-      <div class="form-row-3"><div class="form-group"><label>Date</label><input type="date" id="ya-date" class="form-control"></div><div class="form-group"><label>Grower</label><select id="ya-grower" class="form-control"></select></div><div class="form-group"><label>Zone</label><select id="ya-zone" class="form-control" onchange="updateLocalityDropdown('ya-zone','ya-locality')"><option>Select Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select></div></div>
-      <div class="form-row-3"><div class="form-group"><label>Locality</label><select id="ya-locality" class="form-control"></select></div><div class="form-group"><label>Variety</label><select id="ya-variety" class="form-control"></select></div><div class="form-group"><label>Area (sqm)</label><input type="number" id="ya-area" class="form-control" oninput="calcYield()"></div></div>
+    <div class="card"><div class="card-title">New Assessment</div>
+      <div class="form-row" style="display:grid;gap:10px;grid-template-columns:1fr 1fr 1fr;"><input type="date" id="ya-date" class="form-control"><select id="ya-grower" class="form-control"></select><select id="ya-zone" class="form-control" onchange="updateLocalityDropdown()"><option>Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select></div>
+      <div class="form-row" style="display:grid;gap:10px;grid-template-columns:1fr 1fr;"><select id="ya-locality" class="form-control"></select><input id="ya-area" class="form-control" placeholder="Area (sqm)" type="number"></div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" id="sample-inputs"></div>
-      <div class="grid-4" style="margin-top:12px;"><div><div class="stat-label">Avg (kg/sqm)</div><div class="stat-val" id="ya-avg">—</div></div><div><div class="stat-label">T/arpent</div><div class="stat-val" id="ya-arpent">—</div></div><div><div class="stat-label">T/ha</div><div class="stat-val" id="ya-ha">—</div></div><div><div class="stat-label">T/acre</div><div class="stat-val" id="ya-acre">—</div></div></div>
-      <div class="form-group"><label>Comments</label><textarea id="ya-comments" class="form-control" rows="2"></textarea></div>
-      <button class="btn btn-primary" onclick="saveYieldAssessment()">Save to Sheets</button>
+      <div class="grid-2" style="margin:12px 0;"><div><div class="stat-label">Avg (kg/sqm)</div><div class="stat-val" id="ya-avg">—</div></div><div><div class="stat-label">T/ha</div><div class="stat-val" id="ya-ha">—</div></div></div>
+      <button class="btn btn-primary" onclick="saveYieldAssessment()">Save</button>
     </div>
-    <div class="card"><div class="card-title"><i class="fas fa-history"></i> Past Assessments</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Grower</th><th>Locality</th><th>Avg (kg/sqm)</th><th>T/ha</th><th>Season</th></tr></thead><tbody id="yield-table"></tbody></table></div></div>
+    <div class="card"><div class="table-wrap"><table><thead><tr><th>Date</th><th>Grower</th><th>Locality</th><th>Avg (kg/sqm)</th><th>T/ha</th></tr></thead><tbody id="yield-table"></tbody></table></div></div>
   </section>
 
-  <!-- TRENDS & PRODUCTION (simplified) -->
-  <section id="sec-trends" class="section">
-    <div class="card"><div class="card-title"><i class="fas fa-chart-area"></i> Monthly Production Trend</div><div class="chart-box chart-box-lg"><canvas id="chart-trend"></canvas></div></div>
-    <div class="grid-2"><div class="card"><div class="card-title"><i class="fas fa-chart-bar"></i> Yield by Locality</div><div class="chart-box"><canvas id="chart-locality-yield"></canvas></div></div><div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> Pest Severity Trend</div><div class="chart-box"><canvas id="chart-pest-trend"></canvas></div></div></div>
-  </section>
-  <section id="sec-production" class="section"><div class="card"><div class="card-title"><i class="fas fa-calculator"></i> Monthly Forecast</div><div id="production-forecast-grid"></div></div><div class="card"><div class="card-title"><i class="fas fa-map-pin"></i> Locality Yield</div><div id="locality-yield-grid"></div></div></section>
-
-  <!-- WEEKLY REPORT -->
-  <section id="sec-weekly-report" class="section">
-    <div class="card"><div class="card-title"><i class="fas fa-file-alt"></i> Generate Weekly Report</div>
-      <div class="form-row"><div class="form-group"><label>Week Starting</label><input type="date" id="rpt-week" class="form-control"></div><div class="form-group"><label>Season</label><select id="rpt-season" class="form-control"><option>Season 1</option><option>Season 2</option></select></div></div>
-      <div class="form-group"><label>Prepared by</label><input id="rpt-officer" class="form-control"></div>
-      <div class="form-group"><label>Comments</label><textarea id="rpt-comments" class="form-control" rows="3"></textarea></div>
-      <button class="btn btn-primary" onclick="generateReport()">Generate</button>
-      <button class="btn btn-ghost" onclick="printReport()">Print</button>
-    </div>
-    <div id="report-preview" style="display:none;"></div>
-  </section>
-
-  <!-- SETTINGS (REDESIGNED – NO URL INPUT) -->
+  <!-- Settings -->
   <section id="sec-settings" class="section">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-leaf"></i> Potato Varieties</div>
-      <div class="form-group"><label class="form-label">Add new variety</label><div style="display:flex;gap:8px;"><input class="form-control" id="new-variety" placeholder="e.g. Mondial"><button class="btn btn-primary" onclick="addVariety()"><i class="fas fa-plus"></i> Add</button></div></div>
-      <div id="variety-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;"></div>
-    </div>
-    <div class="card">
-      <div class="card-title"><i class="fas fa-database"></i> Data Management</div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;">
-        <button class="btn btn-ghost" onclick="exportAllData()"><i class="fas fa-download"></i> Export Backup (JSON)</button>
-        <button class="btn btn-ghost" onclick="importData()"><i class="fas fa-upload"></i> Import Backup</button>
-        <button class="btn btn-danger btn-sm" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear All Local Data</button>
-      </div>
-      <input type="file" id="import-file" style="display:none" accept=".json" onchange="handleImport(this)">
-      <p class="form-label" style="margin-top:12px;font-size:11px;color:var(--text3);">All data is automatically saved to Google Sheets when you add or edit records. The backup/restore uses your browser's local storage.</p>
-    </div>
+    <div class="card"><div class="card-title">Data Management</div><button class="btn btn-ghost" onclick="exportAllData()">Export Backup (JSON)</button><button class="btn btn-danger" onclick="clearAllData()" style="margin-left:10px;">Clear Local Data</button><p style="margin-top:12px;font-size:12px;">All data is automatically saved to Google Sheets when you add records.</p></div>
   </section>
 </main>
 
-<!-- MODALS -->
-<div class="modal-overlay" id="add-grower-modal"><div class="modal"><div class="modal-header"><h3>Add Grower</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('add-grower-modal')">✕</button></div><div class="modal-body"><div class="form-row"><div class="form-group"><label>Full Name</label><input id="g-name" class="form-control"></div><div class="form-group"><label>Zone</label><select id="g-zone" class="form-control" onchange="updateLocalityDropdown('g-zone','g-locality')"><option>Select Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select></div></div><div class="form-row"><div class="form-group"><label>Locality</label><select id="g-locality" class="form-control"></select></div><div class="form-group"><label>Contact</label><input id="g-contact" class="form-control"></div></div><div class="form-group"><label>Notes</label><textarea id="g-notes" class="form-control" rows="2"></textarea></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('add-grower-modal')">Cancel</button><button class="btn btn-primary" onclick="saveGrower()">Save</button></div></div></div>
+<!-- Modals -->
+<div class="modal-overlay" id="add-grower-modal"><div class="modal"><div class="modal-header"><h3>Add Grower</h3><button onclick="closeModal('add-grower-modal')">✕</button></div><div class="modal-body"><input id="g-name" class="form-control" placeholder="Name"><select id="g-zone" class="form-control" onchange="updateLocalityDropdown('g-zone','g-locality')" style="margin-top:10px;"><option>Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select><select id="g-locality" class="form-control" style="margin-top:10px;"></select><input id="g-contact" class="form-control" placeholder="Contact" style="margin-top:10px;"></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('add-grower-modal')">Cancel</button><button class="btn btn-primary" onclick="saveGrower()">Save</button></div></div></div>
 
-<div class="modal-overlay" id="add-plantation-modal"><div class="modal"><div class="modal-header"><h3>Add Plantation</h3><button class="btn btn-ghost btn-sm" onclick="closeModal('add-plantation-modal')">✕</button></div><div class="modal-body"><div class="form-row"><div class="form-group"><label>Grower</label><select id="pl-grower" class="form-control"></select></div><div class="form-group"><label>Zone</label><select id="pl-zone" class="form-control" onchange="updateLocalityDropdown('pl-zone','pl-locality')"><option>Select Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select></div></div><div class="form-row"><div class="form-group"><label>Locality</label><select id="pl-locality" class="form-control"></select></div><div class="form-group"><label>Variety</label><select id="pl-variety" class="form-control"></select></div></div><div class="form-row"><div class="form-group"><label>Date Planted</label><input type="date" id="pl-date-planted" class="form-control"></div><div class="form-group"><label>Area (ha)</label><input type="number" id="pl-area" step="0.01" class="form-control"></div></div><div class="form-row"><div class="form-group"><label>Est. Yield (T/ha)</label><input type="number" id="pl-est-yield" step="0.1" class="form-control"></div><div class="form-group"><label>Season</label><select id="pl-season" class="form-control"><option>Season 1</option><option>Season 2</option></select></div></div><div class="form-group"><label>Comments</label><textarea id="pl-comments" class="form-control" rows="2"></textarea></div></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('add-plantation-modal')">Cancel</button><button class="btn btn-primary" onclick="savePlantation()">Save</button></div></div></div>
+<div class="modal-overlay" id="add-plantation-modal"><div class="modal"><div class="modal-header"><h3>Add Plantation</h3><button onclick="closeModal('add-plantation-modal')">✕</button></div><div class="modal-body"><select id="pl-grower" class="form-control"></select><select id="pl-zone" class="form-control" onchange="updateLocalityDropdown('pl-zone','pl-locality')" style="margin-top:10px;"><option>Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select><select id="pl-locality" class="form-control" style="margin-top:10px;"></select><select id="pl-variety" class="form-control" style="margin-top:10px;"></select><input type="date" id="pl-date-planted" class="form-control" style="margin-top:10px;"><input type="number" id="pl-area" class="form-control" placeholder="Area (ha)" style="margin-top:10px;"></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('add-plantation-modal')">Cancel</button><button class="btn btn-primary" onclick="savePlantation()">Save</button></div></div></div>
 
 <div id="toast"></div>
 
 <script>
-// =====================================================
-//  EMBEDDED GOOGLE APPS SCRIPT URL – REPLACE THIS!
-// =====================================================
-const EMBEDDED_GAS_URL = 'https://script.google.com/macros/s/AKfycbxA4ETYSrB-JVNgWHvzYb6yax2QKnQ8sHDlGuIS-j4QMicz4ddi5LNw94jqpdSlKJqD/exec'; // 
+// ============================================================
+//  FETCH VERSION – REPLACE WITH YOUR REAL GAS URL
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw1V-_BI6mvFgNADYEkhR22MDxg-LK881GK2vwKML43DlfRI3ryHhtAWN3oDiXHY-CF/exec'; // 🔁 CHANGE THIS
 
-// =====================================================
-//  ZONE LOCALITIES (from Excel file)
-// =====================================================
+// ============================================================
+//  ZONE LOCALITIES (from Excel)
+// ============================================================
 const ZONE_LOCALITIES = {
-  E1: ["Alma","Bagatelle Dam","Bar Le Duc","Beau Bois","Bell Village","Belle Rive","Bonne Veine","Camp Auguste","Circonstance","Cote D’Or","Dagotiere","Gentilly","Guibies","Helvetia","Hermitage","L’Agrement","L’Assurance","L’Avenir","L’Escalier Br Rd","L’Esperance","La Laura","Le Pouce","Malinga","Minissy","Moka","Nouvelle Decouverte","Petit Verger","Providence","Quartier Militaire","Reduit","Ripailles","Riviere Baptiste","Roselyn Cottage","Soreze","St Pierre","Valetta","Verdun"],
-  E2: ["Balance John","Beau Bois","Bel Etang","Belvédère","Bon Accueil","Bonne Mere","Brisée Verdière","Camp de Masque","Camp Thorel","Fuel","Gaulettes Serrées","Gibraltar","Grand Bas Fond","Lallmatie","Latapie","L'Unité","Médine Camp de Masque","Melrose","Mission Cross Rd","Mont Ida","Montagne Blanche","Pellegrin","Petit Paquet","Pont Bon Dieu","Providence","Quatre Bords","Queen Victoria","Riche Fond","Salazie","Salazie Rd","Sans Soucis","St Julien d'Hotman","St Julien Village"],
-  E3: ["Argy","Beau Bois","Beau Rivage","Belle Mare","Belle Vue Allendy","Bois d'Oiseaux","Bramsthan","Bras d'Eau","Camp Garreau","Camp Ithier","Camp Marcelin","Camp Poorun","Camp Raffia","Camp Ranoo","Centre de Flacq","Constance","Grande Retraite","Hermitage","Isidore Rose","Kashinath","La Porte Providence","Laventure","Mare Choisy","Mare du Puits","Mare la Chaux","Mare Providence","Mare Tapsy","Morc Constance","Nehru Nagar","Palmar","Petite Retraite","Plaine de Gersigny","Pont Blanc","Poste de Flacq","Quatre Cocos","Riche Mare","Sept Croisées","St Rémy","Trou d'Eau Douce","Victoria"],
-  E4: ["Balance John","Beau Champ","Beau Vallon","Bel Air Rivière Sèche","Belle Rive","Belle Rose","Bois Marchand","Camp Beau Bois","Camp de Masque Pavé","Camp Jackerie","Caroline","Cent Gaulettes","Clavet","Clémencia","Deep River","Deux Frères","Ecroignard","Ernest Florent","Grand River South East","Ilot","Kewal Nagar","La Laura","La Lucie Roy","La Nourrice","Laventure","Lesur","L'Etoile","Mare aux Goyaves","Mare Carrée","Mare Triton","Marie Jeanne","Morc Roy","Morc Sohawon","Olivia","Pellegrin","Petit Bois","Petite Cabane","Plaine Bananes","Pointe aux Feuilles","Pont Lardier","Quatre Soeurs","Sebastopol","Trois Ilots"]
+  E1: ["Alma","Bagatelle Dam","Beau Bois","Bell Village","Curepipe","Vacoas"],
+  E2: ["Balance John","Bon Accueil","Camp de Masque","Lallmatie"],
+  E3: ["Centre de Flacq","Belle Mare","Trou d'Eau Douce","Poste de Flacq"],
+  E4: ["Grand River South East","Belle Rive","Quatre Soeurs","Sebastopol"]
 };
 
-// =====================================================
+// ============================================================
 //  STATE (localStorage)
-// =====================================================
-const STATE = {
-  gasUrl: EMBEDDED_GAS_URL,
+// ============================================================
+let STATE = {
   growers: JSON.parse(localStorage.getItem('growers') || '[]'),
   plantation: JSON.parse(localStorage.getItem('plantation') || '[]'),
   pestRecords: JSON.parse(localStorage.getItem('pestRecords') || '[]'),
   yieldAssessments: JSON.parse(localStorage.getItem('yieldAssessments') || '[]'),
-  varieties: JSON.parse(localStorage.getItem('varieties') || '["Mondial","Spunta","Desiree","Innovator","Bartina","Lady Rosetta","Hermes"]'),
+  varieties: JSON.parse(localStorage.getItem('varieties') || '["Mondial","Spunta","Desiree","Innovator"]'),
 };
-function save() { Object.keys(STATE).forEach(k => localStorage.setItem(k, JSON.stringify(STATE[k]))); }
+function saveLocal() { Object.keys(STATE).forEach(k => localStorage.setItem(k, JSON.stringify(STATE[k]))); }
 
-// =====================================================
-//  HELPERS
-// =====================================================
+// ============================================================
+//  CORE API HELPER (fetch to GAS)
+// ============================================================
+async function callGAS(action, data = {}) {
+  data.action = action;
+  try {
+    const response = await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (!result.success) console.warn(result.error);
+    return result;
+  } catch (err) {
+    console.error(err);
+    toast('Network error – check GAS URL and CORS', true);
+    return { success: false, error: err.message };
+  }
+}
+
+// ============================================================
+//  UI HELPERS
+// ============================================================
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   document.querySelector(`.nav-item[onclick*="'${id}'"]`).classList.add('active');
-  document.getElementById('page-title').innerText = id.charAt(0).toUpperCase() + id.slice(1).replace('-',' ');
-  if(id==='dashboard') renderDashboard();
-  if(id==='trends') renderTrends();
-  if(id==='production') renderProduction();
-  if(id==='growers') renderGrowersTable();
-  if(id==='plantation') renderPlantationTable();
-  if(id==='pests') renderPestTable();
-  if(id==='yield-assess') renderYieldTable();
-  if(id==='settings') renderSettings();
-  if(window.innerWidth<768) toggleSidebar();
+  document.getElementById('page-title').innerText = id.charAt(0).toUpperCase() + id.slice(1);
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'growers') renderGrowersTable();
+  if (id === 'plantation') renderPlantationTable();
+  if (id === 'pests') renderPestTable();
+  if (id === 'yield-assess') renderYieldTable();
+  if (window.innerWidth < 768) toggleSidebar();
 }
-function toast(msg, err=false) { const t=document.getElementById('toast'); t.textContent=msg; t.className='show'+(err?' err':''); setTimeout(()=>t.className='',3000); }
+function toast(msg, err = false) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'show' + (err ? ' err' : ''); setTimeout(() => t.className = '', 3000); }
 function openModal(id) { document.getElementById(id).classList.add('open'); populateSelects(); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function updateLocalityDropdown(zoneId, locId) {
+function updateLocalityDropdown(zoneId = 'ya-zone', locId = 'ya-locality') {
   const zone = document.getElementById(zoneId).value;
   const locSelect = document.getElementById(locId);
+  if (!locSelect) return;
   locSelect.innerHTML = '<option value="">Select locality</option>';
-  if(zone && ZONE_LOCALITIES[zone]) ZONE_LOCALITIES[zone].forEach(l => { let o=document.createElement('option'); o.value=l; o.text=l; locSelect.appendChild(o); });
+  if (ZONE_LOCALITIES[zone]) ZONE_LOCALITIES[zone].forEach(l => locSelect.innerHTML += `<option value="${l}">${l}</option>`);
 }
 function populateSelects() {
-  const growerOpts = STATE.growers.map(g=>`<option value="${g.name}">${g.name}</option>`).join('');
-  const varOpts = STATE.varieties.map(v=>`<option value="${v}">${v}</option>`).join('');
-  ['pl-grower','pd-grower','ya-grower'].forEach(id=>{ let el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select…</option>'+growerOpts; });
-  ['pl-variety','ya-variety'].forEach(id=>{ let el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select…</option>'+varOpts; });
-  const allLocalities = [...new Set(Object.values(ZONE_LOCALITIES).flat())].sort();
-  const filterLocOpts = '<option value="">All Localities</option>'+allLocalities.map(l=>`<option value="${l}">${l}</option>`).join('');
-  let fLoc=document.getElementById('filter-locality'); if(fLoc) fLoc.innerHTML=filterLocOpts;
-  let fPlantLoc=document.getElementById('filter-plant-locality'); if(fPlantLoc) fPlantLoc.innerHTML=filterLocOpts;
-  let fv=document.getElementById('filter-variety'); if(fv) fv.innerHTML='<option value="">All Varieties</option>'+varOpts;
+  const growerOpts = STATE.growers.map(g => `<option value="${g.name}">${g.name}</option>`).join('');
+  const varOpts = STATE.varieties.map(v => `<option value="${v}">${v}</option>`).join('');
+  ['pl-grower', 'pd-grower', 'ya-grower'].forEach(id => { let el = document.getElementById(id); if (el) el.innerHTML = '<option value="">Select grower</option>' + growerOpts; });
+  ['pl-variety', 'ya-variety'].forEach(id => { let el = document.getElementById(id); if (el) el.innerHTML = '<option value="">Select variety</option>' + varOpts; });
 }
 
-// =====================================================
+// ============================================================
 //  GROWERS
-// =====================================================
-function saveGrower() {
+// ============================================================
+async function saveGrower() {
   const name = document.getElementById('g-name').value.trim();
   const zone = document.getElementById('g-zone').value;
   const locality = document.getElementById('g-locality').value;
-  if(!name || !zone || !locality) { toast('Please fill all fields',true); return; }
-  const newGrower = { id: Date.now(), name, locality, zone, contact: document.getElementById('g-contact').value, notes: document.getElementById('g-notes').value };
+  const contact = document.getElementById('g-contact').value;
+  if (!name || !zone || !locality) { toast('Fill all fields', true); return; }
+  const newGrower = { id: Date.now(), name, locality, zone, contact };
   STATE.growers.push(newGrower);
-  save();
+  saveLocal();
   closeModal('add-grower-modal');
-  document.getElementById('g-name').value = '';
-  renderGrowersTable();
-  renderDashboard();
-  toast('Grower saved');
-  if(STATE.gasUrl && STATE.gasUrl !== 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec') {
-    google.script.run.withFailureHandler(e=>console.warn(e)).saveGrower({ Grower_Name: name, Locality: locality, Contact: newGrower.contact, Notes: newGrower.notes, Registration_Date: new Date().toISOString().split('T')[0], Status: 'Active' });
-  }
+  renderGrowersTable(); renderDashboard();
+  toast('Grower saved locally');
+  await callGAS('saveGrower', { Grower_Name: name, Locality: locality, Contact: contact, Registration_Date: new Date().toISOString().split('T')[0], Status: 'Active' });
 }
 function renderGrowersTable() {
   const tbody = document.getElementById('growers-table');
-  if(!STATE.growers.length) { tbody.innerHTML='<tr><td colspan="6">No growers</td></tr>'; return; }
-  tbody.innerHTML = STATE.growers.map(g => `<tr><td><strong>${g.name}</strong></td><td>${g.locality} (${g.zone})</td><td>${g.contact||'—'}</td><td>${STATE.plantation.filter(p=>p.grower===g.name).reduce((s,p)=>s+(p.area||0),0).toFixed(2)}</td><td>${[...new Set(STATE.plantation.filter(p=>p.grower===g.name).map(p=>p.variety))].join(', ')||'—'}</td><td><button class="btn btn-ghost btn-sm" onclick="deleteGrower(${g.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+  if (!STATE.growers.length) { tbody.innerHTML = '<tr><td colspan="5">No growers</td></tr>'; return; }
+  tbody.innerHTML = STATE.growers.map(g => `<tr><td><strong>${g.name}</strong></td><td>${g.locality}</td><td>${g.contact || '—'}</td><td>${STATE.plantation.filter(p => p.grower === g.name).reduce((s, p) => s + (p.area || 0), 0).toFixed(2)}</td><td><button class="btn btn-ghost btn-sm" onclick="deleteGrower(${g.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
-function filterGrowers() {
-  const q = document.getElementById('grower-search').value.toLowerCase();
-  const loc = document.getElementById('filter-locality').value;
-  const filtered = STATE.growers.filter(g => g.name.toLowerCase().includes(q) && (!loc || g.locality===loc));
-  const tbody = document.getElementById('growers-table');
-  if(!filtered.length) { tbody.innerHTML='<tr><td colspan="6">No matches</td></tr>'; return; }
-  tbody.innerHTML = filtered.map(g => `<tr><td><strong>${g.name}</strong></td><td>${g.locality} (${g.zone})</td><td>${g.contact||'—'}</td><td>${STATE.plantation.filter(p=>p.grower===g.name).reduce((s,p)=>s+(p.area||0),0).toFixed(2)}</td><td>${[...new Set(STATE.plantation.filter(p=>p.grower===g.name).map(p=>p.variety))].join(', ')||'—'}</td><td><button class="btn btn-ghost btn-sm" onclick="deleteGrower(${g.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-}
-function deleteGrower(id) { if(!confirm('Delete?')) return; STATE.growers = STATE.growers.filter(g=>g.id!==id); save(); renderGrowersTable(); renderDashboard(); toast('Deleted'); }
+function filterGrowers() { renderGrowersTable(); }
+function deleteGrower(id) { if (!confirm('Delete?')) return; STATE.growers = STATE.growers.filter(g => g.id !== id); saveLocal(); renderGrowersTable(); renderDashboard(); toast('Deleted'); }
 
-// =====================================================
+// ============================================================
 //  PLANTATION
-// =====================================================
-function getFortnight(d) { return new Date(d).getDate()<=15 ? 'Fortnight 1' : 'Fortnight 2'; }
-function getMonthYear(d) { let dt=new Date(d); return dt.toLocaleString('default',{month:'short',year:'numeric'}); }
-function savePlantation() {
+// ============================================================
+async function savePlantation() {
   const grower = document.getElementById('pl-grower').value;
   const zone = document.getElementById('pl-zone').value;
   const locality = document.getElementById('pl-locality').value;
-  const planted = document.getElementById('pl-date-planted').value;
-  if(!grower || !zone || !locality || !planted) { toast('Please fill all required fields',true); return; }
-  const rec = {
-    id: Date.now(), grower, zone, locality, variety: document.getElementById('pl-variety').value,
-    datePlanted: planted, area: parseFloat(document.getElementById('pl-area').value)||0,
-    estYield: parseFloat(document.getElementById('pl-est-yield').value)||0,
-    season: document.getElementById('pl-season').value,
-    fortnight: getFortnight(planted), monthYear: getMonthYear(planted),
-    comments: document.getElementById('pl-comments').value
-  };
+  const variety = document.getElementById('pl-variety').value;
+  const datePlanted = document.getElementById('pl-date-planted').value;
+  const area = parseFloat(document.getElementById('pl-area').value) || 0;
+  if (!grower || !zone || !locality || !datePlanted) { toast('Fill required fields', true); return; }
+  const season = (new Date(datePlanted).getMonth() + 1 >= 4 && new Date(datePlanted).getMonth() + 1 <= 6) ? 'Season 1' : 'Season 2';
+  const rec = { id: Date.now(), grower, zone, locality, variety, datePlanted, area, season, fortnight: new Date(datePlanted).getDate() <= 15 ? 'Fortnight 1' : 'Fortnight 2' };
   STATE.plantation.push(rec);
-  save();
+  saveLocal();
   closeModal('add-plantation-modal');
-  renderDashboard(); renderPlantationTable(); toast('Plantation saved');
-  if(STATE.gasUrl && STATE.gasUrl !== 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec') {
-    google.script.run.withFailureHandler(e=>console.warn(e)).savePlantation({
-      Grower_Name: rec.grower, Locality: rec.locality, Variety: rec.variety,
-      Date_Planted: rec.datePlanted, Production_Area_Ha: rec.area,
-      Season: rec.season, Fortnightly_Period: rec.fortnight,
-      Estimated_Yield_T_Ha: rec.estYield, Status: 'Active', Officer_Comments: rec.comments
-    });
-  }
+  renderPlantationTable(); renderDashboard();
+  toast('Plantation saved');
+  await callGAS('savePlantation', { Grower_Name: grower, Locality: locality, Variety: variety, Date_Planted: datePlanted, Production_Area_Ha: area, Season: season, Fortnightly_Period: rec.fortnight });
 }
 function renderPlantationTable() {
-  const rows = [...STATE.plantation].reverse();
   const tbody = document.getElementById('plantation-table');
-  if(!rows.length) { tbody.innerHTML='<tr><td colspan="9">No records</td></tr>'; return; }
-  tbody.innerHTML = rows.map(r => `<tr><td>${r.grower}</td><td>${r.locality} (${r.zone})</td><td>${r.variety||'—'}</td><td>${r.datePlanted||'—'}</td><td>${r.area}</td><td>${r.estYield||'—'}</td><td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season}</span></td><td>${r.fortnight}</td><td><button class="btn btn-ghost btn-sm" onclick="deletePlant(${r.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-  renderFortGrid();
-}
-function filteredPlantation() {
-  let rows = STATE.plantation;
-  const q = document.getElementById('plant-search')?.value.toLowerCase();
-  if(q) rows = rows.filter(r=>r.grower.toLowerCase().includes(q));
-  const varFilter = document.getElementById('filter-variety')?.value;
-  if(varFilter) rows = rows.filter(r=>r.variety===varFilter);
-  const locFilter = document.getElementById('filter-plant-locality')?.value;
-  if(locFilter) rows = rows.filter(r=>r.locality===locFilter);
-  const seasonFilter = document.getElementById('filter-season')?.value;
-  if(seasonFilter) rows = rows.filter(r=>r.season===seasonFilter);
-  return rows;
+  if (!STATE.plantation.length) { tbody.innerHTML = '<tr><td colspan="7">No records</td></tr>'; return; }
+  tbody.innerHTML = STATE.plantation.map(p => `<tr><td>${p.grower}</td><td>${p.locality}</td><td>${p.variety || '—'}</td><td>${p.datePlanted}</td><td>${p.area}</td><td><span class="badge ${p.season === 'Season 1' ? 'badge-s1' : 'badge-s2'}">${p.season}</span></td><td><button class="btn btn-ghost btn-sm" onclick="deletePlant(${p.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 function filterPlantation() { renderPlantationTable(); }
-function clearFilters() { ['plant-search','filter-variety','filter-plant-locality','filter-season'].forEach(id=>{let el=document.getElementById(id); if(el) el.value='';}); renderPlantationTable(); }
-function deletePlant(id) { if(!confirm('Delete?')) return; STATE.plantation = STATE.plantation.filter(r=>r.id!==id); save(); renderPlantationTable(); renderDashboard(); toast('Deleted'); }
-function renderFortGrid() {
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const el=document.getElementById('fort-grid');
-  if(!el) return;
-  el.innerHTML = months.map(m => {
-    const f1 = STATE.plantation.filter(r=>r.datePlanted && getMonthYear(r.datePlanted).startsWith(m) && r.fortnight==='Fortnight 1').length;
-    const f2 = STATE.plantation.filter(r=>r.datePlanted && getMonthYear(r.datePlanted).startsWith(m) && r.fortnight==='Fortnight 2').length;
-    return `<div class="fort-cell"><div class="fort-month">${m}</div><div>1st–15th: ${f1}</div><div>16th–31st: ${f2}</div></div>`;
-  }).join('');
-}
+function deletePlant(id) { if (!confirm('Delete?')) return; STATE.plantation = STATE.plantation.filter(p => p.id !== id); saveLocal(); renderPlantationTable(); renderDashboard(); toast('Deleted'); }
 
-// =====================================================
-//  PESTS & DISEASES (simplified but functional)
-// =====================================================
-const DISEASES = ['Late Blight','Early Blight','Soft Rot','Bacterial Wilt','Scab'];
-const PESTS = ['Leaf Miner','Thrips','Nematodes'];
-function buildPestInputs() {
-  const makeRow = (name,key) => `<div class="form-row"><div style="min-width:120px;">${name}</div><select id="pd-${key}-sev" class="form-control"><option value="">None</option><option>Low</option><option>Moderate</option><option>High</option></select><input id="pd-${key}-pct" class="form-control" placeholder="%" type="number" step="5"></div>`;
-  document.getElementById('disease-inputs').innerHTML = DISEASES.map(d=>makeRow(d,d.toLowerCase().replace(/ /g,''))).join('');
-  document.getElementById('pest-inputs').innerHTML = PESTS.map(p=>makeRow(p,p.toLowerCase().replace(/ /g,''))).join('');
-}
-function savePestRecord() {
+// ============================================================
+//  PESTS
+// ============================================================
+async function savePestRecord() {
   const grower = document.getElementById('pd-grower').value;
-  if(!grower) { toast('Select grower',true); return; }
-  const rec = { id: Date.now(), grower, locality: document.getElementById('pd-locality').value, date: document.getElementById('pd-date').value, comments: document.getElementById('pd-comments').value };
-  [...DISEASES,...PESTS].forEach(f => {
-    const key = f.toLowerCase().replace(/ /g,'');
-    rec[f] = { sev: document.getElementById(`pd-${key}-sev`).value, pct: document.getElementById(`pd-${key}-pct`).value };
-  });
+  const locality = document.getElementById('pd-locality').value;
+  const date = document.getElementById('pd-date').value;
+  const pest = document.getElementById('pd-pest').value;
+  const severity = document.getElementById('pd-severity').value;
+  const pct = document.getElementById('pd-pct').value;
+  if (!grower || !locality || !date || !pest) { toast('Fill all fields', true); return; }
+  const rec = { id: Date.now(), grower, locality, date, pest, severity, pct };
   STATE.pestRecords.push(rec);
-  save();
-  renderPestTable(); renderDashboard(); toast('Pest record saved');
-  if(STATE.gasUrl && STATE.gasUrl !== 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec') {
-    [...DISEASES,...PESTS].forEach(f => {
-      const data = rec[f];
-      if(data.sev && data.sev !== 'None') {
-        google.script.run.withFailureHandler(e=>console.warn(e)).savePestDisease({
-          Grower_Name: rec.grower, Locality: rec.locality, Date_Observed: rec.date,
-          Pest_Disease_Name: f, Severity: data.sev, Severity_Pct: data.pct || (data.sev==='High'?75:data.sev==='Moderate'?40:15),
-          Officer_Comments: rec.comments, Category: PESTS.includes(f)?'Pest':'Disease'
-        });
-      }
-    });
-  }
+  saveLocal();
+  renderPestTable(); renderDashboard();
+  toast('Pest record saved');
+  await callGAS('savePestDisease', { Grower_Name: grower, Locality: locality, Date_Observed: date, Pest_Disease_Name: pest, Severity: severity, Severity_Pct: pct || (severity === 'High' ? 75 : severity === 'Moderate' ? 40 : 15) });
 }
 function renderPestTable() {
   const tbody = document.getElementById('pest-table');
-  if(!STATE.pestRecords.length) { tbody.innerHTML='<tr><td colspan="10">No records</td></tr>'; return; }
-  tbody.innerHTML = STATE.pestRecords.map(r => `<tr><td>${r.grower}</td><td>${r.locality||'—'}</td><td>${r.date||'—'}</td><td>${r['Late Blight']?.sev||'—'}</td><td>${r['Early Blight']?.sev||'—'}</td><td>${r['Soft Rot']?.sev||'—'}</td><td>${r['Leaf Miner']?.sev||'—'}</td><td>${r['Thrips']?.sev||'—'}</td><td>${r['Nematodes']?.sev||'—'}</td><td>${r.comments||'—'}</td></tr>`).join('');
-}
-function filterPestRecords() {
-  const q = document.getElementById('pd-search')?.value.toLowerCase();
-  if(!q) renderPestTable();
-  else {
-    const filtered = STATE.pestRecords.filter(r=>r.grower.toLowerCase().includes(q));
-    const tbody = document.getElementById('pest-table');
-    tbody.innerHTML = filtered.map(r=>`<tr><td>${r.grower}</td><td>${r.locality||'—'}</td><td>${r.date||'—'}</td><td>${r['Late Blight']?.sev||'—'}</td><td>${r['Early Blight']?.sev||'—'}</td><td>${r['Soft Rot']?.sev||'—'}</td><td>${r['Leaf Miner']?.sev||'—'}</td><td>${r['Thrips']?.sev||'—'}</td><td>${r['Nematodes']?.sev||'—'}</td><td>${r.comments||'—'}</td></tr>`).join('');
-  }
+  if (!STATE.pestRecords.length) { tbody.innerHTML = '<tr><td colspan="5">No records</td></tr>'; return; }
+  tbody.innerHTML = STATE.pestRecords.map(r => `<tr><td>${r.grower}</td><td>${r.locality}</td><td>${r.date}</td><td>${r.pest}</td><td><span class="badge badge-${r.severity.toLowerCase()}">${r.severity}</span></td></tr>`).join('');
 }
 
-// =====================================================
+// ============================================================
 //  YIELD ASSESSMENT
-// =====================================================
+// ============================================================
 function calcYield() {
-  const samples = [...document.querySelectorAll('.sample-kg')].map(i=>parseFloat(i.value)||0).filter(v=>v>0);
-  if(!samples.length) { ['ya-avg','ya-arpent','ya-ha','ya-acre'].forEach(id=>document.getElementById(id).innerText='—'); return; }
-  const avg = samples.reduce((a,b)=>a+b,0)/samples.length;
+  const samples = [...document.querySelectorAll('.sample-kg')].map(i => parseFloat(i.value) || 0).filter(v => v > 0);
+  if (!samples.length) { document.getElementById('ya-avg').innerText = '—'; document.getElementById('ya-ha').innerText = '—'; return; }
+  const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
   document.getElementById('ya-avg').innerText = avg.toFixed(3);
-  document.getElementById('ya-arpent').innerText = (avg*4218.24/1000).toFixed(2);
-  document.getElementById('ya-ha').innerText = (avg*10000/1000).toFixed(2);
-  document.getElementById('ya-acre').innerText = (avg*4046.86/1000).toFixed(2);
+  document.getElementById('ya-ha').innerText = (avg * 10).toFixed(2);
 }
-function saveYieldAssessment() {
+async function saveYieldAssessment() {
   const grower = document.getElementById('ya-grower').value;
   const zone = document.getElementById('ya-zone').value;
   const locality = document.getElementById('ya-locality').value;
   const date = document.getElementById('ya-date').value;
-  if(!grower || !zone || !locality || !date) { toast('Fill all required fields',true); return; }
-  const samples = [...document.querySelectorAll('.sample-kg')].map(i=>parseFloat(i.value)||0);
-  const avg = samples.filter(v=>v>0).reduce((a,b)=>a+b,0)/(samples.filter(v=>v>0).length||1);
-  const rec = {
-    id: Date.now(), date, grower, zone, locality, variety: document.getElementById('ya-variety').value,
-    area: document.getElementById('ya-area').value, samples, avg: avg.toFixed(3),
-    yieldHa: (avg*10).toFixed(2), season: document.getElementById('ya-season').value,
-    comments: document.getElementById('ya-comments').value
-  };
+  const area = parseFloat(document.getElementById('ya-area').value) || 0;
+  const samples = [...document.querySelectorAll('.sample-kg')].map(i => parseFloat(i.value) || 0);
+  const avg = samples.filter(v => v > 0).reduce((a, b) => a + b, 0) / (samples.filter(v => v > 0).length || 1);
+  if (!grower || !zone || !locality || !date) { toast('Fill required fields', true); return; }
+  const rec = { id: Date.now(), date, grower, zone, locality, area, samples, avg: avg.toFixed(3), yieldHa: (avg * 10).toFixed(2) };
   STATE.yieldAssessments.push(rec);
-  save();
-  renderYieldTable(); toast('Yield assessment saved');
-  if(STATE.gasUrl && STATE.gasUrl !== 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec') {
-    google.script.run.withFailureHandler(e=>console.warn(e)).saveYieldAssessment({
-      Grower_Name: rec.grower, Locality: rec.locality, Variety: rec.variety,
-      Assessment_Date: rec.date, Area_Sqm: parseFloat(rec.area)||0,
-      Sample1_Kg_Sqm: samples[0]||0, Sample2_Kg_Sqm: samples[1]||0, Sample3_Kg_Sqm: samples[2]||0,
-      Sample4_Kg_Sqm: samples[3]||0, Sample5_Kg_Sqm: samples[4]||0,
-      Officer_Comments: rec.comments
-    });
-  }
+  saveLocal();
+  renderYieldTable();
+  toast('Assessment saved');
+  await callGAS('saveYieldAssessment', { Grower_Name: grower, Locality: locality, Assessment_Date: date, Area_Sqm: area, Sample1_Kg_Sqm: samples[0] || 0, Sample2_Kg_Sqm: samples[1] || 0, Sample3_Kg_Sqm: samples[2] || 0, Sample4_Kg_Sqm: samples[3] || 0, Sample5_Kg_Sqm: samples[4] || 0 });
 }
 function renderYieldTable() {
   const tbody = document.getElementById('yield-table');
-  if(!STATE.yieldAssessments.length) { tbody.innerHTML='<tr><td colspan="6">No assessments</td></tr>'; return; }
-  tbody.innerHTML = STATE.yieldAssessments.map(r => `<tr><td>${r.date}</td><td>${r.grower}</td><td>${r.locality} (${r.zone})</td><td>${r.avg}</td><td>${r.yieldHa}</td><td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season}</span></td></tr>`).join('');
-}
-function clearYieldForm() {
-  ['ya-date','ya-grower','ya-zone','ya-locality','ya-variety','ya-area','ya-comments','ya-season'].forEach(id=>{let el=document.getElementById(id); if(el) el.value='';});
-  document.querySelectorAll('.sample-kg').forEach(i=>i.value='');
-  ['ya-avg','ya-arpent','ya-ha','ya-acre'].forEach(id=>document.getElementById(id).innerText='—');
+  if (!STATE.yieldAssessments.length) { tbody.innerHTML = '<tr><td colspan="5">No assessments</td></tr>'; return; }
+  tbody.innerHTML = STATE.yieldAssessments.map(r => `<tr><td>${r.date}</td><td>${r.grower}</td><td>${r.locality}</td><td>${r.avg}</td><td>${r.yieldHa}</td></tr>`).join('');
 }
 
-// =====================================================
-//  DASHBOARD & CHARTS
-// =====================================================
-let charts = {};
+// ============================================================
+//  DASHBOARD
+// ============================================================
 function renderDashboard() {
   document.getElementById('d-growers').innerText = STATE.growers.length;
-  const totalArea = STATE.plantation.reduce((s,r)=>s+(r.area||0),0);
+  const totalArea = STATE.plantation.reduce((s, p) => s + (p.area || 0), 0);
   document.getElementById('d-area').innerText = totalArea.toFixed(1);
-  const totalProd = STATE.plantation.reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0);
+  const totalProd = STATE.plantation.reduce((s, p) => s + (p.area || 0) * 20, 0);
   document.getElementById('d-prod').innerText = Math.round(totalProd);
-  const alerts = STATE.pestRecords.filter(r=>Object.values(r).some(v=>v?.sev==='High')).length;
+  const alerts = STATE.pestRecords.filter(r => r.severity === 'High').length;
   document.getElementById('d-alerts').innerText = alerts;
-  const now = new Date(), m = now.getMonth()+1;
-  document.getElementById('s1-pill').classList.toggle('active-season', m>=4&&m<=6);
-  document.getElementById('s2-pill').classList.toggle('active-season', !(m>=4&&m<=6));
-  renderRecentTable();
-  renderLocalityChart();
-  renderVarietyChart();
-  renderFortnightlyChart();
-  renderPestOverview();
-}
-function renderRecentTable() {
-  const rows = [...STATE.plantation].reverse().slice(0,8);
   const tbody = document.getElementById('recent-table');
-  if(!rows.length) { tbody.innerHTML='<tr><td colspan="7">No records</td></tr>'; return; }
-  tbody.innerHTML = rows.map(r => `<tr><td>${r.grower}</td><td>${r.locality}</td><td>${r.variety||'—'}</td><td>${r.datePlanted||'—'}</td><td>${r.area}</td><td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season}</span></td><td>Active</td></tr>`).join('');
-}
-function mkChart(id, cfg) { if(charts[id]) charts[id].destroy(); const ctx = document.getElementById(id)?.getContext('2d'); if(ctx) charts[id] = new Chart(ctx, cfg); }
-function renderLocalityChart() {
-  const locs = [...new Set(STATE.plantation.map(r=>r.locality||'Unknown'))];
-  const data = locs.map(l=>STATE.plantation.filter(r=>r.locality===l).reduce((s,r)=>s+(r.area||0),0));
-  mkChart('chart-locality', { type:'bar', data:{ labels:locs, datasets:[{ label:'Area (ha)', data, backgroundColor:'#e8a020' }] }, options:{ responsive:true, maintainAspectRatio:false } });
-}
-function renderVarietyChart() {
-  const vars = [...new Set(STATE.plantation.map(r=>r.variety||'Unknown'))];
-  const data = vars.map(v=>STATE.plantation.filter(r=>r.variety===v).length);
-  mkChart('chart-variety', { type:'doughnut', data:{ labels:vars, datasets:[{ data, backgroundColor:['#e8a020','#58a6ff','#3fb950','#bc8cff','#ffa657'] }] }, options:{ responsive:true, maintainAspectRatio:false } });
-}
-function renderFortnightlyChart() {
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const f1 = months.map(m=>STATE.plantation.filter(r=>r.datePlanted && getMonthYear(r.datePlanted).startsWith(m) && r.fortnight==='Fortnight 1').length);
-  const f2 = months.map(m=>STATE.plantation.filter(r=>r.datePlanted && getMonthYear(r.datePlanted).startsWith(m) && r.fortnight==='Fortnight 2').length);
-  mkChart('chart-fortnightly', { type:'bar', data:{ labels:months, datasets:[{ label:'Fortnight 1', data:f1, backgroundColor:'#e8a020' },{ label:'Fortnight 2', data:f2, backgroundColor:'#58a6ff' }] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{ stacked:true }, y:{ stacked:true } } } });
-}
-function renderPestOverview() {
-  const el = document.getElementById('pest-overview-bars');
-  if(!el) return;
-  const all = [...DISEASES, ...PESTS];
-  const sevScore = { Low:1, Moderate:2, High:3 };
-  el.innerHTML = all.map(f => {
-    const records = STATE.pestRecords.map(r=>r[f]?.sev).filter(Boolean);
-    if(!records.length) return `<div class="sev-bar-wrap"><div class="sev-label-row"><span>${f}</span><span>No data</span></div><div class="sev-bar"><div style="width:0%"></div></div></div>`;
-    const avg = records.reduce((s,v)=>s+sevScore[v],0)/records.length;
-    const pct = Math.round((avg/3)*100);
-    const cls = avg>=2.5?'high':avg>=1.5?'moderate':'low';
-    return `<div class="sev-bar-wrap"><div class="sev-label-row"><span>${f}</span><span class="badge badge-${cls}">${pct}%</span></div><div class="sev-bar"><div class="sev-fill ${cls}" style="width:${pct}%"></div></div></div>`;
-  }).join('');
+  const recent = [...STATE.plantation].reverse().slice(0, 5);
+  tbody.innerHTML = recent.map(p => `<tr><td>${p.grower}</td><td>${p.locality}</td><td>${p.variety || '—'}</td><td>${p.area}</td><td>${p.season}</td></tr>`).join('');
+  // variety chart
+  const vars = STATE.varieties;
+  const counts = vars.map(v => STATE.plantation.filter(p => p.variety === v).length);
+  const ctx = document.getElementById('chart-variety').getContext('2d');
+  if (window.varietyChart) window.varietyChart.destroy();
+  window.varietyChart = new Chart(ctx, { type: 'doughnut', data: { labels: vars, datasets: [{ data: counts, backgroundColor: ['#e8a020', '#58a6ff', '#3fb950', '#bc8cff'] }] }, options: { responsive: true, maintainAspectRatio: true } });
 }
 
-// =====================================================
-//  TRENDS & PRODUCTION (simplified placeholders)
-// =====================================================
-function renderTrends() {
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const prod = months.map(m=>STATE.plantation.filter(r=>r.datePlanted && getMonthYear(r.datePlanted).startsWith(m)).reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0));
-  mkChart('chart-trend', { type:'line', data:{ labels:months, datasets:[{ label:'Est. Production (T)', data:prod, borderColor:'#e8a020', fill:false }] }, options:{ responsive:true, maintainAspectRatio:false } });
-  const locs = [...new Set(STATE.plantation.map(r=>r.locality).filter(Boolean))];
-  const yieldData = locs.map(l=>STATE.yieldAssessments.filter(r=>r.locality===l).reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/Math.max(1,STATE.yieldAssessments.filter(r=>r.locality===l).length));
-  mkChart('chart-locality-yield', { type:'bar', data:{ labels:locs, datasets:[{ label:'Avg Yield (T/ha)', data:yieldData, backgroundColor:'#3fb950' }] }, options:{ responsive:true } });
-  const pestTrend = months.map(m=>{ const recs=STATE.pestRecords.filter(r=>r.date && new Date(r.date).toLocaleString('default',{month:'short'})===m); if(!recs.length) return 0; let tot=0,cnt=0; recs.forEach(r=>{ [...DISEASES,...PESTS].forEach(f=>{ if(r[f]?.sev) { tot+={Low:33,Moderate:66,High:100}[r[f].sev]; cnt++; } }); }); return cnt?Math.round(tot/cnt):0; });
-  mkChart('chart-pest-trend', { type:'line', data:{ labels:months, datasets:[{ label:'Avg Severity Score', data:pestTrend, borderColor:'#f85149', fill:false }] }, options:{ responsive:true } });
+// ============================================================
+//  SYNC & SETTINGS
+// ============================================================
+async function syncToSheets() {
+  toast('Syncing all records to Google Sheets...');
+  for (let g of STATE.growers) await callGAS('saveGrower', { Grower_Name: g.name, Locality: g.locality, Contact: g.contact });
+  for (let p of STATE.plantation) await callGAS('savePlantation', { Grower_Name: p.grower, Locality: p.locality, Variety: p.variety, Date_Planted: p.datePlanted, Production_Area_Ha: p.area, Season: p.season });
+  for (let r of STATE.pestRecords) await callGAS('savePestDisease', { Grower_Name: r.grower, Locality: r.locality, Date_Observed: r.date, Pest_Disease_Name: r.pest, Severity: r.severity, Severity_Pct: r.pct });
+  for (let y of STATE.yieldAssessments) await callGAS('saveYieldAssessment', { Grower_Name: y.grower, Locality: y.locality, Assessment_Date: y.date, Area_Sqm: y.area, Sample1_Kg_Sqm: y.samples?.[0] || 0 });
+  toast('Sync complete');
 }
-function renderProduction() {
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const el = document.getElementById('production-forecast-grid');
-  el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Month</th><th>Season</th><th>Plots</th><th>Area (ha)</th><th>Est. Prod (T)</th></tr></thead><tbody>${months.map((m,i)=>{ const short=m.slice(0,3); const recs=STATE.plantation.filter(r=>r.datePlanted && getMonthYear(r.datePlanted).startsWith(short)); const area=recs.reduce((s,r)=>s+(r.area||0),0); const prod=recs.reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0); return `<tr><td>${m}</td><td>${i>=3&&i<=5?'Season 1':'Season 2'}</td><td>${recs.length}</td><td>${area.toFixed(2)}</td><td>${Math.round(prod)}</td></tr>`; }).join('')}</tbody></table></div>`;
-  const locs = [...new Set(STATE.plantation.map(r=>r.locality).filter(Boolean))];
-  const lel = document.getElementById('locality-yield-grid');
-  lel.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Locality</th><th>Plots</th><th>Area (ha)</th><th>Est. Yield (T/ha)</th><th>Total Prod (T)</th></tr></thead><tbody>${locs.map(l=>{ const recs=STATE.plantation.filter(r=>r.locality===l); const area=recs.reduce((s,r)=>s+(r.area||0),0); const avgYield = STATE.yieldAssessments.filter(r=>r.locality===l).reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/Math.max(1,STATE.yieldAssessments.filter(r=>r.locality===l).length) || 20; return `<tr><td>${l}</td><td>${recs.length}</td><td>${area.toFixed(2)}</td><td>${avgYield.toFixed(1)}</td><td>${Math.round(area*avgYield)}</td></tr>`; }).join('')}</tbody></table></div>`;
-}
+function exportAllData() { const a = document.createElement('a'); a.href = 'data:application/json,' + encodeURIComponent(JSON.stringify(STATE)); a.download = 'pota-backup.json'; a.click(); }
+function clearAllData() { if (!confirm('Delete all local data?')) return; STATE = { growers: [], plantation: [], pestRecords: [], yieldAssessments: [], varieties: STATE.varieties }; saveLocal(); renderDashboard(); renderGrowersTable(); renderPlantationTable(); renderPestTable(); renderYieldTable(); toast('Local data cleared'); }
 
-// =====================================================
-//  WEEKLY REPORT
-// =====================================================
-function generateReport() {
-  const weekStr = document.getElementById('rpt-week').value || new Date().toISOString().split('T')[0];
-  const season = document.getElementById('rpt-season').value;
-  const officer = document.getElementById('rpt-officer').value || 'Field Officer';
-  const comments = document.getElementById('rpt-comments').value;
-  const weekDate = new Date(weekStr);
-  const endDate = new Date(weekDate); endDate.setDate(endDate.getDate()+6);
-  const weekPlant = STATE.plantation.filter(r=>r.datePlanted && r.datePlanted>=weekStr && r.datePlanted<=endDate.toISOString().split('T')[0]);
-  const pestRecs = STATE.pestRecords.filter(r=>r.date && r.date>=weekStr && r.date<=endDate.toISOString().split('T')[0]);
-  const html = `<h1>Weekly Potato Report</h1><div><strong>Period:</strong> ${weekDate.toDateString()} – ${endDate.toDateString()}</div><div><strong>Season:</strong> ${season} | <strong>Officer:</strong> ${officer}</div><h2>Plantations</h2><table border="1"><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Area (ha)</th></tr></thead><tbody>${weekPlant.map(r=>`<tr><td>${r.grower}</td><td>${r.locality}</td><td>${r.variety}</td><td>${r.area}</td></tr>`).join('')||'<tr><td colspan="4">No plantings</td></tr>'}</tbody></table><h2>Pest Observations</h2><table><thead><tr><th>Grower</th><th>Locality</th><th>Pest/Disease</th><th>Severity</th></tr></thead><tbody>${pestRecs.flatMap(r=>[...DISEASES,...PESTS].filter(f=>r[f]?.sev).map(f=>`<tr><td>${r.grower}</td><td>${r.locality}</td><td>${f}</td><td>${r[f].sev}</td></tr>`)).join('')||'<tr><td colspan="4">No pests</td></tr>'}</tbody></table><h2>Comments</h2><p>${comments||'None'}</p>`;
-  const preview = document.getElementById('report-preview');
-  preview.style.display = 'block'; preview.innerHTML = html;
-  toast('Report generated');
-}
-function printReport() {
-  const content = document.getElementById('report-preview').innerHTML;
-  if(!content) { toast('Generate report first', true); return; }
-  const win = window.open('', '_blank');
-  win.document.write(`<html><head><title>PoTa Weekly Report</title><style>body{font-family:sans-serif;padding:20px;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ccc;padding:6px;}th{background:#e8a020;}</style></head><body>${content}</body></html>`);
-  win.document.close(); win.print();
-}
-
-// =====================================================
-//  SETTINGS & DATA MANAGEMENT
-// =====================================================
-function renderSettings() {
-  renderVarietyList();
-  const syncEl = document.getElementById('sync-status');
-  if(STATE.gasUrl && STATE.gasUrl !== 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec') {
-    syncEl.textContent = '● Online';
-    syncEl.style.background = '#1a3a1a';
-  } else {
-    syncEl.textContent = '● Offline (URL missing)';
-    syncEl.style.background = '';
-  }
-}
-function addVariety() {
-  const v = document.getElementById('new-variety').value.trim();
-  if(!v) return;
-  if(!STATE.varieties.includes(v)) STATE.varieties.push(v);
-  save();
-  document.getElementById('new-variety').value = '';
-  renderVarietyList();
-  populateSelects();
-  toast('Variety added');
-}
-function renderVarietyList() {
-  const el = document.getElementById('variety-list');
-  if(!el) return;
-  el.innerHTML = STATE.varieties.map((v,i) => `<div class="file-chip">${v}<span class="del" onclick="STATE.varieties.splice(${i},1); save(); renderVarietyList(); populateSelects();">✕</span></div>`).join('');
-}
-function syncToSheets() {
-  if(!STATE.gasUrl || STATE.gasUrl === 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec') {
-    toast('Please set a valid Google Apps Script URL in the embedded constant', true);
-    return;
-  }
-  toast('Syncing all records...');
-  STATE.growers.forEach(g => google.script.run.withFailureHandler(e=>console.warn(e)).saveGrower({ Grower_Name: g.name, Locality: g.locality, Contact: g.contact, Notes: g.notes }));
-  STATE.plantation.forEach(p => google.script.run.withFailureHandler(e=>console.warn(e)).savePlantation({ Grower_Name: p.grower, Locality: p.locality, Variety: p.variety, Date_Planted: p.datePlanted, Production_Area_Ha: p.area, Season: p.season, Fortnightly_Period: p.fortnight, Estimated_Yield_T_Ha: p.estYield }));
-  STATE.yieldAssessments.forEach(ya => google.script.run.withFailureHandler(e=>console.warn(e)).saveYieldAssessment({ Grower_Name: ya.grower, Locality: ya.locality, Variety: ya.variety, Assessment_Date: ya.date, Area_Sqm: ya.area, Sample1_Kg_Sqm: ya.samples?.[0]||0 }));
-  toast('Sync initiated');
-}
-function exportAllData() {
-  const a = document.createElement('a');
-  a.href = 'data:application/json,' + encodeURIComponent(JSON.stringify(STATE));
-  a.download = 'pota-backup.json';
-  a.click();
-}
-function importData() { document.getElementById('import-file').click(); }
-function handleImport(input) {
-  const file = input.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      Object.assign(STATE, data);
-      save();
-      populateSelects();
-      renderDashboard();
-      toast('Data imported');
-    } catch(err) { toast('Invalid file', true); }
-  };
-  reader.readAsText(file);
-}
-function clearAllData() {
-  if(!confirm('Delete ALL local data?')) return;
-  STATE.growers = []; STATE.plantation = []; STATE.pestRecords = []; STATE.yieldAssessments = [];
-  save();
-  renderDashboard(); renderGrowersTable(); renderPlantationTable(); renderPestTable(); renderYieldTable();
-  toast('All local data cleared');
-}
-
-// =====================================================
+// ============================================================
 //  INIT
-// =====================================================
+// ============================================================
 function init() {
-  // create 5 sample inputs
   const samplesDiv = document.getElementById('sample-inputs');
-  for(let i=1;i<=5;i++) samplesDiv.innerHTML += `<div class="form-group"><label>Sample ${i}</label><input type="number" class="form-control sample-kg" step="0.01" oninput="calcYield()"></div>`;
-  buildPestInputs();
+  for (let i = 1; i <= 5; i++) samplesDiv.innerHTML += `<div><input type="number" class="form-control sample-kg" placeholder="Sample ${i}" step="0.01" oninput="calcYield()"></div>`;
   populateSelects();
   renderDashboard();
-  renderTrends();
-  renderProduction();
-  document.getElementById('ya-date').value = new Date().toISOString().split('T')[0];
+  renderGrowersTable();
+  renderPlantationTable();
+  renderPestTable();
+  renderYieldTable();
   document.getElementById('pd-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('rpt-week').value = new Date().toISOString().split('T')[0];
+  document.getElementById('ya-date').value = new Date().toISOString().split('T')[0];
 }
 document.addEventListener('DOMContentLoaded', init);
 </script>
