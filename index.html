@@ -535,14 +535,18 @@ async function callGAS(action, data = {}) {
   if (!GAS_URL) { console.warn('GAS URL not set. Configure it in Settings.'); return { success: false }; }
   data.action = action;
   try {
+    // KEY FIX: Send as application/x-www-form-urlencoded (a "simple request").
+    // Sending Content-Type: application/json triggers a CORS OPTIONS preflight,
+    // which Google Apps Script cannot respond to — causing the request to be
+    // blocked before it reaches doPost(). Form-encoded posts bypass preflight
+    // entirely and GAS receives the data via e.parameter instead of e.postData.
+    const body = Object.keys(data)
+      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k] ?? ''))
+      .join('&');
     const res = await fetch(GAS_URL, {
       method: 'POST',
-      // FIX: Use 'no-cors' as a fallback note — but the GAS script must deploy with
-      // "Execute as: Me" and "Who has access: Anyone" for CORS to work properly.
-      // Keep 'cors' mode and ensure GAS doPost returns the right headers.
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body
     });
     const json = await res.json();
     if (!json.success) console.warn('GAS error:', json.error);
