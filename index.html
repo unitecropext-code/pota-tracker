@@ -36,6 +36,82 @@
   --transition:cubic-bezier(.4,0,.2,1);
 }
 
+/* ============ LOGIN SCREEN ============ */
+#login-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  transition:opacity .4s ease, visibility .4s ease;
+}
+#login-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.login-box{
+  width:100%;max-width:420px;
+  background:linear-gradient(160deg,#0f1a2e 0%,#0a1220 100%);
+  border:1px solid var(--border2);border-radius:24px;
+  padding:40px 36px 36px;
+  box-shadow:0 24px 64px rgba(0,0,0,.8), 0 0 0 1px rgba(240,165,0,.06);
+  position:relative;overflow:hidden;
+}
+.login-box::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(240,165,0,.07) 0%,transparent 70%);
+}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.login-logo svg{filter:drop-shadow(0 0 10px rgba(240,165,0,.5));}
+.login-logo-text{font-size:22px;font-weight:800;letter-spacing:-.5px;}
+.login-logo-text span{color:var(--gold);}
+.login-logo-sub{font-size:10px;color:var(--text3);letter-spacing:1.4px;text-transform:uppercase;margin-top:1px;}
+.login-title{font-size:17px;font-weight:700;margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--text2);margin-bottom:24px;}
+.login-field{margin-bottom:14px;}
+.login-label{font-size:11px;font-weight:700;color:var(--text2);display:block;
+  margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase;}
+.login-input-wrap{position:relative;}
+.login-input-icon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--text3);font-size:13px;pointer-events:none;
+}
+.login-input{
+  width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  color:var(--text);padding:11px 12px 11px 36px;border-radius:10px;
+  font-size:13px;font-family:inherit;outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.login-input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px var(--gold-dim);
+  background:rgba(255,255,255,.06);
+}
+.login-input::placeholder{color:var(--text3);}
+.login-btn{
+  width:100%;margin-top:8px;padding:13px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--gold),#e09400);color:#000;
+  font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
+  box-shadow:0 4px 20px rgba(240,165,0,.3);
+  transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.login-btn:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));transform:translateY(-1px);}
+.login-btn:active{transform:scale(.97);}
+.login-error{
+  background:var(--red-dim);border:1px solid rgba(239,68,68,.25);color:var(--red);
+  border-radius:8px;padding:10px 12px;font-size:12px;font-weight:600;
+  margin-top:12px;display:none;align-items:center;gap:8px;
+}
+.login-error.show{display:flex;}
+.login-footer{
+  margin-top:24px;padding-top:18px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--text3);text-align:center;line-height:1.7;
+}
+.login-user-pill{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  background:var(--gold-dim);border:1px solid rgba(240,165,0,.2);
+  border-radius:20px;font-size:12px;font-weight:600;color:var(--gold);
+  cursor:pointer;transition:background .18s;
+}
+.login-user-pill:hover{background:rgba(240,165,0,.18);}
+
 /* ============ RESET ============ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;overflow-x:hidden;}
@@ -109,6 +185,27 @@ a{color:inherit;text-decoration:none;}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0;}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4);}50%{box-shadow:0 0 0 6px rgba(34,197,94,0);}}
 .sync-pill-text{font-size:12px;font-weight:600;color:var(--text2);}
+/* ── logged-in user strip ── */
+.user-strip{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  background:rgba(240,165,0,.05);border:1px solid rgba(240,165,0,.12);
+  border-radius:10px;margin-bottom:8px;
+}
+.user-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#e09400);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:#000;flex-shrink:0;
+}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12px;font-weight:700;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-role{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
+.logout-btn{
+  background:none;border:none;color:var(--text3);cursor:pointer;
+  font-size:14px;padding:4px;border-radius:6px;transition:color .18s,background .18s;flex-shrink:0;
+}
+.logout-btn:hover{color:var(--red);background:var(--red-dim);}
 
 /* ============ TOPBAR ============ */
 #topbar{
@@ -670,6 +767,64 @@ tbody tr:hover .row-actions{opacity:1;}
 </head>
 <body>
 
+<!-- ===== LOGIN OVERLAY ===== -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="42" height="42" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44">
+        <defs>
+          <radialGradient id="lgPotatoGrad" cx="45%" cy="40%" r="55%">
+            <stop offset="0%" stop-color="#e8b96a"/>
+            <stop offset="60%" stop-color="#c49040"/>
+            <stop offset="100%" stop-color="#9e6e20"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="22" cy="25" rx="15" ry="12" fill="url(#lgPotatoGrad)" transform="rotate(-12 22 25)"/>
+        <circle cx="15" cy="23" r="1.6" fill="#7a4e10" opacity="0.7"/>
+        <circle cx="24" cy="28" r="1.4" fill="#7a4e10" opacity="0.7"/>
+        <path d="M22 13 Q22 8 22 5" stroke="#4a8c3f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M22 9 Q18 5 15 7 Q17 11 22 9Z" fill="#5aaa4a"/>
+        <path d="M22 7 Q26 3 29 5 Q27 9 22 7Z" fill="#4a9a3a"/>
+        <ellipse cx="22" cy="25" rx="15.5" ry="12.5" fill="none" stroke="rgba(240,165,0,0.35)" stroke-width="1" transform="rotate(-12 22 25)"/>
+      </svg>
+      <div>
+        <div class="login-logo-text">PoTa <span>Tracker</span></div>
+        <div class="login-logo-sub">v2.1 · Mauritius</div>
+      </div>
+    </div>
+    <div class="login-title">Sign In</div>
+    <div class="login-sub">Enter your credentials to access the system</div>
+    <div class="login-field">
+      <label class="login-label">Username</label>
+      <div class="login-input-wrap">
+        <i class="fas fa-user login-input-icon"></i>
+        <input class="login-input" id="login-username" type="text" placeholder="Enter username"
+          autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
+      </div>
+    </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <div class="login-input-wrap">
+        <i class="fas fa-lock login-input-icon"></i>
+        <input class="login-input" id="login-password" type="password" placeholder="Enter password"
+          autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Sign In
+    </button>
+    <div class="login-error" id="login-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="login-error-msg">Invalid username or password.</span>
+    </div>
+    <div class="login-footer">
+      Potato Cultivation Tracking System<br>
+      Ministry of Agro-Industry, Mauritius<br>
+      <span style="color:var(--text3);font-size:10px;">Authorised users only</span>
+    </div>
+  </div>
+</div>
+
 <!-- ===== SIDEBAR ===== -->
 <aside id="sidebar">
   <div class="logo-wrap">
@@ -761,6 +916,14 @@ tbody tr:hover .row-actions{opacity:1;}
     </div>
   </div>
   <div class="sidebar-bottom">
+    <div class="user-strip" id="user-strip">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="user-display-name">—</div>
+        <div class="user-role" id="user-display-role">—</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sign out"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
     <div class="sync-pill" onclick="syncToSheets()" data-tip="Sync all data to Google Sheets">
       <div class="sync-dot" id="sync-dot"></div>
       <div class="sync-pill-text" id="sync-label">Ready to sync</div>
@@ -1389,6 +1552,143 @@ tbody tr:hover .row-actions{opacity:1;}
 <div id="toast-stack"></div>
 
 <script>
+
+  const LOCAL_USERS = [
+  {
+    username:'admin',
+    passwordHash:'4e8c82e77cd7e00a42e5c8bc0f3ae8f0b9a4c1e2d7f3a6b5c8e9d0f1a2b3c4d5',
+    role:'Administrator',
+    fullName:'System Administrator'
+  },
+  {
+    username:'officer',
+    passwordHash:'9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',
+    role:'Field Officer',
+    fullName:'Field Officer'
+  }
+];
+
+// Current session
+let CURRENT_USER = null;
+
+/** SHA-256 hash using Web Crypto (returns hex string) */
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/** Attempt login — checks GAS first, falls back to LOCAL_USERS */
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-error');
+  const errMsg   = document.getElementById('login-error-msg');
+  errEl.classList.remove('show');
+
+  if (!username || !password) {
+    errMsg.textContent = 'Please enter both username and password.';
+    errEl.classList.add('show'); return;
+  }
+
+  const btn = document.querySelector('.login-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+  btn.disabled = true;
+
+  let user = null;
+
+  // ── 1. Try GAS Users sheet if URL is configured ──────────
+  const gasUrl = localStorage.getItem('gas_url') || '';
+  if (gasUrl) {
+    try {
+      const hash = await sha256(password);
+      const params = new URLSearchParams({ action:'login', username, passwordHash:hash });
+      const resp = await fetch(gasUrl, {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body: params.toString()
+      });
+      if (resp.ok) {
+        const text = await resp.text();
+        try {
+          const result = JSON.parse(text);
+          if (result.success && result.user) user = result.user;
+          else if (!result.success && result.error !== 'USER_NOT_FOUND') {
+            // Real error (network, script crash) — fall through to local
+          }
+        } catch(_) {}
+      }
+    } catch(_) {}
+  }
+
+  // ── 2. Fallback to LOCAL_USERS ────────────────────────────
+  if (!user) {
+    const hash = await sha256(password);
+    const found = LOCAL_USERS.find(u => u.username === username && u.passwordHash === hash);
+    if (found) user = { username: found.username, role: found.role, fullName: found.fullName };
+  }
+
+  btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+  btn.disabled = false;
+
+  if (!user) {
+    errMsg.textContent = 'Invalid username or password.';
+    errEl.classList.add('show');
+    document.getElementById('login-password').value = '';
+    return;
+  }
+
+  // ── Success ───────────────────────────────────────────────
+  CURRENT_USER = user;
+  sessionStorage.setItem('pota_session', JSON.stringify(user));
+  applySession(user);
+  document.getElementById('login-overlay').classList.add('hidden');
+  toast('Welcome, ' + user.fullName + ' 👋', 'success');
+
+  // Pre-fill officer fields with logged-in user's name
+  ['rpt-officer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.value = user.fullName;
+  });
+}
+
+/** Apply session data to the UI (avatar, name, role strip) */
+function applySession(user) {
+  const initials = user.fullName.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const avatarEl = document.getElementById('user-avatar');
+  const nameEl   = document.getElementById('user-display-name');
+  const roleEl   = document.getElementById('user-display-role');
+  if (avatarEl) avatarEl.textContent = initials;
+  if (nameEl)   nameEl.textContent   = user.fullName;
+  if (roleEl)   roleEl.textContent   = user.role;
+}
+
+/** Sign out — clear session and show login screen */
+function doLogout() {
+  if (!confirm('Sign out of PoTa Tracker?')) return;
+  CURRENT_USER = null;
+  sessionStorage.removeItem('pota_session');
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('login-overlay').classList.remove('hidden');
+  toast('Signed out successfully', 'info');
+}
+
+/** Restore session on page load (survives refresh within same tab) */
+function restoreSession() {
+  const saved = sessionStorage.getItem('pota_session');
+  if (saved) {
+    try {
+      const user = JSON.parse(saved);
+      CURRENT_USER = user;
+      applySession(user);
+      document.getElementById('login-overlay').classList.add('hidden');
+      return true;
+    } catch(_) {}
+  }
+  return false;
+}
+
 // ============================================================
 //  ZONE → LOCALITY DATA  (corrected to cover all localities)
 // ============================================================
@@ -2856,6 +3156,7 @@ document.addEventListener('click',e=>{
 //  INIT
 // ============================================================
 window.addEventListener('DOMContentLoaded',()=>{
+  restoreSession();
   renderDashboard();
   updateAlertBadge();
   buildPestInputs();
