@@ -504,6 +504,14 @@ tbody tr:hover .row-actions { opacity:1; }
 .shape-chip .del { cursor:pointer;opacity:.7;font-size:10px;transition:opacity .15s; }
 .shape-chip .del:hover { opacity:1;color:var(--red); }
 
+/* ============ HIDE NAV WHILE LOGGED OUT ============ */
+#login-overlay:not(.hidden) ~ #sidebar,
+#login-overlay:not(.hidden) ~ #topbar,
+#login-overlay:not(.hidden) ~ #mobile-nav,
+#login-overlay:not(.hidden) ~ #sync-status-bar,
+#login-overlay:not(.hidden) ~ #fab,
+#login-overlay:not(.hidden) ~ #fab-menu { display:none !important; }
+
 /* ============ MOBILE BOTTOM NAV ============ */
 #mobile-nav { display:none;position:fixed;bottom:0;left:0;right:0;z-index:350;background:rgba(7,9,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 4px calc(8px + env(safe-area-inset-bottom));grid-template-columns:repeat(5,1fr);gap:0; }
 @media(max-width:899px) {
@@ -1176,20 +1184,16 @@ tbody tr:hover .row-actions { opacity:1; }
         </div>
       </div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7;">
-        Add users here so they can log in even without a Google Sheets connection. Passwords are stored as SHA-256 hashes in your browser.
+        Add users here so they can log in even without a Google Sheets connection. A secure initial password is auto-generated and shown once when the user is created.
       </div>
-      <div class="form-row-3" style="margin-bottom:12px;">
+      <div class="form-row-2" style="margin-bottom:12px;">
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Username</label>
-          <input id="nu-username" class="form-control" placeholder="e.g. WebAdmin395" autocomplete="off">
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">Password</label>
-          <input id="nu-password" class="form-control" type="password" placeholder="Enter password" autocomplete="new-password">
+          <input id="nu-username" class="form-control" placeholder="e.g. field.officer" autocomplete="off">
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Full Name</label>
-          <input id="nu-fullname" class="form-control" placeholder="e.g. Web Admin">
+          <input id="nu-fullname" class="form-control" placeholder="e.g. Field Officer">
         </div>
       </div>
       <div class="form-row-2" style="margin-bottom:12px;">
@@ -1207,6 +1211,7 @@ tbody tr:hover .row-actions { opacity:1; }
           </button>
         </div>
       </div>
+      <div id="nu-generated-pw" style="display:none;margin-top:12px;padding:12px 14px;background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:10px;font-size:12px;line-height:1.9;"></div>
       <div id="local-users-list" style="margin-top:10px;"></div>
     </div>
     <div class="card">
@@ -2670,13 +2675,11 @@ function exportReportCsv() {
 // ============================================================
 async function addLocalUser() {
   const username = document.getElementById('nu-username').value.trim().toLowerCase();
-  const password = document.getElementById('nu-password').value;
   const fullName = document.getElementById('nu-fullname').value.trim() || username;
   const role     = document.getElementById('nu-role').value;
 
   if (!username) { toast('Username is required', 'error'); return; }
-  if (!password) { toast('Password is required', 'error'); return; }
-  if (password.length < 4) { toast('Password must be at least 4 characters', 'error'); return; }
+  if (username.length < 3) { toast('Username must be at least 3 characters', 'error'); return; }
 
   let users = JSON.parse(localStorage.getItem('pota_managed_users') || '[]');
   if (users.find(u => u.username === username)) {
@@ -2684,18 +2687,35 @@ async function addLocalUser() {
     return;
   }
 
+  // Auto-generate a secure initial password (shown once to admin)
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let rawPassword = '';
+  for (let i = 0; i < 10; i++) rawPassword += chars[Math.floor(Math.random() * chars.length)];
+  rawPassword += '@' + Math.floor(Math.random() * 900 + 100);
+
   let hash;
-  try { hash = await sha256(password); } catch(e) { hash = sha256Sync(password); }
+  try { hash = await sha256(rawPassword); } catch(e) { hash = sha256Sync(rawPassword); }
 
   users.push({ username, passwordHash: hash, fullName, role });
   localStorage.setItem('pota_managed_users', JSON.stringify(users));
 
   document.getElementById('nu-username').value = '';
-  document.getElementById('nu-password').value = '';
   document.getElementById('nu-fullname').value = '';
 
   renderLocalUsersList();
-  toast('User "' + username + '" added — they can now log in', 'success');
+
+  // Show generated password prominently — only chance to see it
+  const el = document.getElementById('nu-generated-pw');
+  if (el) {
+    el.style.display = 'block';
+    el.innerHTML = `<i class="fas fa-key" style="color:var(--gold);margin-right:6px;"></i>
+      <strong>User "${username}" created.</strong> Initial password (save now — shown once):<br>
+      <span style="font-family:monospace;font-size:15px;color:var(--gold);letter-spacing:2px;">${rawPassword}</span>
+      <button class="btn btn-ghost btn-sm" style="margin-left:10px;" onclick="navigator.clipboard.writeText('${rawPassword}').then(()=>toast('Copied!','success'))">
+        <i class="fas fa-copy"></i> Copy
+      </button>`;
+    setTimeout(() => { if (el) el.style.display = 'none'; }, 30000);
+  }
 }
 
 function removeLocalUser(username) {
