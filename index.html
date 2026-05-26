@@ -97,12 +97,7 @@
   margin-top:24px;padding-top:18px;border-top:1px solid var(--border);
   font-size:11px;color:var(--text3);text-align:center;line-height:1.7;
 }
-.login-creds-hint {
-  margin-top:14px;padding:10px 12px;
-  background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.18);
-  border-radius:8px;font-size:11px;color:var(--text2);line-height:1.9;
-}
-.login-creds-hint strong { color:var(--gold); }
+
 
 /* ============ RESET ============ */
 * { margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
@@ -625,11 +620,7 @@ tbody tr:hover .row-actions { opacity:1; }
       <i class="fas fa-exclamation-circle"></i>
       <span id="login-error-msg">Invalid username or password.</span>
     </div>
-    <div class="login-creds-hint" id="login-creds-hint" style="display:none;">
-      <strong>Default offline credentials:</strong><br>
-      <strong>admin</strong> / PoTa@2025 &nbsp;·&nbsp; <strong>officer</strong> / Field#01<br>
-      To use custom accounts, set your GAS URL in <strong>Settings</strong>.
-    </div>
+
     <div class="login-footer">
       Potato Cultivation Data Tracking System<br>
       <span style="color:var(--text3);font-size:10px;">Authorised users only</span>
@@ -1176,15 +1167,7 @@ tbody tr:hover .row-actions { opacity:1; }
         Data is saved locally in your browser. Use Export/Import for backup. Sync to Google Sheets for cloud storage.
       </div>
     </div>
-    <div class="card">
-      <div class="card-title"><i class="fas fa-shield-alt" style="color:var(--blue);"></i> Default Credentials (Offline Fallback)</div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.9;">
-        When no GAS URL is configured, or GAS returns <code>USER_NOT_FOUND</code>, login falls back to these built-in accounts:<br>
-        <strong style="color:var(--text);">admin</strong> / <strong style="color:var(--gold);">PoTa@2025</strong> &nbsp;·&nbsp; Role: Administrator<br>
-        <strong style="color:var(--text);">officer</strong> / <strong style="color:var(--gold);">Field#01</strong> &nbsp;·&nbsp; Role: Field Officer<br>
-        <span style="color:var(--orange);">⚠ Change these passwords in production via the GAS Users sheet.</span>
-      </div>
-    </div>
+
     <div class="card" style="grid-column:1/-1;">
       <div class="card-title"><i class="fas fa-users-cog" style="color:var(--purple);"></i> Local User Management
         <span class="badge badge-gold" id="local-users-count">0</span>
@@ -1358,27 +1341,7 @@ tbody tr:hover .row-actions { opacity:1; }
 <div id="toast-stack"></div>
 
 <script>
-// ============================================================
-//  LOCAL USERS — offline fallback
-//  SHA-256 hashes:
-//    admin   → PoTa@2025
-//    officer → Field#01
-//  IMPORTANT: these must match Code.gs seedDefaultUsers() hashes.
-// ============================================================
-const LOCAL_USERS = [
-  {
-    username:     'admin',
-    passwordHash: 'be630d59221675f762494058edb75c326278b7e535023589e273a9995c10b563',
-    role:         'Administrator',
-    fullName:     'System Administrator'
-  },
-  {
-    username:     'officer',
-    passwordHash: '5af8fce02fd23d17c15227e79b7f0c965a71ef27e4f8b738be3d9f3c88554067',
-    role:         'Field Officer',
-    fullName:     'Field Officer'
-  }
-];
+
 
 let CURRENT_USER = null;
 
@@ -1436,18 +1399,17 @@ async function sha256(str) {
 
 // ============================================================
 //  LOGIN
-//  Priority: GAS Users sheet → LOCAL_USERS fallback.
+//  Priority: GAS Users sheet → locally-managed users (Settings).
 //  Rules:
-//   - ACCOUNT_INACTIVE  → block, never fall through
+//   - ACCOUNT_INACTIVE    → block, never fall through
 //   - INVALID_CREDENTIALS → block, never fall through
-//   - USER_NOT_FOUND / network error → fall through to LOCAL_USERS
+//   - USER_NOT_FOUND / network error → fall through to managed users
 // ============================================================
 async function doLogin() {
   const username = document.getElementById('login-username').value.trim().toLowerCase();
   const password = document.getElementById('login-password').value;
   const errEl    = document.getElementById('login-error');
   const errMsg   = document.getElementById('login-error-msg');
-  const credsHint = document.getElementById('login-creds-hint');
   errEl.classList.remove('show');
 
   if (!username || !password) {
@@ -1512,23 +1474,16 @@ async function doLogin() {
     if (found) user = { username: found.username, role: found.role || 'Field Officer', fullName: found.fullName || found.username };
   }
 
-  // 3. Built-in fallback accounts
-  if (!user && !gasBlocked) {
-    const found = LOCAL_USERS.find(u => u.username === username && u.passwordHash === hash);
-    if (found) user = { username: found.username, role: found.role, fullName: found.fullName };
-  }
+
 
   resetBtn();
 
   if (!user) {
-    if (credsHint) credsHint.style.display = 'block';
     errMsg.textContent = gasBlocked ? 'Wrong password for this account.' : 'Invalid username or password.';
     errEl.classList.add('show');
     document.getElementById('login-password').value = '';
     return;
   }
-
-  if (credsHint) credsHint.style.display = 'none';
 
   // ── SUCCESS: complete the login ──────────────────────────
   CURRENT_USER = user;
@@ -2722,12 +2677,6 @@ async function addLocalUser() {
   if (!username) { toast('Username is required', 'error'); return; }
   if (!password) { toast('Password is required', 'error'); return; }
   if (password.length < 4) { toast('Password must be at least 4 characters', 'error'); return; }
-
-  // Check it doesn't clash with built-in users
-  if (LOCAL_USERS.find(u => u.username === username)) {
-    toast('That username is a built-in account — use it directly to log in', 'warning');
-    return;
-  }
 
   let users = JSON.parse(localStorage.getItem('pota_managed_users') || '[]');
   if (users.find(u => u.username === username)) {
