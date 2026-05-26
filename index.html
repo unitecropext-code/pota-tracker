@@ -97,45 +97,12 @@
   margin-top:24px;padding-top:18px;border-top:1px solid var(--border);
   font-size:11px;color:var(--text3);text-align:center;line-height:1.7;
 }
-.login-gas-toggle {
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  margin-top:14px;font-size:11px;color:var(--text3);cursor:pointer;
-  transition:color .18s;user-select:none;
-}
-.login-gas-toggle:hover { color:var(--gold); }
-.login-gas-toggle i { font-size:11px; }
-.login-gas-section {
-  margin-top:12px;padding:14px;
-  background:rgba(255,255,255,.03);border:1px solid var(--border);
-  border-radius:10px;display:none;
-}
-.login-gas-section.open { display:block; }
-.login-gas-hint { font-size:11px;color:var(--text3);line-height:1.7;margin-bottom:10px; }
-.login-gas-hint strong { color:var(--text2); }
-.login-gas-hint code { background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:10px;color:var(--gold); }
-.login-gas-row { display:flex;gap:6px;align-items:center; }
-.login-gas-input {
-  flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
-  color:var(--text);padding:8px 10px;border-radius:8px;
-  font-size:11px;font-family:inherit;outline:none;
-  transition:border-color .2s,box-shadow .2s;
-}
-.login-gas-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim); }
-.login-gas-input::placeholder { color:var(--text3); }
-.login-gas-save {
-  padding:8px 12px;border-radius:8px;border:none;
-  background:linear-gradient(135deg,var(--gold),#e09400);color:#000;
-  font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;
-  white-space:nowrap;transition:all .18s;flex-shrink:0;
-}
-.login-gas-save:hover { background:linear-gradient(135deg,var(--gold2),var(--gold)); }
-.login-offline-hint {
-  margin-top:10px;padding:10px 12px;
+.login-creds-hint {
+  margin-top:14px;padding:10px 12px;
   background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.18);
-  border-radius:8px;font-size:11px;color:var(--text2);line-height:1.8;display:none;
+  border-radius:8px;font-size:11px;color:var(--text2);line-height:1.9;
 }
-.login-offline-hint.show { display:block; }
-.login-offline-hint strong { color:var(--gold); }
+.login-creds-hint strong { color:var(--gold); }
 
 /* ============ RESET ============ */
 * { margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
@@ -658,25 +625,10 @@ tbody tr:hover .row-actions { opacity:1; }
       <i class="fas fa-exclamation-circle"></i>
       <span id="login-error-msg">Invalid username or password.</span>
     </div>
-    <div class="login-offline-hint" id="login-offline-hint">
-      <strong>⚙ Google Sheets not configured.</strong><br>
-      Only these default accounts work offline:<br>
-      Username: <strong>admin</strong> · Password: <strong>PoTa@2025</strong><br>
-      Username: <strong>officer</strong> · Password: <strong>Field#01</strong><br>
-      Configure your Google Sheets URL below to use sheet-defined users.
-    </div>
-    <div class="login-gas-toggle" onclick="toggleLoginGasConfig()">
-      <i class="fas fa-cog"></i> Configure Google Sheets URL
-    </div>
-    <div class="login-gas-section" id="login-gas-section">
-      <div class="login-gas-hint">
-        Paste your <strong>Google Apps Script /exec URL</strong> to authenticate users from your Google Sheet.<br>
-        Go to Apps Script → Deploy → Web App → copy the URL.
-      </div>
-      <div class="login-gas-row">
-        <input class="login-gas-input" id="login-gas-url-input" placeholder="https://script.google.com/macros/s/…/exec">
-        <button class="login-gas-save" onclick="saveGasUrlFromLogin()">Save</button>
-      </div>
+    <div class="login-creds-hint" id="login-creds-hint" style="display:none;">
+      <strong>Default offline credentials:</strong><br>
+      <strong>admin</strong> / PoTa@2025 &nbsp;·&nbsp; <strong>officer</strong> / Field#01<br>
+      To use custom accounts, set your GAS URL in <strong>Settings</strong>.
     </div>
     <div class="login-footer">
       Potato Cultivation Data Tracking System<br>
@@ -1233,6 +1185,47 @@ tbody tr:hover .row-actions { opacity:1; }
         <span style="color:var(--orange);">⚠ Change these passwords in production via the GAS Users sheet.</span>
       </div>
     </div>
+    <div class="card" style="grid-column:1/-1;">
+      <div class="card-title"><i class="fas fa-users-cog" style="color:var(--purple);"></i> Local User Management
+        <span class="badge badge-gold" id="local-users-count">0</span>
+        <div class="card-title-actions">
+          <button class="btn btn-ghost btn-sm" onclick="clearLocalUsers()"><i class="fas fa-trash-alt" style="color:var(--red);"></i> Clear All</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7;">
+        Add users here so they can log in even without a Google Sheets connection. Passwords are stored as SHA-256 hashes in your browser.
+      </div>
+      <div class="form-row-3" style="margin-bottom:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Username</label>
+          <input id="nu-username" class="form-control" placeholder="e.g. WebAdmin395" autocomplete="off">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Password</label>
+          <input id="nu-password" class="form-control" type="password" placeholder="Enter password" autocomplete="new-password">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Full Name</label>
+          <input id="nu-fullname" class="form-control" placeholder="e.g. Web Admin">
+        </div>
+      </div>
+      <div class="form-row-2" style="margin-bottom:12px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Role</label>
+          <select id="nu-role" class="form-control">
+            <option value="Administrator">Administrator</option>
+            <option value="Field Officer" selected>Field Officer</option>
+            <option value="Viewer">Viewer</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;display:flex;align-items:flex-end;">
+          <button class="btn btn-gold" onclick="addLocalUser()" style="width:100%;">
+            <i class="fas fa-user-plus"></i> Add User
+          </button>
+        </div>
+      </div>
+      <div id="local-users-list" style="margin-top:10px;"></div>
+    </div>
     <div class="card">
       <div class="card-title"><i class="fas fa-keyboard"></i> Keyboard Shortcuts</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
@@ -1389,10 +1382,56 @@ const LOCAL_USERS = [
 
 let CURRENT_USER = null;
 
-// SHA-256 using Web Crypto API — returns lowercase hex string
+// Pure-JS SHA-256 (works on file://, http, https — no external dependency)
+function sha256Sync(msg) {
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let h=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const enc=new TextEncoder().encode(msg);
+  const bits=enc.length*8;
+  const data=[...enc,0x80];
+  while(data.length%64!==56)data.push(0);
+  for(let i=7;i>=0;i--)data.push(Math.floor(bits/Math.pow(2,i*8))&0xff);
+  function rotr(n,b){return(n>>>b)|(n<<(32-b));}
+  for(let i=0;i<data.length;i+=64){
+    const w=[];
+    for(let j=0;j<16;j++)w.push((data[i+j*4]<<24)|(data[i+j*4+1]<<16)|(data[i+j*4+2]<<8)|data[i+j*4+3]);
+    for(let j=16;j<64;j++){
+      const s0=rotr(w[j-15],7)^rotr(w[j-15],18)^(w[j-15]>>>3);
+      const s1=rotr(w[j-2],17)^rotr(w[j-2],19)^(w[j-2]>>>10);
+      w.push((w[j-16]+s0+w[j-7]+s1)|0);
+    }
+    let [a,b,c,d,e,f,g,hv]=h;
+    for(let j=0;j<64;j++){
+      const S1=rotr(e,6)^rotr(e,11)^rotr(e,25);
+      const ch=(e&f)^(~e&g);
+      const t1=(hv+S1+ch+K[j]+w[j])|0;
+      const S0=rotr(a,2)^rotr(a,13)^rotr(a,22);
+      const maj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+maj)|0;
+      hv=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+    }
+    h[0]=(h[0]+a)|0;h[1]=(h[1]+b)|0;h[2]=(h[2]+c)|0;h[3]=(h[3]+d)|0;
+    h[4]=(h[4]+e)|0;h[5]=(h[5]+f)|0;h[6]=(h[6]+g)|0;h[7]=(h[7]+hv)|0;
+  }
+  return h.map(n=>(n>>>0).toString(16).padStart(8,'0')).join('');
+}
+
+// SHA-256: tries Web Crypto first, falls back to pure-JS (works on file://)
 async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  try {
+    if (typeof crypto !== 'undefined' && crypto.subtle) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+  } catch(_) {}
+  return sha256Sync(str);
 }
 
 // ============================================================
@@ -1408,6 +1447,7 @@ async function doLogin() {
   const password = document.getElementById('login-password').value;
   const errEl    = document.getElementById('login-error');
   const errMsg   = document.getElementById('login-error-msg');
+  const credsHint = document.getElementById('login-creds-hint');
   errEl.classList.remove('show');
 
   if (!username || !password) {
@@ -1425,29 +1465,23 @@ async function doLogin() {
     btn.disabled  = false;
   };
 
-  let user = null;
+  let user       = null;
+  let gasBlocked = false;
 
-  // Show offline hint if no GAS URL configured
+  // Compute hash ONCE — pure-JS fallback guarantees this always works
+  let hash;
+  try { hash = await sha256(password); } catch(e) { hash = sha256Sync(password); }
+
+  // 1. Try GAS Users sheet if a URL is saved
   const gasUrl = localStorage.getItem('gas_url') || '';
-  const offlineHint = document.getElementById('login-offline-hint');
-  if (!gasUrl && offlineHint) offlineHint.classList.add('show');
-  else if (offlineHint) offlineHint.classList.remove('show');
-
-  // Pre-fill login-gas-url-input if GAS URL already saved
-  const gasInput = document.getElementById('login-gas-url-input');
-  if (gasInput && gasUrl && !gasInput.value) gasInput.value = gasUrl;
-
-  // 1. Try GAS Users sheet if URL is configured
   if (gasUrl) {
     try {
-      const hash   = await sha256(password);
       const params = new URLSearchParams({ action: 'login', username, passwordHash: hash });
       const resp   = await fetch(gasUrl, {
         method:  'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body:    params.toString()
       });
-
       if (resp.ok) {
         const text = await resp.text();
         try {
@@ -1462,56 +1496,41 @@ async function doLogin() {
               return;
             }
             if (result.error === 'INVALID_CREDENTIALS') {
-              resetBtn();
-              errMsg.textContent = 'Invalid username or password.';
-              errEl.classList.add('show');
-              document.getElementById('login-password').value = '';
-              return;
+              gasBlocked = true; // wrong password for a sheet user — don't fall through
             }
-            // USER_NOT_FOUND or any other GAS error → fall through to LOCAL_USERS
+            // USER_NOT_FOUND → fall through to local users
           }
-        } catch (_) {
-          // JSON parse error → GAS unreachable → fall through
-        }
+        } catch(_) { /* non-JSON / unreachable → fall through */ }
       }
-    } catch (_) {
-      // Network error → fall through to LOCAL_USERS
-    }
+    } catch(_) { /* network error → fall through */ }
   }
 
-  // 2. Fallback to LOCAL_USERS
-  if (!user) {
-    const hash  = await sha256(password);
+  // 2. Locally-managed users (added via Settings)
+  if (!user && !gasBlocked) {
+    const locals = JSON.parse(localStorage.getItem('pota_managed_users') || '[]');
+    const found  = locals.find(u => u.username === username && u.passwordHash === hash);
+    if (found) user = { username: found.username, role: found.role || 'Field Officer', fullName: found.fullName || found.username };
+  }
+
+  // 3. Built-in fallback accounts
+  if (!user && !gasBlocked) {
     const found = LOCAL_USERS.find(u => u.username === username && u.passwordHash === hash);
-    if (found) {
-      user = { username: found.username, role: found.role, fullName: found.fullName };
-    }
+    if (found) user = { username: found.username, role: found.role, fullName: found.fullName };
   }
 
   resetBtn();
 
   if (!user) {
-    const currentGasUrl = localStorage.getItem('gas_url') || '';
-    if (!currentGasUrl) {
-      errMsg.textContent = 'No Google Sheets URL configured — only default accounts work offline. Click "Configure Google Sheets URL" below.';
-    } else {
-      errMsg.textContent = 'Invalid username or password. If your account is in Google Sheets, check your GAS URL is correct and try again.';
-    }
+    if (credsHint) credsHint.style.display = 'block';
+    errMsg.textContent = gasBlocked ? 'Wrong password for this account.' : 'Invalid username or password.';
     errEl.classList.add('show');
     document.getElementById('login-password').value = '';
     return;
   }
 
-  // Success
-  CURRENT_USER = user;
-  sessionStorage.setItem('pota_session', JSON.stringify(user));
-  applySession(user);
-  document.getElementById('login-overlay').classList.add('hidden');
-  toast('Welcome, ' + user.fullName + '!', 'success');
+  if (credsHint) credsHint.style.display = 'none';
 
-  const rptOfficer = document.getElementById('rpt-officer');
-  if (rptOfficer && !rptOfficer.value) rptOfficer.value = user.fullName;
-}
+
 
 function applySession(user) {
   const initials = user.fullName.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
@@ -1534,42 +1553,6 @@ function doLogout() {
   toast('Signed out successfully', 'info');
 }
 
-function toggleLoginGasConfig() {
-  const sec = document.getElementById('login-gas-section');
-  if (sec) sec.classList.toggle('open');
-}
-
-function saveGasUrlFromLogin() {
-  const input = document.getElementById('login-gas-url-input');
-  const val   = input ? input.value.trim() : '';
-  if (!val) {
-    alert('Please paste your Google Apps Script URL first.');
-    return;
-  }
-  if (!val.startsWith('https://script.google.com/')) {
-    alert('URL must start with https://script.google.com/');
-    return;
-  }
-  GAS_URL = val;
-  localStorage.setItem('gas_url', GAS_URL);
-  // Sync to the settings page input too
-  const settingsInput = document.getElementById('gas-url-input');
-  if (settingsInput) settingsInput.value = GAS_URL;
-  // Hide offline hint
-  const offlineHint = document.getElementById('login-offline-hint');
-  if (offlineHint) offlineHint.classList.remove('show');
-  // Collapse the section
-  const sec = document.getElementById('login-gas-section');
-  if (sec) sec.classList.remove('open');
-  const errEl  = document.getElementById('login-error');
-  const errMsg = document.getElementById('login-error-msg');
-  errEl.classList.remove('show');
-  errMsg.textContent = 'Google Sheets URL saved. You can now sign in with your sheet credentials.';
-  errEl.style.cssText = 'display:flex;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:#22c55e;border-radius:8px;padding:10px 12px;font-size:12px;font-weight:600;margin-top:12px;align-items:center;gap:8px;';
-  errEl.classList.add('show');
-  setTimeout(() => { errEl.classList.remove('show'); errEl.style.cssText=''; }, 3500);
-}
-
 function restoreSession() {
   const saved = sessionStorage.getItem('pota_session');
   if (saved) {
@@ -1581,13 +1564,6 @@ function restoreSession() {
       return true;
     } catch (_) {}
   }
-  // Show offline hint if no GAS URL saved
-  const gasUrl = localStorage.getItem('gas_url') || '';
-  const offlineHint = document.getElementById('login-offline-hint');
-  if (!gasUrl && offlineHint) offlineHint.classList.add('show');
-  // Pre-fill GAS URL input if already saved
-  const gasInput = document.getElementById('login-gas-url-input');
-  if (gasInput && gasUrl) gasInput.value = gasUrl;
   return false;
 }
 
@@ -2728,8 +2704,84 @@ function exportReportCsv() {
 // ============================================================
 //  SETTINGS
 // ============================================================
+// ============================================================
+//  LOCAL USER MANAGEMENT
+// ============================================================
+async function addLocalUser() {
+  const username = document.getElementById('nu-username').value.trim().toLowerCase();
+  const password = document.getElementById('nu-password').value;
+  const fullName = document.getElementById('nu-fullname').value.trim() || username;
+  const role     = document.getElementById('nu-role').value;
+
+  if (!username) { toast('Username is required', 'error'); return; }
+  if (!password) { toast('Password is required', 'error'); return; }
+  if (password.length < 4) { toast('Password must be at least 4 characters', 'error'); return; }
+
+  // Check it doesn't clash with built-in users
+  if (LOCAL_USERS.find(u => u.username === username)) {
+    toast('That username is a built-in account — use it directly to log in', 'warning');
+    return;
+  }
+
+  let users = JSON.parse(localStorage.getItem('pota_managed_users') || '[]');
+  if (users.find(u => u.username === username)) {
+    toast('Username "' + username + '" already exists', 'warning');
+    return;
+  }
+
+  let hash;
+  try { hash = await sha256(password); } catch(e) { hash = sha256Sync(password); }
+
+  users.push({ username, passwordHash: hash, fullName, role });
+  localStorage.setItem('pota_managed_users', JSON.stringify(users));
+
+  document.getElementById('nu-username').value = '';
+  document.getElementById('nu-password').value = '';
+  document.getElementById('nu-fullname').value = '';
+
+  renderLocalUsersList();
+  toast('User "' + username + '" added — they can now log in', 'success');
+}
+
+function removeLocalUser(username) {
+  if (!confirm('Remove user "' + username + '"?')) return;
+  let users = JSON.parse(localStorage.getItem('pota_managed_users') || '[]');
+  users = users.filter(u => u.username !== username);
+  localStorage.setItem('pota_managed_users', JSON.stringify(users));
+  renderLocalUsersList();
+  toast('User removed', 'warning');
+}
+
+function clearLocalUsers() {
+  if (!confirm('Remove ALL locally managed users?')) return;
+  localStorage.removeItem('pota_managed_users');
+  renderLocalUsersList();
+  toast('All local users cleared', 'warning');
+}
+
+function renderLocalUsersList() {
+  const users = JSON.parse(localStorage.getItem('pota_managed_users') || '[]');
+  const el    = document.getElementById('local-users-list');
+  const cntEl = document.getElementById('local-users-count');
+  if (cntEl) cntEl.textContent = users.length;
+  if (!el) return;
+  if (!users.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0;">No local users added yet.</div>';
+    return;
+  }
+  el.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Username</th><th>Full Name</th><th>Role</th><th></th></tr></thead><tbody>' +
+    users.map(u => `<tr>
+      <td><strong>${u.username}</strong></td>
+      <td>${u.fullName || '—'}</td>
+      <td><span class="badge ${u.role==='Administrator'?'badge-gold':u.role==='Viewer'?'badge-none':'badge-active'}">${u.role}</span></td>
+      <td><div class="row-actions" style="opacity:1;"><button class="btn btn-red btn-icon btn-sm" onclick="removeLocalUser('${u.username}')"><i class="fas fa-trash-alt"></i></button></div></td>
+    </tr>`).join('') +
+    '</tbody></table></div>';
+}
+
 function renderSettings() {
   renderVarietyList();
+  renderLocalUsersList();
   const gasInput = document.getElementById('gas-url-input');
   if (gasInput && GAS_URL) gasInput.value = GAS_URL;
 }
