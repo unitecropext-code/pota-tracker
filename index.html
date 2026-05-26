@@ -1306,27 +1306,239 @@ function loadDB() {
 function doLogin() {
   const u = document.getElementById('login-user').value.trim();
   const p = document.getElementById('login-pass').value;
-  const user = USERS[u];
-  if (user && user.pass === p) {
-    DB.currentUser = { username: u, ...user };
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    document.getElementById('user-display').textContent = user.name;
-    document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
-    initApp();
-  } else {
-    document.getElementById('login-error').style.display = 'block';
-    setTimeout(() => document.getElementById('login-error').style.display = 'none', 3000);
+  // ============================================================
+//  PoTa Tracker v3.0 — LOGIN FIX
+//  DROP-IN REPLACEMENT for the login/auth block in your HTML.
+//
+//  ROOT CAUSES OF THE FREEZE:
+//    1. USERS object keys are lowercase ('admin','officer1') but
+//       your Google Sheet has uppercase ('EOSEOKG','ESOKR') —
+//       lookup returns undefined → initApp() never called.
+//    2. doLogin() called initApp() which triggers async GAS calls
+//       synchronously on page load, causing a UI lock.
+//    3. No timeout guard on GAS login attempt → hangs forever
+//       if network is slow.
+//
+//  THIS FIX:
+//    • Matches users case-insensitively (local fallback table).
+//    • Tries GAS login first (with a 6-second timeout).
+//    • Falls back to local credentials if GAS is not configured
+//      or the network fails — app still opens.
+//    • initApp() is only called AFTER login resolves.
+//    • Loading spinner shown during async GAS attempt.
+// ============================================================
+
+// ── Credentials matching your Google Sheet Users tab ─────────
+// Add/remove entries here to match your sheet exactly.
+// Keys are lowercased for case-insensitive matching.
+const LOCAL_USERS = {
+  'superadmin': { pass: 'KOPS@1353',  name: 'Super Administrator', role: 'Administrator', zone: 'All' },
+  'admin':      { pass: 'pota2024',   name: 'Administrator',        role: 'Administrator', zone: 'All' },
+  'eoseokg':    { pass: 'GAN@3522',   name: 'Keshav Gangadin',      role: 'Field Officer',  zone: 'East' },
+  'esokr':      { pass: 'MHEE@9315',  name: 'Keshav Ramheet',       role: 'Field Officer',  zone: 'North' },
+  'officer1':   { pass: 'officer123', name: 'Field Officer 1',       role: 'Field Officer',  zone: 'All' },
+  'officer2':   { pass: 'field456',   name: 'Field Officer 2',       role: 'Field Officer',  zone: 'All' },
+};
+
+// ── Session storage key ───────────────────────────────────────
+const SESSION_KEY = 'pota_session';
+
+// ── On page load: skip login if session exists ────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem(SESSION_KEY);
+  if (saved) {
+    try {
+      const user = JSON.parse(saved);
+      applySession(user);
+      return;
+    } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
   }
-}
-function doLogout() {
-  if (!confirm('Sign out?')) return;
-  DB.currentUser = null;
-  document.getElementById('app').classList.remove('visible');
+  showLoginScreen();
+});
+
+// ── Show / hide screens ───────────────────────────────────────
+function showLoginScreen() {
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-pass').value = '';
+  document.getElementById('app').style.display = 'none';
+  // Re-attach Enter key listeners every time screen is shown
+  ['login-user','login-pass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.onkeydown = e => { if (e.key === 'Enter') doLogin(); };
+  });
 }
 
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = '';       // restores original display value
+  document.getElementById('app').classList.add('visible'); // belt-and-suspenders for old CSS
+}
+
+// ── Main login handler ────────────────────────────────────────
+async function doLogin() {
+  const userEl  = document.getElementById('login-user');
+  const passEl  = document.getElementById('login-pass');
+  const errEl   = document.getElementById('login-error');
+  const btnEl   = document.getElementById('login-btn');
+
+  const username = (userEl.value || '').trim();
+  const password = (passEl.value || '').trim();
+
+  if (!username || !password) {
+    showLoginError('Please enter your username and password.');
+    return;
+  }
+
+  // Disable button + show spinner to prevent double-clicks
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Signing in…'; }
+  if (errEl) errEl.style.display = 'none';
+
+  // ── 1. Try GAS login (if URL is configured) ──────────────────
+  const gasUrl = localStorage.getItem('gas_url') || '';
+  if (gasUrl) {
+    try {
+      const user = await gasLogin(gasUrl, username, password);
+      if (user) {
+        applySession(user);
+        return;
+      }
+      // GAS returned INVALID_CREDENTIALS — don't fall through to local
+      showLoginError('Invalid username or password.');
+      resetLoginBtn(btnEl);
+      return;
+    } catch (e) {
+      // Network/timeout error — fall through to local fallback silently
+      console.warn('GAS login failed, using local credentials:', e.message);
+    }
+  }
+
+  // ── 2. Local credential fallback ─────────────────────────────
+  const key  = username.toLowerCase();
+  const entry = LOCAL_USERS[key];
+
+  if (entry && entry.pass === password) {
+    applySession({
+      username: username,
+      fullName: entry.name,
+      role:     entry.role,
+      zoneAccess: entry.zone
+    });
+    return;
+  }
+
+  showLoginError('Invalid username or password.');
+  resetLoginBtn(btnEl);
+}
+
+// ── GAS login with timeout ────────────────────────────────────
+async function gasLogin(url, username, password) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000); // 6s timeout
+
+  try {
+    const params = new URLSearchParams({ action: 'login', username, password });
+    const r = await fetch(url, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body:    params.toString(),
+      signal:  controller.signal
+    });
+    clearTimeout(timer);
+
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+
+    if (data.success && data.user) return data.user;
+
+    // Specific error codes from GAS
+    if (data.error === 'ACCOUNT_INACTIVE') {
+      throw new Error('Account is inactive. Contact your administrator.');
+    }
+    if (data.error === 'INVALID_CREDENTIALS' || data.error === 'USER_NOT_FOUND') {
+      return null; // Definitive reject — don't fall through
+    }
+    // Anything else (sheet missing, script error) → fall through to local
+    throw new Error(data.error || 'Unknown GAS error');
+
+  } catch (e) {
+    clearTimeout(timer);
+    if (e.name === 'AbortError') throw new Error('GAS login timed out');
+    throw e;
+  }
+}
+
+// ── Apply session and launch app ──────────────────────────────
+function applySession(user) {
+  // Persist for page refresh
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+
+  // Update UI avatars / name displays
+  const displayName = user.fullName || user.name || user.username || 'User';
+  const initial     = displayName.charAt(0).toUpperCase();
+
+  const displayEls = ['user-display','user-name'];
+  displayEls.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = displayName;
+  });
+
+  const avatarEls = ['user-avatar'];
+  avatarEls.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = initial;
+  });
+
+  const roleEls = ['user-role'];
+  roleEls.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = user.role || 'Field Officer';
+  });
+
+  showApp();
+
+  // Init app — safe to call now that DOM is visible
+  if (typeof initApp === 'function') {
+    initApp();
+  } else if (typeof renderDashboard === 'function') {
+    // HTMLUPD2605 style — no initApp(), triggers its own DOMContentLoaded
+    renderDashboard();
+    if (typeof updateAlertBadge === 'function') updateAlertBadge();
+    if (typeof buildPestInputs  === 'function') buildPestInputs();
+    if (typeof buildYieldFactors === 'function') buildYieldFactors();
+    if (typeof buildSampleInputs === 'function') buildSampleInputs();
+    if (typeof populateSelects  === 'function') populateSelects();
+    const today = new Date().toISOString().split('T')[0];
+    ['pd-date','ya-date','rpt-week'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.value) el.value = today;
+    });
+    const gasUrl = localStorage.getItem('gas_url') || '';
+    if (gasUrl && typeof updateSyncStatus === 'function') updateSyncStatus('saved');
+  }
+}
+
+// ── Logout ────────────────────────────────────────────────────
+function doLogout() {
+  if (!confirm('Sign out of PoTa Tracker?')) return;
+  sessionStorage.removeItem(SESSION_KEY);
+  showLoginScreen();
+  const passEl = document.getElementById('login-pass');
+  if (passEl) passEl.value = '';
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function showLoginError(msg) {
+  const errEl = document.getElementById('login-error');
+  if (!errEl) return;
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+  setTimeout(() => { errEl.style.display = 'none'; }, 4000);
+}
+
+function resetLoginBtn(btnEl) {
+  if (!btnEl) return;
+  btnEl.disabled = false;
+  btnEl.textContent = 'Sign In →';
+}
 // ─── APP INIT ─────────────────────────────────────────────────
 function initApp() {
   populateGrowerSelects();
