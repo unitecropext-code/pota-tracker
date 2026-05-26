@@ -1412,8 +1412,10 @@ async function doLogin() {
     if (!ok) document.getElementById('login-password').value = '';
   };
 
-  let user       = null;
-  let gasBlocked = false;
+  let user            = null;
+  let gasBlocked      = false;  // true = GAS confirmed wrong password → stop all fallback
+  let gasUserNotFound = false;  // true = GAS reachable but user not in sheet → allow fallback
+  let gasReachable    = false;  // true = GAS responded (success or known error)
 
   // ── 1. GAS Users sheet (GET, plain password — GAS hashes server-side) ──
   const gasUrl = localStorage.getItem('gas_url') || '';
@@ -1429,19 +1431,25 @@ async function doLogin() {
         const data = await resp.json().catch(() => null);
         if (data && data.success && data.user) {
           user = data.user;
+          gasReachable = true;
         } else if (data && !data.success) {
+          gasReachable = true;
           if (data.error === 'ACCOUNT_INACTIVE') {
             done(false);
             errMsg.textContent = 'Account suspended. Contact your administrator.';
             errEl.classList.add('show');
             return;
           }
-          if (data.error === 'INVALID_CREDENTIALS') gasBlocked = true;
-          // USER_NOT_FOUND → fall through
+          if (data.error === 'INVALID_CREDENTIALS') {
+            gasBlocked = true;   // wrong password confirmed by GAS — do NOT fall through
+          } else {
+            // USER_NOT_FOUND or any other GAS error → user not seeded yet, allow fallback
+            gasUserNotFound = true;
+          }
         }
       }
     } catch (e) {
-      // timeout or network — fall through to offline layers
+      // timeout or network error — gasReachable stays false → allow all fallbacks
     }
   }
 
@@ -1453,8 +1461,11 @@ async function doLogin() {
     if (f) user = { username: f.username, role: f.role || 'Field Officer', fullName: f.fullName || f.username };
   }
 
-  // ── 3. Silent offline fallback (only when GAS not configured or unreachable) ──
-  if (!user && !gasBlocked && !gasUrl) {
+  // ── 3. Offline fallback — runs when:
+  //   (a) no GAS URL configured, OR
+  //   (b) GAS unreachable/timeout, OR
+  //   (c) GAS reachable but user not found in sheet (sheet empty / seedUsers not yet run)
+  if (!user && !gasBlocked && (!gasUrl || !gasReachable || gasUserNotFound)) {
     const ph = _h(password);
     const f  = _OF.find(u => u.u === username && u.h === ph);
     if (f) user = { username: f.u, role: f.r, fullName: f.n };
@@ -1464,7 +1475,7 @@ async function doLogin() {
     done(false);   // re-enable btn and clear password field
     errMsg.textContent = gasBlocked
       ? 'Incorrect password for this account.'
-      : gasUrl
+      : gasUrl && gasReachable && !gasUserNotFound
         ? 'Invalid username or password. (Check GAS URL in Settings if the problem persists.)'
         : 'Invalid username or password.';
     errEl.classList.add('show');
