@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PoTa Tracker v2.8 — Mauritius</title>
+<title>PoTa Tracker v2.9 — Mauritius</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -35,24 +35,11 @@ a{color:inherit;text-decoration:none}
 /* ========== LAYOUT ========== */
 #login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:var(--bg);overflow:auto;padding:20px}
 #app-screen{display:none;height:100vh;overflow:hidden}
-#sidebar{
-  position:fixed;top:0;left:0;width:var(--sidebar);height:100%;z-index:300;
-  background:linear-gradient(180deg,#0c1422 0%,#08111c 100%);
-  border-right:1px solid var(--border);display:flex;flex-direction:column;
-  transition:transform .3s;
-}
+#sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100%;z-index:300;background:linear-gradient(180deg,#0c1422 0%,#08111c 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:transform .3s}
 #sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:290}
-#topbar{
-  position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);z-index:200;
-  background:rgba(7,9,15,.92);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:12px;padding:0 20px;
-}
-#main-content{
-  margin-left:var(--sidebar);padding-top:var(--topbar);
-  height:100vh;overflow-y:auto;
-}
-#main-content > .page-inner{padding:20px 24px 80px;}
+#topbar{position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);z-index:200;background:rgba(7,9,15,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px}
+#main-content{margin-left:var(--sidebar);padding-top:var(--topbar);height:100vh;overflow-y:auto}
+#main-content>.page-inner{padding:20px 24px 80px}
 .page{display:none}
 .page.active{display:block}
 
@@ -63,41 +50,22 @@ a{color:inherit;text-decoration:none}
 .logo-text{font-size:19px;font-weight:800;letter-spacing:-.4px;line-height:1.1}
 .logo-text span{color:var(--gold)}
 .logo-sub{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px}
-.sidebar-nav{flex:1;overflow-y:auto;padding:10px 10px}
+.sidebar-nav{flex:1;overflow-y:auto;padding:10px}
 .nav-section-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:4px 8px 6px}
-.nav-item{
-  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;
-  margin-bottom:2px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);
-  transition:all .15s;border:1px solid transparent;
-}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;margin-bottom:2px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;border:1px solid transparent}
 .nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
-.nav-item.active{
-  background:linear-gradient(90deg,rgba(240,165,0,.15),rgba(240,165,0,.06));
-  color:var(--gold);font-weight:600;border-color:rgba(240,165,0,.15);
-}
-.nav-item svg,.nav-item .ni{color:inherit;flex-shrink:0}
+.nav-item.active{background:linear-gradient(90deg,rgba(240,165,0,.15),rgba(240,165,0,.06));color:var(--gold);font-weight:600;border-color:rgba(240,165,0,.15)}
 .nav-chevron{margin-left:auto;opacity:.6}
 .sidebar-bottom{flex-shrink:0;border-top:1px solid var(--border);padding:10px}
-.sync-strip{
-  display:flex;align-items:center;gap:8px;padding:8px 12px;
-  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;
-}
+.sync-strip{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
 .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .5s}
 .sync-dot.live{background:var(--green);animation:pulse 2s infinite}
 .sync-dot.offline{background:var(--text3)}
 .sync-dot.checking{background:#f59e0b;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .sync-label{font-size:12px;font-weight:600;color:var(--text2)}
-.user-strip{
-  display:flex;align-items:center;gap:8px;padding:8px 12px;
-  background:rgba(240,165,0,.05);border:1px solid rgba(240,165,0,.12);border-radius:10px;
-}
-.user-avatar{
-  width:28px;height:28px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:800;color:#000;
-}
+.user-strip{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(240,165,0,.05);border:1px solid rgba(240,165,0,.12);border-radius:10px}
+.user-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000}
 .user-name{font-size:12px;font-weight:700;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .user-role{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
 .logout-btn{padding:4px;border-radius:6px;background:none;color:var(--text3);font-size:14px;transition:all .15s;flex-shrink:0}
@@ -109,7 +77,7 @@ a{color:inherit;text-decoration:none}
 #topbar-title{font-size:15px;font-weight:700;flex:1}
 #topbar-subtitle{font-size:11px;color:var(--text2);margin-top:1px}
 
-/* ========== CARDS & PANELS ========== */
+/* ========== CARDS ========== */
 .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
 .card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .card-title .icon{color:var(--gold)}
@@ -118,11 +86,7 @@ a{color:inherit;text-decoration:none}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 
 /* ========== STAT CARDS ========== */
-.stat-card{
-  background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;
-  position:relative;overflow:hidden;cursor:default;
-  transition:transform .2s,border-color .2s,box-shadow .2s;
-}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0}
 .stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.5);border-color:var(--border2)}
 .stat-card.gold::before{background:linear-gradient(90deg,var(--gold),var(--orange))}
@@ -143,11 +107,7 @@ a{color:inherit;text-decoration:none}
 .stat-delta{font-size:11px;color:var(--text3);margin-top:4px}
 
 /* ========== BUTTONS ========== */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:8px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;
-  transition:all .15s;border:1px solid transparent;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid transparent}
 .btn:active{transform:scale(.96)}
 .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;box-shadow:0 4px 16px rgba(240,165,0,.3)}
 .btn-gold:hover{background:linear-gradient(135deg,#ffbe3d,var(--gold))}
@@ -186,10 +146,7 @@ a{color:inherit;text-decoration:none}
 .table-wrap tbody tr:hover .table-actions{opacity:1}
 
 /* ========== FILTER BAR ========== */
-.filter-bar{
-  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
-  background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:14px;
-}
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:14px}
 .search-wrap{position:relative;flex:1;min-width:160px}
 .search-wrap input{width:100%;padding-left:30px}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);pointer-events:none}
@@ -205,44 +162,22 @@ a{color:inherit;text-decoration:none}
 textarea.form-input{resize:vertical;min-height:70px}
 
 /* ========== MODALS ========== */
-.modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);
-  z-index:500;align-items:center;justify-content:center;padding:16px;
-}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:16px}
 .modal-overlay.show{display:flex}
-.modal{
-  background:var(--card2);border:1px solid var(--border2);border-radius:18px;
-  width:100%;max-width:540px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;
-  box-shadow:0 32px 80px rgba(0,0,0,.8);
-  animation:modalIn .2s ease;
-}
+.modal{background:var(--card2);border:1px solid var(--border2);border-radius:18px;width:100%;max-width:540px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,.8);animation:modalIn .2s ease}
 .modal.wide{max-width:720px}
 @keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
-.modal-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--card2);
-}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--card2)}
 .modal-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .modal-title .icon{color:var(--gold)}
-.modal-close{
-  width:28px;height:28px;border-radius:7px;background:none;color:var(--text3);font-size:16px;
-  display:flex;align-items:center;justify-content:center;transition:all .15s;
-}
+.modal-close{width:28px;height:28px;border-radius:7px;background:none;color:var(--text3);font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .modal-close:hover{color:var(--red);background:rgba(239,68,68,.12)}
 .modal-body{padding:18px;overflow-y:auto;flex:1}
-.modal-footer{
-  padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;
-  background:var(--card2);flex-shrink:0;
-}
+.modal-footer{padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--card2);flex-shrink:0}
 
 /* ========== TOAST ========== */
 #toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{
-  display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;
-  font-size:12px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.5);
-  pointer-events:all;border:1px solid;backdrop-filter:blur(12px);
-  animation:toastIn .25s ease;max-width:340px;
-}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:12px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:all;border:1px solid;backdrop-filter:blur(12px);animation:toastIn .25s ease;max-width:340px}
 @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
 .toast-icon{font-size:15px;flex-shrink:0}
 .toast.success{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:#4ade80}
@@ -251,29 +186,15 @@ textarea.form-input{resize:vertical;min-height:70px}
 .toast.info{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#60a5fa}
 
 /* ========== LOGIN ========== */
-.login-card{
-  background:linear-gradient(180deg,#0f1a2e,#0a1220);
-  border:1px solid var(--border2);border-radius:20px;padding:38px;
-  width:100%;max-width:420px;
-  box-shadow:0 32px 80px rgba(0,0,0,.8);
-  position:relative;overflow:hidden;
-}
+.login-card{background:linear-gradient(180deg,#0f1a2e,#0a1220);border:1px solid var(--border2);border-radius:20px;padding:38px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,.8);position:relative;overflow:hidden}
 .login-glow{position:absolute;top:0;right:0;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(240,165,0,.06) 0%,transparent 70%);pointer-events:none}
 .grid-bg{position:fixed;inset:0;pointer-events:none;opacity:.03}
-.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px}
 .login-title{font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
 .login-subtitle{font-size:12px;color:var(--text2);margin-bottom:24px}
-.login-error{
-  display:none;align-items:center;gap:8px;background:rgba(239,68,68,.12);
-  border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:10px;
-  padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:14px;
-}
+.login-error{display:none;align-items:center;gap:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:14px}
 .login-error.show{display:flex}
 .pw-wrap{position:relative}
-.pw-toggle{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  background:none;color:var(--text3);font-size:14px;transition:color .15s;
-}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;color:var(--text3);font-size:14px;transition:color .15s}
 .pw-toggle:hover{color:var(--text2)}
 
 /* ========== DASHBOARD ========== */
@@ -287,19 +208,13 @@ textarea.form-input{resize:vertical;min-height:70px}
 /* ========== MAP ========== */
 #map{height:520px;border-radius:0}
 .map-zone-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-.zone-card{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;
-  text-align:center;cursor:pointer;transition:all .2s;
-}
+.zone-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all .2s}
 .zone-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .zone-num{font-size:22px;font-weight:800;margin:2px 0}
 .zone-name{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text2)}
 
 /* ========== YIELD CALC ========== */
-.calc-result{
-  background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.2);
-  border-radius:12px;padding:16px;margin-top:16px;
-}
+.calc-result{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.2);border-radius:12px;padding:16px;margin-top:16px}
 .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .calc-item{text-align:center}
 .calc-val{font-size:22px;font-weight:800;color:var(--gold)}
@@ -309,9 +224,7 @@ textarea.form-input{resize:vertical;min-height:70px}
 
 /* ========== PRINT ========== */
 @media print{
-  #login-screen,#sidebar,#sidebar-overlay,#topbar,
-  .filter-bar,.modal-overlay,#toast-container,
-  .table-actions,.stat-delta{display:none!important}
+  #login-screen,#sidebar,#sidebar-overlay,#topbar,.filter-bar,.modal-overlay,#toast-container,.table-actions,.stat-delta{display:none!important}
   #app-screen,#main-content{margin:0!important;padding:0!important}
   .page-inner{padding:0!important}
   body{overflow:visible!important;background:#fff!important;color:#000!important}
@@ -329,11 +242,7 @@ textarea.form-input{resize:vertical;min-height:70px}
 .ctable .section-row td{background:rgba(30,45,69,.3);font-weight:700;font-size:10px;text-transform:uppercase;color:var(--text3)}
 .ctable .total-col{background:rgba(240,165,0,.06)!important;font-weight:700;color:var(--gold)}
 .ctable .sum-row td{background:rgba(240,165,0,.04)!important}
-.ctable input[type=number]{
-  width:52px;background:transparent;border:none;outline:none;text-align:center;
-  font-family:inherit;font-size:11px;color:var(--text);padding:2px;
-  border-radius:4px;transition:background .15s;
-}
+.ctable input[type=number]{width:52px;background:transparent;border:none;outline:none;text-align:center;font-family:inherit;font-size:11px;color:var(--text);padding:2px;border-radius:4px;transition:background .15s}
 .ctable input[type=number]:focus{background:rgba(240,165,0,.1)}
 .ctable .yield-val{color:var(--gold)}
 .ctable .prod-val{color:var(--green)}
@@ -346,28 +255,18 @@ textarea.form-input{resize:vertical;min-height:70px}
 .campaign-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
 
 /* ========== REPORTS ========== */
-.report-preview{
-  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;
-  padding:16px;font-family:'Courier New',monospace;font-size:12px;color:var(--text2);
-  white-space:pre-wrap;max-height:520px;overflow-y:auto;line-height:1.6;
-}
+.report-preview{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:12px;color:var(--text2);white-space:pre-wrap;max-height:520px;overflow-y:auto;line-height:1.6}
 .report-preview.empty{display:flex;align-items:center;justify-content:center;color:var(--text3);min-height:200px;font-family:inherit;font-size:13px}
 
 /* ========== SETTINGS ========== */
 .settings-section{margin-bottom:20px}
 .settings-section-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--text)}
-.connection-status{
-  display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;
-  font-size:12px;font-weight:600;margin:10px 0;border:1px solid;
-}
+.connection-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;font-size:12px;font-weight:600;margin:10px 0;border:1px solid}
 .connection-status.ok{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.2);color:#4ade80}
 .connection-status.fail{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2);color:#f87171}
 
 /* ========== ALERT BANNER ========== */
-.alert-banner{
-  display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;
-  font-size:13px;font-weight:600;margin-bottom:14px;border:1px solid;
-}
+.alert-banner{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:14px;border:1px solid}
 .alert-banner.warning{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2);color:#f87171}
 
 /* ========== EMPTY STATE ========== */
@@ -398,7 +297,6 @@ textarea.form-input{resize:vertical;min-height:70px}
 </head>
 <body>
 
-<!-- ==================== TOAST ==================== -->
 <div id="toast-container"></div>
 
 <!-- ==================== LOGIN ==================== -->
@@ -407,7 +305,7 @@ textarea.form-input{resize:vertical;min-height:70px}
 <div style="position:absolute;top:25%;left:25%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(240,165,0,.04) 0%,transparent 70%);filter:blur(40px);pointer-events:none"></div>
 <div class="login-card">
   <div class="login-glow"></div>
-  <div class="login-logo">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px">
     <svg width="46" height="46" viewBox="0 0 44 44" style="filter:drop-shadow(0 0 10px rgba(240,165,0,.5))">
       <defs><radialGradient id="pg" cx="45%" cy="40%" r="55%"><stop offset="0%" stop-color="#e8b96a"/><stop offset="60%" stop-color="#c49040"/><stop offset="100%" stop-color="#9e6e20"/></radialGradient></defs>
       <ellipse cx="22" cy="25" rx="15" ry="12" fill="url(#pg)" transform="rotate(-12 22 25)"/>
@@ -435,13 +333,12 @@ textarea.form-input{resize:vertical;min-height:70px}
     </div>
   </div>
   <button class="btn btn-gold" style="width:100%;padding:12px;font-size:14px" id="login-btn" onclick="doLogin()">Sign In</button>
+  <div style="margin-top:14px;font-size:11px;color:var(--text3);text-align:center">v2.9 · Offline-capable · Google Sheets sync</div>
 </div>
 </div>
-
-<!-- ==================== SIDEBAR OVERLAY ==================== -->
-<div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <!-- ==================== SIDEBAR ==================== -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="sidebar">
   <div class="sidebar-logo">
     <div class="logo-glow"></div>
@@ -453,7 +350,7 @@ textarea.form-input{resize:vertical;min-height:70px}
         <path d="M22 13 Q22 8 22 5" stroke="#4a8c3f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
         <path d="M22 9 Q18 5 15 7 Q17 11 22 9Z" fill="#5aaa4a"/><path d="M22 7 Q26 3 29 5 Q27 9 22 7Z" fill="#4a9a3a"/>
       </svg>
-      <div><div class="logo-text">Po<span>Ta</span> Tracker</div><div class="logo-sub">v2.8 · Mauritius</div></div>
+      <div><div class="logo-text">Po<span>Ta</span> Tracker</div><div class="logo-sub">v2.9 · Mauritius</div></div>
     </div>
   </div>
   <nav class="sidebar-nav">
@@ -499,11 +396,11 @@ textarea.form-input{resize:vertical;min-height:70px}
 <div id="main-content">
 <div class="page-inner">
 
-<!-- ===== DASHBOARD ===== -->
+<!-- DASHBOARD -->
 <div class="page active" id="page-dashboard">
   <div class="grid-4" id="stats-grid" style="margin-bottom:16px"></div>
   <div class="grid-2" style="margin-bottom:14px">
-    <div class="card"><div class="card-title"><span class="icon">📈</span>Yield Trend (T/Ha) — Campaign 2024</div><canvas id="chart-yield"></canvas></div>
+    <div class="card"><div class="card-title"><span class="icon">📈</span>Yield Trend (T/Ha)</div><canvas id="chart-yield"></canvas></div>
     <div class="card"><div class="card-title"><span class="icon">🗺</span>Growers by Zone</div><canvas id="chart-zone"></canvas></div>
   </div>
   <div class="grid-2">
@@ -512,20 +409,18 @@ textarea.form-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- ===== MAP ===== -->
+<!-- MAP -->
 <div class="page" id="page-map">
   <div class="map-zone-cards" id="zone-cards"></div>
-  <div class="table-wrap" style="margin-bottom:14px">
-    <div id="map" style="height:500px;border-radius:13px"></div>
-  </div>
+  <div class="table-wrap" style="margin-bottom:14px"><div id="map" style="height:500px;border-radius:13px"></div></div>
   <div class="card">
-    <div class="card-title"><span class="icon">🗺</span>Zone Legend</div>
+    <div class="card-title"><span class="icon">🗺</span>Zone Summary</div>
     <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:14px" id="map-legend"></div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px" id="zone-detail-grid"></div>
   </div>
 </div>
 
-<!-- ===== GROWERS ===== -->
+<!-- GROWERS -->
 <div class="page" id="page-growers">
   <div class="filter-bar">
     <div class="search-wrap"><span class="search-icon">🔍</span><input id="grower-search" placeholder="Search growers…" oninput="renderGrowers()"/></div>
@@ -539,7 +434,7 @@ textarea.form-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- ===== PLANTATIONS ===== -->
+<!-- PLANTATIONS -->
 <div class="page" id="page-plantations">
   <div class="filter-bar">
     <div class="search-wrap"><span class="search-icon">🔍</span><input id="plt-search" placeholder="Search plantations…" oninput="renderPlantations()"/></div>
@@ -553,9 +448,9 @@ textarea.form-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- ===== PEST / DISEASE ===== -->
+<!-- PEST / DISEASE -->
 <div class="page" id="page-pest">
-  <div id="pest-alert" class="alert-banner warning" style="display:none">⚠ High-risk or critical pest/disease observations require immediate attention</div>
+  <div id="pest-alert" class="alert-banner warning" style="display:none">⚠ High-risk or critical observations require immediate attention</div>
   <div class="filter-bar">
     <div class="search-wrap"><span class="search-icon">🔍</span><input id="pest-search" placeholder="Search…" oninput="renderPest()"/></div>
     <select id="pest-sev-filter" onchange="renderPest()"><option value="">All Severities</option><option>Low</option><option>Moderate</option><option>High</option><option>Critical</option></select>
@@ -567,7 +462,7 @@ textarea.form-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- ===== YIELD ASSESSMENT ===== -->
+<!-- YIELD ASSESSMENT -->
 <div class="page" id="page-yield">
   <div class="filter-bar">
     <div class="search-wrap"><span class="search-icon">🔍</span><input id="yield-search" placeholder="Search…" oninput="renderYield()"/></div>
@@ -579,11 +474,11 @@ textarea.form-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- ===== CAMPAIGN TABLE ===== -->
+<!-- CAMPAIGN TABLE -->
 <div class="page" id="page-campaign">
   <div class="filter-bar" style="margin-bottom:10px">
     <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase">Season:</label>
-    <select id="camp-season" onchange="renderCampaign()"><option>S1 2024</option><option>S2 2024</option><option>S1 2025</option></select>
+    <select id="camp-season" onchange="renderCampaign()"><option>S1 2024</option><option>S2 2024</option><option>S1 2025</option><option>S2 2025</option></select>
     <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase">Zone:</label>
     <select id="camp-zone" onchange="renderCampaign()"><option>East</option><option>North</option><option>South</option><option>West</option><option>Central</option></select>
     <button class="btn btn-gold btn-sm" id="camp-save-btn" style="display:none" onclick="saveCampaign()">💾 Save Changes</button>
@@ -593,10 +488,10 @@ textarea.form-input{resize:vertical;min-height:70px}
   </div>
   <div class="campaign-summary" id="camp-summary"></div>
   <div class="table-wrap"><div id="campaign-grid"></div></div>
-  <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:right">Values: YIELD = T/Ha · PRODUCTION = Tonnes · AREA = Ha · Click any cell to edit</div>
+  <div style="font-size:11px;color:var(--text3);margin-top:8px;text-align:right">YIELD = T/Ha · PRODUCTION = Tonnes · AREA = Ha · Click any cell to edit</div>
 </div>
 
-<!-- ===== REPORTS ===== -->
+<!-- REPORTS -->
 <div class="page" id="page-reports">
   <div class="grid-2">
     <div>
@@ -604,6 +499,9 @@ textarea.form-input{resize:vertical;min-height:70px}
         <div class="card-title"><span class="icon">📅</span>Report Parameters</div>
         <div class="form-group"><label class="form-label">Season</label>
           <select id="rep-season" class="form-input"><option value="S1">Season 1</option><option value="S2">Season 2</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Zone</label>
+          <select id="rep-zone" class="form-input"><option value="All">All Zones</option><option>East</option><option>North</option><option>South</option><option>West</option><option>Central</option></select>
         </div>
         <div class="form-row cols-2">
           <div class="form-group"><label class="form-label">Week Start</label><input type="date" id="rep-start" class="form-input"/></div>
@@ -615,10 +513,7 @@ textarea.form-input{resize:vertical;min-height:70px}
           <button class="btn btn-blue" style="flex:1" onclick="downloadReport()">⬇ Download .txt</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title"><span class="icon">📊</span>Quick Stats</div>
-        <div id="quick-stats"></div>
-      </div>
+      <div class="card"><div class="card-title"><span class="icon">📊</span>Quick Stats</div><div id="quick-stats"></div></div>
     </div>
     <div class="card">
       <div class="card-title"><span class="icon">📄</span>Report Preview</div>
@@ -627,7 +522,7 @@ textarea.form-input{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- ===== SETTINGS ===== -->
+<!-- SETTINGS -->
 <div class="page" id="page-settings">
   <div class="grid-2">
     <div class="card settings-section">
@@ -658,12 +553,8 @@ textarea.form-input{resize:vertical;min-height:70px}
     </div>
     <div class="card settings-section" id="admin-pw-section" style="display:none">
       <div class="settings-section-title">🛡 Admin: Reset User Password</div>
-      <div class="form-group"><label class="form-label">Select User</label>
-        <select id="admin-pw-user" class="form-input"></select>
-      </div>
-      <div class="form-group"><label class="form-label">New Password</label>
-        <input id="admin-pw-new" class="form-input" type="password" placeholder="••••••••"/>
-      </div>
+      <div class="form-group"><label class="form-label">Select User</label><select id="admin-pw-user" class="form-input"></select></div>
+      <div class="form-group"><label class="form-label">New Password</label><input id="admin-pw-new" class="form-input" type="password" placeholder="min 6 chars"/></div>
       <button class="btn btn-blue" style="width:100%" onclick="adminChangePw()">Update Password</button>
     </div>
     <div class="card settings-section" id="admin-create-section" style="display:none">
@@ -889,8 +780,14 @@ textarea.form-input{resize:vertical;min-height:70px}
 
 <script>
 // =================================================================
-// PoTa Tracker v2.8 — Full JavaScript
-// KEY FIX: login now uses POST (not GET) to match updated backend
+// PoTa Tracker v2.9 — Complete JavaScript
+// KEY FIXES:
+//   1. DEFAULT_USERS — correct SHA-256 hashes for all 3 accounts
+//   2. getUsers() — detects & wipes stale/wrong hashes from localStorage
+//   3. offlineLogin() — plain-text fallback + auto-upgrade to hash
+//   4. doLogin() — trims whitespace before sending credentials
+//   5. Reports — Zone field added to parameters & sync payload
+//   6. gasPost — consistent POST for all operations
 // =================================================================
 
 const MONTHS=['MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC','JAN','FEB'];
@@ -906,11 +803,21 @@ const ZONE_BOUNDS={
 
 // -------- STORAGE --------
 const KEYS={USERS:'pota_users',SESSION:'pota_session',GROWERS:'pota_growers',PLANTS:'pota_plantations',PEST:'pota_pest',YIELD:'pota_yield',CAMPAIGN:'pota_campaign',GAS:'pota_gas_url'};
+
+// FIX 1: Correct SHA-256 hashes — verified with crypto.subtle + Node.js
+// superadmin/KOPS@1353, EOSEOKG/GAN@3522, ESOKR/MHEE@9315
 const DEFAULT_USERS=[
-  {username:'superadmin',passwordHash:'240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',fullName:'Super Administrator',role:'Administrator',zoneAccess:'All',status:'Active'},
-  {username:'EOSEOKG',passwordHash:'118b8d35a17bcf2c7d2d790509e12308dc6332c5d234f0098d2d6be6700bebb1',fullName:'Keshav Gangadin',role:'Field Officer',zoneAccess:'East',status:'Active'},
-  {username:'ESOKR',passwordHash:'b4b6611bbd38c677548c0f5055c83f3439cba5367134c23cc2b94b84d4ba84d9',fullName:'Keshav Ramheet',role:'Field Officer',zoneAccess:'North',status:'Active'}
+  {username:'superadmin',passwordHash:'620eb8e0293efc0fe7cf90b4e3d0adffc0d3c2c355dba4e2ec1aba3cfa12a0d3',fullName:'Super Administrator',role:'Administrator',zoneAccess:'All',status:'Active'},
+  {username:'EOSEOKG',passwordHash:'bee234b7915a91f6e7f9d96729ffc8a41c773dce8ec3630534d3d56b2b4927db',fullName:'Keshav Gangadin',role:'Field Officer',zoneAccess:'East',status:'Active'},
+  {username:'ESOKR',passwordHash:'5269b1fc0dc20b92e48edbf0947fcf616ee25dd71ab83889be76799c05279d91',fullName:'Keshav Ramheet',role:'Field Officer',zoneAccess:'North',status:'Active'}
 ];
+
+// FIX 2: Lookup table so getUsers() can detect stale hashes and auto-reset
+const CORRECT_HASHES={
+  'superadmin':'620eb8e0293efc0fe7cf90b4e3d0adffc0d3c2c355dba4e2ec1aba3cfa12a0d3',
+  'eoseokg':'bee234b7915a91f6e7f9d96729ffc8a41c773dce8ec3630534d3d56b2b4927db',
+  'esokr':'5269b1fc0dc20b92e48edbf0947fcf616ee25dd71ab83889be76799c05279d91'
+};
 
 async function hashPw(password){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));
@@ -921,16 +828,25 @@ function load(k){try{const d=localStorage.getItem(k);return d?JSON.parse(d):[]}c
 function loadObj(k){try{const d=localStorage.getItem(k);return d?JSON.parse(d):null}catch{return null}}
 function save(k,d){localStorage.setItem(k,JSON.stringify(d))}
 function uid(p){return p+'_'+Date.now().toString(36).toUpperCase()+'_'+Math.random().toString(36).substr(2,4).toUpperCase()}
+
+// FIX 2: getUsers detects stale/wrong hashes and force-reseeds from DEFAULT_USERS
 function getUsers(){
   const u=loadObj(KEYS.USERS);
-  if(!u||!u.length||u.some(x=>!isHashed(x.passwordHash))){save(KEYS.USERS,DEFAULT_USERS);return JSON.parse(JSON.stringify(DEFAULT_USERS));}
+  const stale=u&&u.some(x=>{
+    const key=(x.username||'').toLowerCase();
+    return CORRECT_HASHES[key]&&x.passwordHash!==CORRECT_HASHES[key];
+  });
+  if(!u||!u.length||u.some(x=>!isHashed(x.passwordHash))||stale){
+    save(KEYS.USERS,DEFAULT_USERS);
+    return JSON.parse(JSON.stringify(DEFAULT_USERS));
+  }
   return u;
 }
 function saveUsers(u){save(KEYS.USERS,u)}
 function getGasUrl(){return localStorage.getItem(KEYS.GAS)||''}
 function setGasUrl(u){localStorage.setItem(KEYS.GAS,u)}
 
-// -------- SEED DEMO DATA --------
+// -------- DEMO DATA --------
 function seedData(){
   if(load(KEYS.GROWERS).length)return;
   save(KEYS.GROWERS,[
@@ -958,13 +874,10 @@ function seedData(){
 // -------- AUTH --------
 let currentUser=null;
 
-// ================================================================
-// FIX: doLogin now sends credentials via POST (not GET URL params)
-// Tries GAS backend first; falls back to local offline auth
-// ================================================================
+// FIX 4: trim credentials before sending to avoid whitespace issues
 async function doLogin(){
   const username=document.getElementById('login-user').value.trim().toLowerCase();
-  const rawPassword=document.getElementById('login-pass').value;
+  const rawPassword=document.getElementById('login-pass').value.trim();
   if(!username||!rawPassword){showLoginError('Please enter username and password.');return;}
   const btn=document.getElementById('login-btn');
   btn.disabled=true;btn.textContent='Signing in…';
@@ -973,7 +886,6 @@ async function doLogin(){
   const gasUrl=getGasUrl();
   if(gasUrl){
     try{
-      // ✅ FIX: POST with JSON body — passwords never appear in URL or server logs
       const res=await fetch(gasUrl,{
         method:'POST',
         headers:{'Content-Type':'text/plain'},
@@ -981,40 +893,34 @@ async function doLogin(){
       });
       const data=await res.json();
       if(data.success&&data.user){
-        resetLoginBtn();
-        onLoginSuccess(data.user);
-        return;
+        resetLoginBtn();onLoginSuccess(data.user);return;
       }
-      // Map GAS error codes to friendly messages
-      const msgs={
-        USER_NOT_FOUND:'Username not found.',
-        INVALID_CREDENTIALS:'Incorrect password. Please try again.',
-        ACCOUNT_INACTIVE:'This account is inactive.',
-        MISSING_CREDENTIALS:'Please enter username and password.'
-      };
-      // GAS auth failed — do NOT fall through to local; show the error
+      const msgs={USER_NOT_FOUND:'Username not found.',INVALID_CREDENTIALS:'Incorrect password. Please try again.',ACCOUNT_INACTIVE:'This account is inactive.',MISSING_CREDENTIALS:'Please enter username and password.'};
       resetLoginBtn();
       showLoginError(msgs[data.error]||data.error||'Login failed. Please try again.');
     }catch(networkErr){
-      // Network error only — fall back to offline auth
-      console.warn('GAS unreachable, trying offline login:',networkErr.message);
+      console.warn('GAS unreachable, offline login:',networkErr.message);
       resetLoginBtn();
       await offlineLogin(username,rawPassword);
     }
   }else{
-    // No GAS URL configured — always use offline auth
     resetLoginBtn();
     await offlineLogin(username,rawPassword);
   }
 }
 
+// FIX 3: plain-text fallback + auto-upgrade to hash on success
 async function offlineLogin(username,rawPassword){
   const users=getUsers();
   const u=users.find(u=>u.username.toLowerCase()===username.toLowerCase());
   if(!u){showLoginError('Username not found.');return;}
   if(u.status&&u.status!=='Active'){showLoginError('This account is inactive.');return;}
   const h=await hashPw(rawPassword);
-  if(u.passwordHash!==h){showLoginError('Incorrect password. Please try again.');return;}
+  // Primary: hash comparison. Fallback: plain-text stored (migration case)
+  const match=u.passwordHash===h||u.passwordHash===rawPassword;
+  if(!match){showLoginError('Incorrect password. Please try again.');return;}
+  // Auto-upgrade plain-text to hash on first login
+  if(u.passwordHash===rawPassword){u.passwordHash=h;saveUsers(users);}
   onLoginSuccess({username:u.username,fullName:u.fullName,role:u.role,zoneAccess:u.zoneAccess});
 }
 
@@ -1033,21 +939,10 @@ function doLogout(){
   document.getElementById('login-pass').value='';
   hideLoginError();
 }
-function showLoginError(msg){
-  const e=document.getElementById('login-error');
-  e.classList.add('show');
-  document.getElementById('login-error-msg').textContent=msg;
-}
+function showLoginError(msg){const e=document.getElementById('login-error');e.classList.add('show');document.getElementById('login-error-msg').textContent=msg;}
 function hideLoginError(){document.getElementById('login-error').classList.remove('show');}
-function resetLoginBtn(){
-  const b=document.getElementById('login-btn');
-  b.disabled=false;b.textContent='Sign In';
-}
-function togglePw(inputId,btn){
-  const i=document.getElementById(inputId);
-  i.type=i.type==='password'?'text':'password';
-  btn.textContent=i.type==='password'?'👁':'🙈';
-}
+function resetLoginBtn(){const b=document.getElementById('login-btn');b.disabled=false;b.textContent='Sign In';}
+function togglePw(inputId,btn){const i=document.getElementById(inputId);i.type=i.type==='password'?'text':'password';btn.textContent=i.type==='password'?'👁':'🙈';}
 document.getElementById('login-pass').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin();});
 
 // -------- USER UI --------
@@ -1068,29 +963,20 @@ function updateUserUI(){
 // -------- SYNC --------
 async function checkSyncStatus(){
   const url=getGasUrl();
-  const dot=document.getElementById('sync-dot');
-  const lbl=document.getElementById('sync-label');
+  const dot=document.getElementById('sync-dot');const lbl=document.getElementById('sync-label');
   if(!url){dot.className='sync-dot offline';lbl.textContent='Offline mode';return;}
   dot.className='sync-dot checking';lbl.textContent='Checking…';
   try{
-    const res=await fetch(url+'?action=ping');
-    const data=await res.json();
+    const res=await fetch(url+'?action=ping');const data=await res.json();
     if(data.success){dot.className='sync-dot live';lbl.textContent='Google Sheets live';}
     else{dot.className='sync-dot offline';lbl.textContent='Connection error';}
   }catch{dot.className='sync-dot offline';lbl.textContent='Offline mode';}
 }
 
-// ================================================================
-// FIX: gasPost sends all data as POST (consistent with backend)
-// ================================================================
 async function gasPost(action,data){
   const url=getGasUrl();
   if(!url)throw new Error('No GAS URL configured');
-  const res=await fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action,...data})
-  });
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,...data})});
   return res.json();
 }
 async function trySyncGas(action,data){
@@ -1152,25 +1038,14 @@ function renderDashboard(){
     {label:'Avg Yield',value:avgYield.toFixed(1)+' T/Ha',delta:'From assessments',cls:'blue',icon:'📈'},
     {label:'High Risk Pests',value:highPest,delta:'Requiring attention',cls:'red',icon:'⚠'},
   ];
-  document.getElementById('stats-grid').innerHTML=stats.map(s=>`
-    <div class="stat-card ${s.cls}">
-      <div class="stat-icon">${s.icon}</div>
-      <div class="stat-label">${s.label}</div>
-      <div class="stat-value">${s.value}</div>
-      <div class="stat-delta">${s.delta}</div>
-    </div>`).join('');
+  document.getElementById('stats-grid').innerHTML=stats.map(s=>`<div class="stat-card ${s.cls}"><div class="stat-icon">${s.icon}</div><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div><div class="stat-delta">${s.delta}</div></div>`).join('');
   renderYieldChart();renderZoneChart(growers);renderVarietyChart(plants);
-  const items=[
-    {icon:'🌱',cls:'rgba(34,197,94,.12)',text:'Plantation recorded — Ramtohul Family Farm',time:'Today'},
-    {icon:'🐛',cls:'rgba(240,165,0,.12)',text:'Late Blight observed — Flacq region',time:'Yesterday'},
-    {icon:'📈',cls:'rgba(59,130,246,.12)',text:'Yield assessment — Seebaruth Holdings',time:'2 days ago'},
-    {icon:'👤',cls:'rgba(168,85,247,.12)',text:'New grower registered — Boodhoo Agriculture',time:'3 days ago'},
-  ];
-  document.getElementById('activity-list').innerHTML=items.map(a=>`
-    <div class="activity-item">
-      <div class="activity-icon" style="background:${a.cls}">${a.icon}</div>
-      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.text}</div><div style="font-size:10px;color:var(--text3)">${a.time}</div></div>
-    </div>`).join('');
+  const recentItems=[
+    ...plants.slice(-2).map(p=>({icon:'🌱',cls:'rgba(34,197,94,.12)',text:'Plantation — '+p.growerName,time:p.datePlanted||'Recent'})),
+    ...pests.slice(-2).map(p=>({icon:'🐛',cls:'rgba(240,165,0,.12)',text:p.pestDiseaseName+' — '+p.locality,time:p.dateObserved||'Recent'})),
+    ...yields.slice(-2).map(y=>({icon:'📈',cls:'rgba(59,130,246,.12)',text:'Yield assessment — '+y.growerName,time:y.assessmentDate||'Recent'})),
+  ].slice(0,5);
+  document.getElementById('activity-list').innerHTML=recentItems.length?recentItems.map(a=>`<div class="activity-item"><div class="activity-icon" style="background:${a.cls}">${a.icon}</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.text}</div><div style="font-size:10px;color:var(--text3)">${a.time}</div></div></div>`).join(''):'<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No recent activity</div>';
 }
 function renderYieldChart(){
   const ctx=document.getElementById('chart-yield');
@@ -1199,8 +1074,7 @@ function initMap(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(leafletMap);
   Object.entries(ZONE_BOUNDS).forEach(([zone,bounds])=>{
     const color=ZONE_COLORS[zone];
-    L.polygon(bounds,{color,weight:2,opacity:.85,fillColor:color,fillOpacity:.12,dashArray:'6,4'}).addTo(leafletMap)
-      .bindPopup(`<div style="font-family:Inter,sans-serif"><b style="color:#ecf0f8">${zone} Zone</b></div>`);
+    L.polygon(bounds,{color,weight:2,opacity:.85,fillColor:color,fillOpacity:.12,dashArray:'6,4'}).addTo(leafletMap).bindPopup(`<div style="font-family:Inter,sans-serif"><b style="color:#ecf0f8">${zone} Zone</b></div>`);
     const ctr=bounds.reduce((a,c)=>[a[0]+c[0]/bounds.length,a[1]+c[1]/bounds.length],[0,0]);
     L.marker(ctr,{icon:L.divIcon({html:`<div style="background:rgba(0,0,0,.75);color:${color};border:1px solid ${color}40;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:Inter,sans-serif;white-space:nowrap">${zone.toUpperCase()}</div>`,className:'',iconAnchor:[30,10]})}).addTo(leafletMap);
   });
@@ -1209,26 +1083,18 @@ function initMap(){
 function addGrowerMarkers(){
   if(!leafletMap)return;
   load(KEYS.GROWERS).forEach(g=>{
-    const color=ZONE_COLORS[g.zone]||'#fff';
-    const bounds=ZONE_BOUNDS[g.zone];if(!bounds)return;
+    const color=ZONE_COLORS[g.zone]||'#fff';const bounds=ZONE_BOUNDS[g.zone];if(!bounds)return;
     const ctr=bounds.reduce((a,c)=>[a[0]+c[0]/bounds.length,a[1]+c[1]/bounds.length],[0,0]);
     const jitter=()=>(Math.random()-.5)*.04;
-    L.marker([ctr[0]+jitter(),ctr[1]+jitter()],{icon:L.divIcon({html:`<div style="width:10px;height:10px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,.5);box-shadow:0 0 8px ${color}80"></div>`,className:'',iconAnchor:[5,5]})}).addTo(leafletMap)
-      .bindPopup(`<div style="font-family:Inter,sans-serif;min-width:150px"><b style="color:#ecf0f8">${g.growerName}</b><br><span style="font-size:11px;color:#8899b4">Zone: <b style="color:${color}">${g.zone}</b> · ${g.locality}</span><br><span style="font-size:11px;color:#8899b4">Area: ${g.totalAreaHa} Ha · <b style="color:${g.status==='Active'?'#22c55e':'#ef4444'}">${g.status}</b></span></div>`);
+    L.marker([ctr[0]+jitter(),ctr[1]+jitter()],{icon:L.divIcon({html:`<div style="width:10px;height:10px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,.5);box-shadow:0 0 8px ${color}80"></div>`,className:'',iconAnchor:[5,5]})}).addTo(leafletMap).bindPopup(`<div style="font-family:Inter,sans-serif;min-width:150px"><b style="color:#ecf0f8">${g.growerName}</b><br><span style="font-size:11px;color:#8899b4">Zone: <b style="color:${color}">${g.zone}</b> · ${g.locality}</span><br><span style="font-size:11px;color:#8899b4">Area: ${g.totalAreaHa} Ha · <b style="color:${g.status==='Active'?'#22c55e':'#ef4444'}">${g.status}</b></span></div>`);
   });
 }
 function refreshMapZoneCards(){
   const growers=load(KEYS.GROWERS);const plants=load(KEYS.PLANTS);
   const zones=['East','North','South','West','Central'];
-  document.getElementById('zone-cards').innerHTML=zones.map(z=>{
-    const color=ZONE_COLORS[z];const gc=growers.filter(g=>g.zone===z).length;
-    return`<div class="zone-card" style="border-color:${color}30" onclick="filterMapZone('${z}')"><div class="zone-name" style="color:${color}">${z}</div><div class="zone-num" style="color:${color}">${gc}</div><div class="zone-name">growers</div></div>`;
-  }).join('');
+  document.getElementById('zone-cards').innerHTML=zones.map(z=>{const color=ZONE_COLORS[z];const gc=growers.filter(g=>g.zone===z).length;return`<div class="zone-card" style="border-color:${color}30" onclick="filterMapZone('${z}')"><div class="zone-name" style="color:${color}">${z}</div><div class="zone-num" style="color:${color}">${gc}</div><div class="zone-name">growers</div></div>`;}).join('');
   document.getElementById('map-legend').innerHTML=zones.map(z=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:28px;height:2px;border-radius:2px;background:${ZONE_COLORS[z]}"></div><span style="color:var(--text2)">${z} Zone</span></div>`).join('');
-  document.getElementById('zone-detail-grid').innerHTML=zones.map(z=>{
-    const color=ZONE_COLORS[z];
-    return`<div style="font-size:11px"><div style="font-weight:700;color:${color};margin-bottom:4px">${z} Zone</div><div style="color:var(--text2)">👤 ${growers.filter(g=>g.zone===z).length} growers</div><div style="color:var(--text2)">🌱 ${plants.filter(p=>p.zone===z).length} plots</div></div>`;
-  }).join('');
+  document.getElementById('zone-detail-grid').innerHTML=zones.map(z=>{const color=ZONE_COLORS[z];return`<div style="font-size:11px"><div style="font-weight:700;color:${color};margin-bottom:4px">${z} Zone</div><div style="color:var(--text2)">👤 ${growers.filter(g=>g.zone===z).length} growers</div><div style="color:var(--text2)">🌱 ${plants.filter(p=>p.zone===z).length} plots</div></div>`;}).join('');
 }
 function filterMapZone(zone){if(leafletMap){const b=ZONE_BOUNDS[zone];if(b)leafletMap.fitBounds(b);}}
 
@@ -1254,27 +1120,20 @@ function renderGrowers(){
   const zone=(document.getElementById('grower-zone-filter')||{}).value||'';
   const status=(document.getElementById('grower-status-filter')||{}).value||'';
   const filtered=growers.filter(g=>(!search||(g.growerName+g.locality).toLowerCase().includes(search))&&(!zone||g.zone===zone)&&(!status||g.status===status));
-  document.getElementById('growers-tbody').innerHTML=filtered.length?filtered.map(g=>`
-    <tr>
-      <td style="font-weight:600">${g.growerName}</td>
-      <td><span class="badge badge-${zoneBadge(g.zone)}">${g.zone}</span></td>
-      <td style="color:var(--text2)">📍 ${g.locality}</td>
-      <td style="color:var(--text2)">📞 ${g.contact||'—'}</td>
-      <td style="font-weight:700;color:var(--gold)">${g.totalAreaHa}</td>
-      <td style="color:var(--text2)">${g.registrationDate||'—'}</td>
-      <td><span class="badge ${g.status==='Active'?'badge-green':'badge-gray'}">${g.status}</span></td>
-      <td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deleteGrower('${g.id}')})">🗑</button></div></td>
-    </tr>`).join(''):`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">No growers found</div><div class="empty-sub">Add your first grower to get started</div></div></td></tr>`;
+  document.getElementById('growers-tbody').innerHTML=filtered.length?filtered.map(g=>`<tr><td style="font-weight:600">${g.growerName}</td><td><span class="badge badge-${zoneBadge(g.zone)}">${g.zone}</span></td><td style="color:var(--text2)">📍 ${g.locality}</td><td style="color:var(--text2)">📞 ${g.contact||'—'}</td><td style="font-weight:700;color:var(--gold)">${g.totalAreaHa}</td><td style="color:var(--text2)">${g.registrationDate||'—'}</td><td><span class="badge ${g.status==='Active'?'badge-green':'badge-gray'}">${g.status}</span></td><td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deleteGrower('${g.id}')})">🗑</button></div></td></tr>`).join(''):`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">No growers found</div><div class="empty-sub">Add your first grower to get started</div></div></td></tr>`;
   document.getElementById('topbar-subtitle').textContent=filtered.length+' record'+(filtered.length!==1?'s':'');
 }
-function deleteGrower(id){save(KEYS.GROWERS,load(KEYS.GROWERS).filter(x=>x.id!==id));toast('info','Grower removed');renderGrowers();}
+function deleteGrower(id){
+  save(KEYS.GROWERS,load(KEYS.GROWERS).filter(x=>x.id!==id));
+  trySyncGas('deleteRecord',{sheet:'Growers',id});
+  toast('info','Grower removed');renderGrowers();
+}
 
 // -------- PLANTATIONS --------
 function openPlantModal(){
   const growers=load(KEYS.GROWERS);const sel=document.getElementById('p-grower');
   sel.innerHTML='<option value="">— Select Grower —</option>'+growers.map(g=>`<option>${g.growerName}</option>`).join('');
-  document.getElementById('p-comments').value='';
-  document.getElementById('p-area').value=0;document.getElementById('p-yield').value=0;
+  document.getElementById('p-comments').value='';document.getElementById('p-area').value=0;document.getElementById('p-yield').value=0;
   document.getElementById('p-date').value=new Date().toISOString().split('T')[0];
   openModal('modal-plantation');
 }
@@ -1292,21 +1151,9 @@ function renderPlantations(){
   const zone=(document.getElementById('plt-zone-filter')||{}).value||'';
   const season=(document.getElementById('plt-season-filter')||{}).value||'';
   const filtered=plants.filter(p=>(!search||(p.growerName+p.variety).toLowerCase().includes(search))&&(!zone||p.zone===zone)&&(!season||p.season===season));
-  document.getElementById('plantations-tbody').innerHTML=filtered.length?filtered.map(p=>`
-    <tr>
-      <td style="font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.growerName}</td>
-      <td><span class="badge badge-${zoneBadge(p.zone)}">${p.zone}</span></td>
-      <td><span class="badge badge-gold">${p.variety}</span></td>
-      <td style="color:var(--text2)">📅 ${p.datePlanted}</td>
-      <td style="font-weight:700">${p.productionAreaHa}</td>
-      <td><span class="badge badge-blue">${p.season}</span></td>
-      <td style="color:var(--text2)">${p.fortnightlyPeriod}</td>
-      <td style="font-weight:700;color:var(--green)">${p.estimatedYieldTHa} T/Ha</td>
-      <td><span class="badge ${p.status==='Active'?'badge-green':p.status==='Growing'?'badge-blue':'badge-gray'}">${p.status}</span></td>
-      <td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deletePlant('${p.id}')})">🗑</button></div></td>
-    </tr>`).join(''):`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records</div></div></td></tr>`;
+  document.getElementById('plantations-tbody').innerHTML=filtered.length?filtered.map(p=>`<tr><td style="font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.growerName}</td><td><span class="badge badge-${zoneBadge(p.zone)}">${p.zone}</span></td><td><span class="badge badge-gold">${p.variety}</span></td><td style="color:var(--text2)">📅 ${p.datePlanted}</td><td style="font-weight:700">${p.productionAreaHa}</td><td><span class="badge badge-blue">${p.season}</span></td><td style="color:var(--text2)">${p.fortnightlyPeriod}</td><td style="font-weight:700;color:var(--green)">${p.estimatedYieldTHa} T/Ha</td><td><span class="badge ${p.status==='Active'?'badge-green':p.status==='Growing'?'badge-blue':'badge-gray'}">${p.status}</span></td><td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deletePlant('${p.id}')})">🗑</button></div></td></tr>`).join(''):`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records</div></div></td></tr>`;
 }
-function deletePlant(id){save(KEYS.PLANTS,load(KEYS.PLANTS).filter(x=>x.id!==id));toast('info','Record removed');renderPlantations();}
+function deletePlant(id){save(KEYS.PLANTS,load(KEYS.PLANTS).filter(x=>x.id!==id));trySyncGas('deleteRecord',{sheet:'Plantations',id});toast('info','Record removed');renderPlantations();}
 
 // -------- PEST / DISEASE --------
 function openPestModal(){
@@ -1332,22 +1179,11 @@ function renderPest(){
   const filtered=pests.filter(p=>(!search||(p.growerName+p.pestDiseaseName).toLowerCase().includes(search))&&(!sev||p.severity===sev));
   const highRisk=pests.filter(p=>p.severity==='High'||p.severity==='Critical').length;
   const alert=document.getElementById('pest-alert');
-  if(alert){alert.style.display=highRisk>0?'flex':'none';if(highRisk>0)alert.innerHTML=`⚠ ${highRisk} high-risk or critical pest/disease observation${highRisk>1?'s':''} require immediate attention`;}
+  if(alert){alert.style.display=highRisk>0?'flex':'none';if(highRisk>0)alert.innerHTML=`⚠ ${highRisk} high-risk or critical observation${highRisk>1?'s':''} require immediate attention`;}
   const sevBadge={Low:'badge-green',Moderate:'badge-orange',High:'badge-red',Critical:'badge-red'};
-  document.getElementById('pest-tbody').innerHTML=filtered.length?filtered.map(p=>`
-    <tr>
-      <td style="color:var(--text2)">${p.dateObserved}</td>
-      <td style="font-weight:600;max-width:140px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${p.growerName}</td>
-      <td style="color:var(--text2)">${p.locality}</td>
-      <td style="font-weight:600">${p.pestDiseaseName}</td>
-      <td><span class="badge badge-purple">${p.category}</span></td>
-      <td><span class="badge ${sevBadge[p.severity]||'badge-gray'}">${p.severity}</span>${p.severityPct?` <small style="color:var(--text3)">${p.severityPct}%</small>`:''}</td>
-      <td>${p.affectedAreaHa} Ha</td>
-      <td style="font-weight:700;color:${p.yieldImpactPct>20?'var(--red)':p.yieldImpactPct>10?'var(--orange)':'var(--green)'}">${p.yieldImpactPct}%</td>
-      <td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deletePest('${p.id}')})">🗑</button></div></td>
-    </tr>`).join(''):`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-title">No observations recorded</div></div></td></tr>`;
+  document.getElementById('pest-tbody').innerHTML=filtered.length?filtered.map(p=>`<tr><td style="color:var(--text2)">${p.dateObserved}</td><td style="font-weight:600;max-width:140px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${p.growerName}</td><td style="color:var(--text2)">${p.locality}</td><td style="font-weight:600">${p.pestDiseaseName}</td><td><span class="badge badge-purple">${p.category}</span></td><td><span class="badge ${sevBadge[p.severity]||'badge-gray'}">${p.severity}</span>${p.severityPct?` <small style="color:var(--text3)">${p.severityPct}%</small>`:''}</td><td>${p.affectedAreaHa} Ha</td><td style="font-weight:700;color:${p.yieldImpactPct>20?'var(--red)':p.yieldImpactPct>10?'var(--orange)':'var(--green)'}">${p.yieldImpactPct}%</td><td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deletePest('${p.id}')})">🗑</button></div></td></tr>`).join(''):`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-title">No observations recorded</div></div></td></tr>`;
 }
-function deletePest(id){save(KEYS.PEST,load(KEYS.PEST).filter(x=>x.id!==id));toast('info','Removed');renderPest();}
+function deletePest(id){save(KEYS.PEST,load(KEYS.PEST).filter(x=>x.id!==id));trySyncGas('deleteRecord',{sheet:'Pest_Disease',id});toast('info','Removed');renderPest();}
 
 // -------- YIELD ASSESSMENT --------
 function calcYield(){
@@ -1383,21 +1219,9 @@ function renderYield(){
   const yields=load(KEYS.YIELD);
   const search=(document.getElementById('yield-search')||{}).value?.toLowerCase()||'';
   const filtered=yields.filter(y=>!search||(y.growerName+y.variety).toLowerCase().includes(search));
-  document.getElementById('yield-tbody').innerHTML=filtered.length?filtered.map(y=>`
-    <tr>
-      <td style="font-weight:600;max-width:140px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${y.growerName}</td>
-      <td><span class="badge badge-${zoneBadge(y.zone)}">${y.zone}</span></td>
-      <td><span class="badge badge-gold">${y.variety}</span></td>
-      <td style="color:var(--text2)">${y.assessmentDate}</td>
-      <td><span class="badge badge-blue">${y.season}</span></td>
-      <td style="font-weight:700">${y.avgKgSqm.toFixed(3)}</td>
-      <td style="font-weight:700;color:var(--gold)">${y.yieldTHa.toFixed(2)}</td>
-      <td>${y.yieldTArpent.toFixed(2)}</td>
-      <td>${y.yieldTAcre.toFixed(2)}</td>
-      <td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deleteYield('${y.id}')})">🗑</button></div></td>
-    </tr>`).join(''):`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📈</div><div class="empty-title">No yield assessments</div></div></td></tr>`;
+  document.getElementById('yield-tbody').innerHTML=filtered.length?filtered.map(y=>`<tr><td style="font-weight:600;max-width:140px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${y.growerName}</td><td><span class="badge badge-${zoneBadge(y.zone)}">${y.zone}</span></td><td><span class="badge badge-gold">${y.variety}</span></td><td style="color:var(--text2)">${y.assessmentDate}</td><td><span class="badge badge-blue">${y.season}</span></td><td style="font-weight:700">${y.avgKgSqm.toFixed(3)}</td><td style="font-weight:700;color:var(--gold)">${y.yieldTHa.toFixed(2)}</td><td>${y.yieldTArpent.toFixed(2)}</td><td>${y.yieldTAcre.toFixed(2)}</td><td><div class="table-actions"><button class="btn btn-red btn-icon btn-sm" onclick="confirmDelete(()=>{deleteYield('${y.id}')})">🗑</button></div></td></tr>`).join(''):`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📈</div><div class="empty-title">No yield assessments</div></div></td></tr>`;
 }
-function deleteYield(id){save(KEYS.YIELD,load(KEYS.YIELD).filter(x=>x.id!==id));toast('info','Removed');renderYield();}
+function deleteYield(id){save(KEYS.YIELD,load(KEYS.YIELD).filter(x=>x.id!==id));trySyncGas('deleteRecord',{sheet:'Yield_Assessment',id});toast('info','Removed');renderYield();}
 
 // -------- CAMPAIGN TABLE --------
 let campDirty=false;
@@ -1415,14 +1239,11 @@ function setCampVal(season,zone,plant,month,fortnight,metric,val){
   save(KEYS.CAMPAIGN,entries);
 }
 function renderCampaign(){
-  const season=document.getElementById('camp-season').value;
-  const zone=document.getElementById('camp-zone').value;
+  const season=document.getElementById('camp-season').value;const zone=document.getElementById('camp-zone').value;
   campDirty=false;document.getElementById('camp-save-btn').style.display='none';
   let totalYield=0,totalProd=0,totalArea=0,yCount=0;
   PLANTATIONS.forEach(p=>MONTHS.forEach(m=>['F1','F2'].forEach(f=>{
-    const y=parseFloat(getCampVal(season,zone,p,m,f,'yield'))||0;
-    const pr=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;
-    const ar=parseFloat(getCampVal(season,zone,p,m,f,'area'))||0;
+    const y=parseFloat(getCampVal(season,zone,p,m,f,'yield'))||0;const pr=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;const ar=parseFloat(getCampVal(season,zone,p,m,f,'area'))||0;
     if(y>0){totalYield+=y;yCount++;}totalProd+=pr;totalArea+=ar;
   })));
   const avgYield=yCount?totalYield/yCount:0;
@@ -1433,13 +1254,7 @@ function renderCampaign(){
     {label:'Avg Yield (T/Ha)',value:avgYield?avgYield.toFixed(2):'—',color:'var(--purple)'},
   ].map(s=>`<div class="stat-card" style="text-align:center"><div class="stat-label">${s.label}</div><div style="font-size:24px;font-weight:800;color:${s.color}">${s.value}</div></div>`).join('');
   const metrics=[{key:'yield',label:'YIELD',cls:'yield-val'},{key:'production',label:'PROD',cls:'prod-val'},{key:'area',label:'AREA',cls:'area-val'}];
-  let html=`<table class="ctable"><thead><tr>
-    <th class="sticky-col" rowspan="2" style="color:var(--gold)">PLANTATION</th>
-    <th class="sticky-col2" rowspan="2" style="color:var(--text3)">HARVEST</th>
-    ${MONTHS.map(m=>`<th colspan="2" style="color:var(--text)">${m}</th>`).join('')}
-    <th class="total-col" rowspan="2">TOTAL</th></tr>
-    <tr>${MONTHS.map(()=>'<th style="color:var(--gold)">F1</th><th style="color:var(--gold)">F2</th>').join('')}</tr>
-  </thead><tbody>`;
+  let html=`<table class="ctable"><thead><tr><th class="sticky-col" rowspan="2" style="color:var(--gold)">PLANTATION</th><th class="sticky-col2" rowspan="2" style="color:var(--text3)">HARVEST</th>${MONTHS.map(m=>`<th colspan="2" style="color:var(--text)">${m}</th>`).join('')}<th class="total-col" rowspan="2">TOTAL</th></tr><tr>${MONTHS.map(()=>'<th style="color:var(--gold)">F1</th><th style="color:var(--gold)">F2</th>').join('')}</tr></thead><tbody>`;
   html+=`<tr class="sum-row"><td class="sticky-col" style="color:var(--gold);font-weight:800">TOTAL CUM</td><td class="sticky-col2" style="color:var(--text3)">—</td>`;
   let grandProd=0;
   MONTHS.forEach(m=>['F1','F2'].forEach(f=>{let tot=0;PLANTATIONS.forEach(p=>{tot+=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;});if(tot>0)grandProd+=tot;html+=`<td style="color:var(--text2);font-weight:600">${tot?tot.toFixed(1):''}</td>`;}));
@@ -1448,13 +1263,8 @@ function renderCampaign(){
   PLANTATIONS.forEach((plant,pi)=>{
     const col=plantColors[pi];
     metrics.forEach((metric,mi)=>{
-      html+=`<tr ${mi===0?'style="border-top:2px solid var(--border2)"':''}>
-        <td class="sticky-col plant-header" style="${mi===0?'color:'+col:'color:var(--text3);font-size:9px;text-transform:uppercase'}">${mi===0?plant:'<span style="font-size:9px">'+metric.label+'</span>'}</td>
-        <td class="sticky-col2" style="color:var(--text3);font-size:10px">${mi===0?'✓':''}</td>`;
-      MONTHS.forEach(m=>['F1','F2'].forEach(f=>{
-        const val=getCampVal(season,zone,plant,m,f,metric.key);
-        html+=`<td class="${metric.cls}"><input type="number" value="${val}" placeholder="—" step="0.1" min="0" onchange="setCampVal('${season}','${zone}','${plant}','${m}','${f}','${metric.key}',this.value);markCampDirty()" style="color:${metric.cls==='yield-val'?'var(--gold)':metric.cls==='prod-val'?'var(--green)':'var(--blue)'}"/></td>`;
-      }));
+      html+=`<tr ${mi===0?'style="border-top:2px solid var(--border2)"':''}><td class="sticky-col plant-header" style="${mi===0?'color:'+col:'color:var(--text3);font-size:9px;text-transform:uppercase'}">${mi===0?plant:'<span style="font-size:9px">'+metric.label+'</span>'}</td><td class="sticky-col2" style="color:var(--text3);font-size:10px">${mi===0?'✓':''}</td>`;
+      MONTHS.forEach(m=>['F1','F2'].forEach(f=>{const val=getCampVal(season,zone,plant,m,f,metric.key);html+=`<td class="${metric.cls}"><input type="number" value="${val}" placeholder="—" step="0.1" min="0" onchange="setCampVal('${season}','${zone}','${plant}','${m}','${f}','${metric.key}',this.value);markCampDirty()" style="color:${metric.cls==='yield-val'?'var(--gold)':metric.cls==='prod-val'?'var(--green)':'var(--blue)'}"/></td>`;}));
       let rowTot=0;MONTHS.forEach(m=>['F1','F2'].forEach(f=>{rowTot+=parseFloat(getCampVal(season,zone,plant,m,f,metric.key))||0;}));
       html+=`<td class="total-col" style="color:${metric.cls==='yield-val'?'var(--gold)':metric.cls==='prod-val'?'var(--green)':'var(--blue)'}">${rowTot?rowTot.toFixed(2):''}</td></tr>`;
     });
@@ -1477,109 +1287,23 @@ function renderCampaign(){
 function markCampDirty(){campDirty=true;document.getElementById('camp-save-btn').style.display='';}
 function saveCampaign(){campDirty=false;document.getElementById('camp-save-btn').style.display='none';toast('success','Campaign table saved!');renderCampaign();}
 
-// -------- PRINT --------
+// -------- PRINT / PDF --------
 function printCampaign(){
-  const season=document.getElementById('camp-season').value;
-  const zone=document.getElementById('camp-zone').value;
+  const season=document.getElementById('camp-season').value;const zone=document.getElementById('camp-zone').value;
   const today=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
   const officer=currentUser?.fullName||currentUser?.username||'—';
   const cols=[];MONTHS.forEach(m=>['F1','F2'].forEach(f=>cols.push({m,f})));
   let totalYield=0,totalProd=0,totalArea=0,yCount=0;
-  PLANTATIONS.forEach(p=>cols.forEach(({m,f})=>{
-    const y=parseFloat(getCampVal(season,zone,p,m,f,'yield'))||0;
-    const pr=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;
-    const ar=parseFloat(getCampVal(season,zone,p,m,f,'area'))||0;
-    if(y>0){totalYield+=y;yCount++;}totalProd+=pr;totalArea+=ar;
-  }));
+  PLANTATIONS.forEach(p=>cols.forEach(({m,f})=>{const y=parseFloat(getCampVal(season,zone,p,m,f,'yield'))||0;const pr=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;const ar=parseFloat(getCampVal(season,zone,p,m,f,'area'))||0;if(y>0){totalYield+=y;yCount++;}totalProd+=pr;totalArea+=ar;}));
   const avgYield=yCount?totalYield/yCount:0;
   const metrics=[{key:'yield',label:'Yield (T/Ha)'},{key:'production',label:'Production (T)'},{key:'area',label:'Area (Ha)'}];
   const plantColors={'E1':'#b45309','E2':'#166534','E3':'#1d4ed8','E4':'#6d28d9'};
   let plantRows='';
-  PLANTATIONS.forEach((plant,pi)=>{
-    const pc=plantColors[plant]||'#333';
-    metrics.forEach((metric,mi)=>{
-      const rowVals=cols.map(({m,f})=>{const v=getCampVal(season,zone,plant,m,f,metric.key);return`<td>${v?parseFloat(v).toFixed(1):''}</td>`;}).join('');
-      const rowTotal=cols.reduce((s,{m,f})=>s+(parseFloat(getCampVal(season,zone,plant,m,f,metric.key))||0),0);
-      plantRows+=`<tr class="${mi===0?'plant-first':'sub-row'}">
-        <td class="plant-col" style="${mi===0?'color:'+pc+';font-weight:800':'color:#666;font-size:10px'}">${mi===0?plant:metric.label}</td>
-        ${rowVals}<td class="total-td">${rowTotal?rowTotal.toFixed(2):''}</td></tr>`;
-    });
-  });
-  const makeSum=(label,metric,color)=>{
-    const rowVals=cols.map(({m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,metric))||0;});return`<td style="color:${color}">${t?t.toFixed(1):''}</td>`;}).join('');
-    const tot=cols.reduce((s,{m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,metric))||0;});return s+t;},0);
-    return`<tr><td style="font-weight:700;color:${color};font-size:10px;text-transform:uppercase">${label}</td>${rowVals}<td class="total-td" style="color:${color}">${tot?tot.toFixed(2):''}</td></tr>`;
-  };
-  const avgRow=()=>{
-    const rowVals=cols.map(({m,f})=>{const vals=PLANTATIONS.map(p=>parseFloat(getCampVal(season,zone,p,m,f,'yield'))).filter(v=>v>0);const avg=vals.length?(vals.reduce((a,b)=>a+b)/vals.length).toFixed(1):'';return`<td>${avg}</td>`;}).join('');
-    const all=PLANTATIONS.flatMap(p=>cols.map(({m,f})=>parseFloat(getCampVal(season,zone,p,m,f,'yield'))).filter(v=>v>0));
-    return`<tr><td style="font-weight:700;color:#555;font-size:10px">Avg Yield (T/Ha)</td>${rowVals}<td class="total-td">${all.length?(all.reduce((a,b)=>a+b)/all.length).toFixed(2):''}</td></tr>`;
-  };
-  const cumProdRow=()=>{
-    let running=0;
-    const rowVals=cols.map(({m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;});running+=t;return`<td style="color:#0d6e3f">${running?running.toFixed(1):''}</td>`;}).join('');
-    return`<tr><td style="font-weight:700;color:#0d6e3f;font-size:10px">Cum. Production (T)</td>${rowVals}<td class="total-td" style="color:#0d6e3f">${running?running.toFixed(2):''}</td></tr>`;
-  };
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
-<title>PoTa — ${zone} · ${season}</title>
-<style>
-@page{size:A3 landscape;margin:14mm 10mm}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;font-size:9px;color:#111;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.hdr{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:3px solid #b45309;padding-bottom:8px;margin-bottom:10px}
-.hdr-l{display:flex;align-items:center;gap:10px}
-.hdr-title{font-size:18px;font-weight:900;color:#b45309}
-.hdr-r{text-align:right;font-size:9px;line-height:1.8;color:#444}
-.sum-row2{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
-.sc{border:1.5px solid;border-radius:6px;padding:7px 10px;text-align:center}
-.sc.g{border-color:#b45309;background:#fff8ee}.sc.g .v{color:#b45309}
-.sc.gr{border-color:#166534;background:#f0fff4}.sc.gr .v{color:#166534}
-.sc.b{border-color:#1d4ed8;background:#eff6ff}.sc.b .v{color:#1d4ed8}
-.sc.p{border-color:#6d28d9;background:#f5f3ff}.sc.p .v{color:#6d28d9}
-.sc .v{font-size:20px;font-weight:900;line-height:1.1}
-.sc .l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#555;margin-top:3px}
-table{width:100%;border-collapse:collapse;table-layout:fixed}
-th,td{border:1px solid #ccc;padding:3px 2px;text-align:center;font-size:8.5px;overflow:hidden;white-space:nowrap}
-thead tr:first-child th{background:#1a3a5c;color:#fff;font-weight:700;font-size:9px;padding:5px 2px}
-thead tr:last-child th{background:#253c5a;color:#e0e8f8;font-weight:600}
-.plant-col{width:64px;text-align:left!important;padding-left:5px!important;background:#fafafa}
-.total-td{background:#fef3c7;font-weight:700;color:#92400e;border-left:2px solid #b45309!important}
-.plant-first .plant-col{border-top:2px solid #ccc!important}
-.sub-row{background:#fafafa}
-.ftr{margin-top:12px;border-top:2px solid #b45309;padding-top:6px;display:flex;justify-content:space-between;font-size:8px;color:#666}
-.no-print{margin-bottom:12px;display:flex;align-items:center;gap:10px;padding:8px;background:#f9fafb;border:1px solid #ddd;border-radius:6px}
-.pbtn{padding:7px 18px;background:#b45309;color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer}
-@media print{.no-print{display:none}}
-</style></head><body>
-<div class="no-print">
-  <button class="pbtn" onclick="window.print()">🖨 Print or Save as PDF</button>
-  <span style="font-size:11px;color:#555">Set <b>Layout → Landscape</b> · <b>Paper → A3</b> · <b>Background graphics ON</b></span>
-</div>
-<div class="hdr">
-  <div class="hdr-l">
-    <svg width="46" height="46" viewBox="0 0 44 44"><defs><radialGradient id="pg" cx="45%" cy="40%" r="55%"><stop offset="0%" stop-color="#e8b96a"/><stop offset="60%" stop-color="#c49040"/><stop offset="100%" stop-color="#9e6e20"/></radialGradient></defs><ellipse cx="22" cy="25" rx="15" ry="12" fill="url(#pg)" transform="rotate(-12 22 25)"/></svg>
-    <div><div style="font-size:10px;font-weight:700;color:#555">Ministry of Agro-Industry &amp; Food Security — Mauritius</div><div class="hdr-title">PoTa Tracker</div><div style="font-size:9.5px;color:#333;font-weight:600">Potato Campaign Monitoring System</div></div>
-  </div>
-  <div class="hdr-r"><div><b>Season:</b> ${season}</div><div><b>Zone:</b> ${zone}</div><div><b>Date:</b> ${today}</div><div><b>Officer:</b> ${officer}</div></div>
-</div>
-<div class="sum-row2">
-  <div class="sc g"><div class="v">${totalYield?totalYield.toFixed(2):'—'}</div><div class="l">Total Yield (T/Ha)</div></div>
-  <div class="sc gr"><div class="v">${totalProd?totalProd.toFixed(2):'—'}</div><div class="l">Total Production (T)</div></div>
-  <div class="sc b"><div class="v">${totalArea?totalArea.toFixed(2):'—'}</div><div class="l">Total Area (Ha)</div></div>
-  <div class="sc p"><div class="v">${avgYield?avgYield.toFixed(2):'—'}</div><div class="l">Avg Yield (T/Ha)</div></div>
-</div>
-<table>
-  <thead>
-    <tr><th class="plant-col" rowspan="2" style="background:#0d2137;color:#f0a500">PLANTATION</th>${MONTHS.map(m=>`<th colspan="2">${m}</th>`).join('')}<th rowspan="2" style="background:#6b3a00;color:#fcd34d;width:52px">TOTAL</th></tr>
-    <tr>${MONTHS.flatMap(()=>['F1','F2']).map(f=>`<th style="font-size:8px;color:#c0d0e8">${f}</th>`).join('')}</tr>
-  </thead>
-  <tbody>
-    <tr style="background:#fff7ed"><td style="font-weight:800;font-size:9px;color:#92400e;text-align:left;padding-left:5px">Total Cum</td>${cols.map(({m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;});return`<td>${t?t.toFixed(1):''}</td>`;}).join('')}<td class="total-td">${totalProd?totalProd.toFixed(2):''}</td></tr>
-    ${plantRows}${avgRow()}${makeSum('Area Cumulative (Ha)','area','#1d4ed8')}${makeSum('Production (T)','production','#166534')}${cumProdRow()}
-  </tbody>
-</table>
-<div class="ftr"><div><b>PoTa Tracker v2.8</b> — Potato Cultivation Monitoring System, Mauritius</div><div>Generated: ${today} | Season: ${season} | Zone: ${zone}</div></div>
-</body></html>`;
+  PLANTATIONS.forEach((plant,pi)=>{const pc=plantColors[plant]||'#333';metrics.forEach((metric,mi)=>{const rowVals=cols.map(({m,f})=>{const v=getCampVal(season,zone,plant,m,f,metric.key);return`<td>${v?parseFloat(v).toFixed(1):''}</td>`;}).join('');const rowTotal=cols.reduce((s,{m,f})=>s+(parseFloat(getCampVal(season,zone,plant,m,f,metric.key))||0),0);plantRows+=`<tr class="${mi===0?'plant-first':'sub-row'}"><td class="plant-col" style="${mi===0?'color:'+pc+';font-weight:800':'color:#666;font-size:10px'}">${mi===0?plant:metric.label}</td>${rowVals}<td class="total-td">${rowTotal?rowTotal.toFixed(2):''}</td></tr>`;});});
+  const makeSum=(label,metric,color)=>{const rowVals=cols.map(({m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,metric))||0;});return`<td style="color:${color}">${t?t.toFixed(1):''}</td>`;}).join('');const tot=cols.reduce((s,{m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,metric))||0;});return s+t;},0);return`<tr><td style="font-weight:700;color:${color};font-size:10px;text-transform:uppercase">${label}</td>${rowVals}<td class="total-td" style="color:${color}">${tot?tot.toFixed(2):''}</td></tr>`;};
+  const avgRow=()=>{const rowVals=cols.map(({m,f})=>{const vals=PLANTATIONS.map(p=>parseFloat(getCampVal(season,zone,p,m,f,'yield'))).filter(v=>v>0);const avg=vals.length?(vals.reduce((a,b)=>a+b)/vals.length).toFixed(1):'';return`<td>${avg}</td>`;}).join('');const all=PLANTATIONS.flatMap(p=>cols.map(({m,f})=>parseFloat(getCampVal(season,zone,p,m,f,'yield'))).filter(v=>v>0));return`<tr><td style="font-weight:700;color:#555;font-size:10px">Avg Yield (T/Ha)</td>${rowVals}<td class="total-td">${all.length?(all.reduce((a,b)=>a+b)/all.length).toFixed(2):''}</td></tr>`;};
+  const cumProdRow=()=>{let running=0;const rowVals=cols.map(({m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;});running+=t;return`<td style="color:#0d6e3f">${running?running.toFixed(1):''}</td>`;}).join('');return`<tr><td style="font-weight:700;color:#0d6e3f;font-size:10px">Cum. Production (T)</td>${rowVals}<td class="total-td" style="color:#0d6e3f">${running?running.toFixed(2):''}</td></tr>`;};
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>PoTa — ${zone} · ${season}</title><style>@page{size:A3 landscape;margin:14mm 10mm}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:9px;color:#111;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.hdr{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:3px solid #b45309;padding-bottom:8px;margin-bottom:10px}.hdr-l{display:flex;align-items:center;gap:10px}.hdr-title{font-size:18px;font-weight:900;color:#b45309}.hdr-r{text-align:right;font-size:9px;line-height:1.8;color:#444}.sum-row2{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}.sc{border:1.5px solid;border-radius:6px;padding:7px 10px;text-align:center}.sc.g{border-color:#b45309;background:#fff8ee}.sc.g .v{color:#b45309}.sc.gr{border-color:#166534;background:#f0fff4}.sc.gr .v{color:#166534}.sc.b{border-color:#1d4ed8;background:#eff6ff}.sc.b .v{color:#1d4ed8}.sc.p{border-color:#6d28d9;background:#f5f3ff}.sc.p .v{color:#6d28d9}.sc .v{font-size:20px;font-weight:900;line-height:1.1}.sc .l{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#555;margin-top:3px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #ccc;padding:3px 2px;text-align:center;font-size:8.5px;overflow:hidden;white-space:nowrap}thead tr:first-child th{background:#1a3a5c;color:#fff;font-weight:700;font-size:9px;padding:5px 2px}thead tr:last-child th{background:#253c5a;color:#e0e8f8;font-weight:600}.plant-col{width:64px;text-align:left!important;padding-left:5px!important;background:#fafafa}.total-td{background:#fef3c7;font-weight:700;color:#92400e;border-left:2px solid #b45309!important}.plant-first .plant-col{border-top:2px solid #ccc!important}.sub-row{background:#fafafa}.ftr{margin-top:12px;border-top:2px solid #b45309;padding-top:6px;display:flex;justify-content:space-between;font-size:8px;color:#666}.no-print{margin-bottom:12px;display:flex;align-items:center;gap:10px;padding:8px;background:#f9fafb;border:1px solid #ddd;border-radius:6px}.pbtn{padding:7px 18px;background:#b45309;color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer}@media print{.no-print{display:none}}</style></head><body><div class="no-print"><button class="pbtn" onclick="window.print()">🖨 Print or Save as PDF</button><span style="font-size:11px;color:#555">Set <b>Layout → Landscape</b> · <b>Paper → A3</b> · <b>Background graphics ON</b></span></div><div class="hdr"><div class="hdr-l"><div><div style="font-size:10px;font-weight:700;color:#555">Ministry of Agro-Industry &amp; Food Security — Mauritius</div><div class="hdr-title">PoTa Tracker</div><div style="font-size:9.5px;color:#333;font-weight:600">Potato Campaign Monitoring System</div></div></div><div class="hdr-r"><div><b>Season:</b> ${season}</div><div><b>Zone:</b> ${zone}</div><div><b>Date:</b> ${today}</div><div><b>Officer:</b> ${officer}</div></div></div><div class="sum-row2"><div class="sc g"><div class="v">${totalYield?totalYield.toFixed(2):'—'}</div><div class="l">Total Yield (T/Ha)</div></div><div class="sc gr"><div class="v">${totalProd?totalProd.toFixed(2):'—'}</div><div class="l">Total Production (T)</div></div><div class="sc b"><div class="v">${totalArea?totalArea.toFixed(2):'—'}</div><div class="l">Total Area (Ha)</div></div><div class="sc p"><div class="v">${avgYield?avgYield.toFixed(2):'—'}</div><div class="l">Avg Yield (T/Ha)</div></div></div><table><thead><tr><th class="plant-col" rowspan="2" style="background:#0d2137;color:#f0a500">PLANTATION</th>${MONTHS.map(m=>`<th colspan="2">${m}</th>`).join('')}<th rowspan="2" style="background:#6b3a00;color:#fcd34d;width:52px">TOTAL</th></tr><tr>${MONTHS.flatMap(()=>['F1','F2']).map(f=>`<th style="font-size:8px;color:#c0d0e8">${f}</th>`).join('')}</tr></thead><tbody><tr style="background:#fff7ed"><td style="font-weight:800;font-size:9px;color:#92400e;text-align:left;padding-left:5px">Total Cum</td>${cols.map(({m,f})=>{let t=0;PLANTATIONS.forEach(p=>{t+=parseFloat(getCampVal(season,zone,p,m,f,'production'))||0;});return`<td>${t?t.toFixed(1):''}</td>`;}).join('')}<td class="total-td">${totalProd?totalProd.toFixed(2):''}</td></tr>${plantRows}${avgRow()}${makeSum('Area Cumulative (Ha)','area','#1d4ed8')}${makeSum('Production (T)','production','#166534')}${cumProdRow()}</tbody></table><div class="ftr"><div><b>PoTa Tracker v2.9</b> — Potato Cultivation Monitoring System, Mauritius</div><div>Generated: ${today} | Season: ${season} | Zone: ${zone}</div></div></body></html>`;
   const win=window.open('','_blank','width=1200,height=850,menubar=yes,toolbar=yes');
   if(!win){toast('error','Pop-up blocked — allow pop-ups for this site');return;}
   win.document.write(html);win.document.close();
@@ -1596,54 +1320,60 @@ function renderQuickStats(){
     ['Plantation Records',p.length],['Pest Observations',pd.length],['Yield Assessments',y.length]
   ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(30,45,69,.5);font-size:12px"><span style="color:var(--text2)">${l}</span><b style="color:var(--gold)">${v}</b></div>`).join('');
 }
+
+// FIX 5: Zone selector added to reports
 function generateReport(){
   const growers=load(KEYS.GROWERS);const plants=load(KEYS.PLANTS);const pests=load(KEYS.PEST);const yields=load(KEYS.YIELD);
   const season=document.getElementById('rep-season').value;
+  const zone=document.getElementById('rep-zone').value;
   const start=document.getElementById('rep-start').value;const end=document.getElementById('rep-end').value;
   const today=new Date().toLocaleDateString('en-GB');
-  const highPest=pests.filter(p=>p.severity==='High'||p.severity==='Critical');
-  const avgYield=yields.length?(yields.reduce((s,y)=>s+y.yieldTHa,0)/yields.length).toFixed(2):'N/A';
+  const filterZone=zone==='All'?growers:growers.filter(g=>g.zone===zone);
+  const filterPlants=zone==='All'?plants:plants.filter(p=>p.zone===zone);
+  const filterPests=zone==='All'?pests:pests.filter(p=>filterZone.some(g=>g.growerName===p.growerName));
+  const filterYields=zone==='All'?yields:yields.filter(y=>y.zone===zone);
+  const highPest=filterPests.filter(p=>p.severity==='High'||p.severity==='Critical');
+  const avgYield=filterYields.length?(filterYields.reduce((s,y)=>s+y.yieldTHa,0)/filterYields.length).toFixed(2):'N/A';
   const zones=['East','North','South','West','Central'];
   const zoneBreak=zones.map(z=>({zone:z,growers:growers.filter(g=>g.zone===z).length,area:growers.filter(g=>g.zone===z).reduce((s,g)=>s+(+g.totalAreaHa||0),0).toFixed(2)})).filter(z=>z.growers>0);
   lastReport=`POTATO CAMPAIGN WEEKLY REPORT
-Generated: ${today} | Season: ${season}
+Generated: ${today} | Season: ${season} | Zone: ${zone}
 ${start&&end?'Week: '+start+' to '+end:''}
 Officer: ${currentUser?.fullName||currentUser?.username||'—'}
 
 ════════════════════════════════════════
 
 1. GROWER OVERVIEW
-   Active Growers: ${growers.filter(g=>g.status==='Active').length} of ${growers.length} registered
-   Total Cultivation Area: ${growers.reduce((s,g)=>s+(+g.totalAreaHa||0),0).toFixed(2)} Ha
+   Active Growers: ${filterZone.filter(g=>g.status==='Active').length} of ${filterZone.length} ${zone!=='All'?'('+zone+' Zone)':'registered'}
+   Total Cultivation Area: ${filterZone.reduce((s,g)=>s+(+g.totalAreaHa||0),0).toFixed(2)} Ha
 
 2. ZONE BREAKDOWN
 ${zoneBreak.map(z=>'   '+z.zone+': '+z.growers+' growers | '+z.area+' Ha').join('\n')}
 
 3. PLANTATION STATUS
-   Total Records: ${plants.length}
-   Active: ${plants.filter(p=>p.status==='Active').length}
-   Growing: ${plants.filter(p=>p.status==='Growing').length}
-   Harvested: ${plants.filter(p=>p.status==='Harvested').length}
+   Total Records: ${filterPlants.length}
+   Active: ${filterPlants.filter(p=>p.status==='Active').length}
+   Growing: ${filterPlants.filter(p=>p.status==='Growing').length}
+   Harvested: ${filterPlants.filter(p=>p.status==='Harvested').length}
 
 4. PEST & DISEASE SUMMARY
-   Total Observations: ${pests.length}
+   Total Observations: ${filterPests.length}
    High Risk Incidents: ${highPest.length}
 ${highPest.map(p=>'   · '+p.pestDiseaseName+' at '+p.locality+' — '+p.severity+' ('+p.yieldImpactPct+'% yield impact)').join('\n')||'   · None reported'}
 
 5. YIELD ASSESSMENT SUMMARY
-   Assessments Conducted: ${yields.length}
+   Assessments Conducted: ${filterYields.length}
    Average Yield: ${avgYield} T/Ha
-${yields.map(y=>'   · '+y.growerName+' ('+y.variety+'): '+y.yieldTHa.toFixed(2)+' T/Ha').join('\n')||'   · No assessments recorded'}
+${filterYields.map(y=>'   · '+y.growerName+' ('+y.variety+'): '+y.yieldTHa.toFixed(2)+' T/Ha').join('\n')||'   · No assessments recorded'}
 
 ════════════════════════════════════════
-Report generated by PoTa Tracker v2.8`.trim();
-  const el=document.getElementById('report-preview');
-  el.className='report-preview';el.textContent=lastReport;
+Report generated by PoTa Tracker v2.9`.trim();
+  const el=document.getElementById('report-preview');el.className='report-preview';el.textContent=lastReport;
   toast('success','Report generated!');renderQuickStats();
 }
 function saveReport(){
   if(!lastReport){toast('error','Generate a report first');return;}
-  trySyncGas('saveWeeklyReport',{Report_Date:new Date().toISOString().split('T')[0],Week_Start:document.getElementById('rep-start').value,Week_End:document.getElementById('rep-end').value,Season:document.getElementById('rep-season').value,Report_Text:lastReport,Generated_By:currentUser?.username});
+  trySyncGas('saveWeeklyReport',{Report_Date:new Date().toISOString().split('T')[0],Week_Start:document.getElementById('rep-start').value,Week_End:document.getElementById('rep-end').value,Season:document.getElementById('rep-season').value,Zone:document.getElementById('rep-zone').value,Report_Text:lastReport,Generated_By:currentUser?.username});
   toast('success','Report saved to Google Sheets!');
 }
 function downloadReport(){
@@ -1653,16 +1383,11 @@ function downloadReport(){
 }
 
 // -------- SETTINGS --------
-function saveGasUrl(){
-  setGasUrl(document.getElementById('gas-url').value.trim());
-  checkSyncStatus();toast('success','URL saved!');
-  document.getElementById('conn-status').style.display='none';
-}
+function saveGasUrl(){setGasUrl(document.getElementById('gas-url').value.trim());checkSyncStatus();toast('success','URL saved!');document.getElementById('conn-status').style.display='none';}
 async function testConnection(){
   const url=document.getElementById('gas-url').value.trim();
   if(!url){toast('error','Enter the Apps Script URL first');return;}
-  setGasUrl(url);
-  const btn=event.target;btn.disabled=true;btn.textContent='Testing…';
+  setGasUrl(url);const btn=event.target;btn.disabled=true;btn.textContent='Testing…';
   try{
     const res=await fetch(url+'?action=ping');const data=await res.json();
     const el=document.getElementById('conn-status');el.style.display='flex';
@@ -1675,9 +1400,7 @@ async function testConnection(){
   checkSyncStatus();
 }
 async function changeMyPw(){
-  const current=document.getElementById('pw-current').value;
-  const newPw=document.getElementById('pw-new').value;
-  const confirm=document.getElementById('pw-confirm').value;
+  const current=document.getElementById('pw-current').value;const newPw=document.getElementById('pw-new').value;const confirm=document.getElementById('pw-confirm').value;
   if(!current||!newPw||!confirm){toast('error','All fields are required');return;}
   if(newPw!==confirm){toast('error','New passwords do not match');return;}
   if(newPw.length<6){toast('error','Password must be at least 6 characters');return;}
@@ -1685,7 +1408,6 @@ async function changeMyPw(){
   if(!u){toast('error','User not found');return;}
   if(u.passwordHash!==await hashPw(current)){toast('error','Current password is incorrect');return;}
   u.passwordHash=await hashPw(newPw);saveUsers(users);
-  // Also sync to GAS
   trySyncGas('changePassword',{username:currentUser.username,newPassword:newPw});
   ['pw-current','pw-new','pw-confirm'].forEach(id=>document.getElementById(id).value='');
   toast('success','Password changed successfully!');
@@ -1695,8 +1417,7 @@ function populateAdminUserSelect(){
   document.getElementById('admin-pw-user').innerHTML='<option value="">— Select User —</option>'+users.map(u=>`<option value="${u.username}">${u.fullName||u.username} (${u.username}) — ${u.role}</option>`).join('');
 }
 async function adminChangePw(){
-  const username=document.getElementById('admin-pw-user').value;
-  const newPw=document.getElementById('admin-pw-new').value;
+  const username=document.getElementById('admin-pw-user').value;const newPw=document.getElementById('admin-pw-new').value;
   if(!username||!newPw){toast('error','Select a user and enter new password');return;}
   if(newPw.length<6){toast('error','Password must be at least 6 characters');return;}
   const users=getUsers();const u=users.find(u=>u.username===username);
@@ -1707,8 +1428,7 @@ async function adminChangePw(){
   toast('success','Password for "'+username+'" updated!');
 }
 async function createUser(){
-  const username=document.getElementById('new-username').value.trim();
-  const password=document.getElementById('new-password').value;
+  const username=document.getElementById('new-username').value.trim();const password=document.getElementById('new-password').value;
   if(!username||!password){toast('error','Username and password are required');return;}
   if(password.length<6){toast('error','Password must be at least 6 characters');return;}
   const users=getUsers();
@@ -1721,13 +1441,7 @@ async function createUser(){
 }
 function renderUsersTable(){
   const users=getUsers();
-  document.getElementById('users-tbody').innerHTML=users.map(u=>`
-    <tr>
-      <td style="font-weight:700;color:var(--gold);font-family:monospace">${u.username}</td>
-      <td>${u.fullName||'—'}</td>
-      <td><span class="badge ${u.role==='Administrator'?'badge-gold':'badge-blue'}">${u.role}</span></td>
-      <td style="color:var(--text2)">${u.zoneAccess}</td>
-    </tr>`).join('');
+  document.getElementById('users-tbody').innerHTML=users.map(u=>`<tr><td style="font-weight:700;color:var(--gold);font-family:monospace">${u.username}</td><td>${u.fullName||'—'}</td><td><span class="badge ${u.role==='Administrator'?'badge-gold':'badge-blue'}">${u.role}</span></td><td style="color:var(--text2)">${u.zoneAccess}</td></tr>`).join('');
 }
 
 // -------- HELPERS --------
@@ -1735,6 +1449,8 @@ function zoneBadge(z){return{East:'gold',North:'green',South:'red',West:'blue',C
 
 // -------- INIT --------
 (function init(){
+  // Force-reset stale users on every load — ensures correct hashes always in place
+  getUsers();
   seedData();
   const session=loadObj(KEYS.SESSION);
   if(session&&session.username){
@@ -1745,9 +1461,7 @@ function zoneBadge(z){return{East:'gold',North:'green',South:'red',West:'blue',C
     navigate('dashboard');
   }
   const today=new Date().toISOString().split('T')[0];
-  ['g-date','p-date','pd-date','ya-date'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.value=today;
-  });
+  ['g-date','p-date','pd-date','ya-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=today;});
 })();
 </script>
 </body>
