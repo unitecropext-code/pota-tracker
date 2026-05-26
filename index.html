@@ -1530,7 +1530,13 @@ async function doLogin() {
 
   if (credsHint) credsHint.style.display = 'none';
 
-
+  // ── SUCCESS: complete the login ──────────────────────────
+  CURRENT_USER = user;
+  sessionStorage.setItem('pota_session', JSON.stringify(user));
+  applySession(user);
+  document.getElementById('login-overlay').classList.add('hidden');
+  toast('Welcome back, ' + user.fullName + '!', 'success');
+}
 
 function applySession(user) {
   const initials = user.fullName.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
