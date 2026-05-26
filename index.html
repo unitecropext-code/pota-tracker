@@ -97,6 +97,45 @@
   margin-top:24px;padding-top:18px;border-top:1px solid var(--border);
   font-size:11px;color:var(--text3);text-align:center;line-height:1.7;
 }
+.login-gas-toggle {
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:14px;font-size:11px;color:var(--text3);cursor:pointer;
+  transition:color .18s;user-select:none;
+}
+.login-gas-toggle:hover { color:var(--gold); }
+.login-gas-toggle i { font-size:11px; }
+.login-gas-section {
+  margin-top:12px;padding:14px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;display:none;
+}
+.login-gas-section.open { display:block; }
+.login-gas-hint { font-size:11px;color:var(--text3);line-height:1.7;margin-bottom:10px; }
+.login-gas-hint strong { color:var(--text2); }
+.login-gas-hint code { background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:4px;padding:0 5px;font-size:10px;color:var(--gold); }
+.login-gas-row { display:flex;gap:6px;align-items:center; }
+.login-gas-input {
+  flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  color:var(--text);padding:8px 10px;border-radius:8px;
+  font-size:11px;font-family:inherit;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.login-gas-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim); }
+.login-gas-input::placeholder { color:var(--text3); }
+.login-gas-save {
+  padding:8px 12px;border-radius:8px;border:none;
+  background:linear-gradient(135deg,var(--gold),#e09400);color:#000;
+  font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;
+  white-space:nowrap;transition:all .18s;flex-shrink:0;
+}
+.login-gas-save:hover { background:linear-gradient(135deg,var(--gold2),var(--gold)); }
+.login-offline-hint {
+  margin-top:10px;padding:10px 12px;
+  background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.18);
+  border-radius:8px;font-size:11px;color:var(--text2);line-height:1.8;display:none;
+}
+.login-offline-hint.show { display:block; }
+.login-offline-hint strong { color:var(--gold); }
 
 /* ============ RESET ============ */
 * { margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
@@ -618,6 +657,26 @@ tbody tr:hover .row-actions { opacity:1; }
     <div class="login-error" id="login-error">
       <i class="fas fa-exclamation-circle"></i>
       <span id="login-error-msg">Invalid username or password.</span>
+    </div>
+    <div class="login-offline-hint" id="login-offline-hint">
+      <strong>⚙ Google Sheets not configured.</strong><br>
+      Only these default accounts work offline:<br>
+      Username: <strong>admin</strong> · Password: <strong>PoTa@2025</strong><br>
+      Username: <strong>officer</strong> · Password: <strong>Field#01</strong><br>
+      Configure your Google Sheets URL below to use sheet-defined users.
+    </div>
+    <div class="login-gas-toggle" onclick="toggleLoginGasConfig()">
+      <i class="fas fa-cog"></i> Configure Google Sheets URL
+    </div>
+    <div class="login-gas-section" id="login-gas-section">
+      <div class="login-gas-hint">
+        Paste your <strong>Google Apps Script /exec URL</strong> to authenticate users from your Google Sheet.<br>
+        Go to Apps Script → Deploy → Web App → copy the URL.
+      </div>
+      <div class="login-gas-row">
+        <input class="login-gas-input" id="login-gas-url-input" placeholder="https://script.google.com/macros/s/…/exec">
+        <button class="login-gas-save" onclick="saveGasUrlFromLogin()">Save</button>
+      </div>
     </div>
     <div class="login-footer">
       Potato Cultivation Data Tracking System<br>
@@ -1368,8 +1427,17 @@ async function doLogin() {
 
   let user = null;
 
-  // 1. Try GAS Users sheet if URL is configured
+  // Show offline hint if no GAS URL configured
   const gasUrl = localStorage.getItem('gas_url') || '';
+  const offlineHint = document.getElementById('login-offline-hint');
+  if (!gasUrl && offlineHint) offlineHint.classList.add('show');
+  else if (offlineHint) offlineHint.classList.remove('show');
+
+  // Pre-fill login-gas-url-input if GAS URL already saved
+  const gasInput = document.getElementById('login-gas-url-input');
+  if (gasInput && gasUrl && !gasInput.value) gasInput.value = gasUrl;
+
+  // 1. Try GAS Users sheet if URL is configured
   if (gasUrl) {
     try {
       const hash   = await sha256(password);
@@ -1423,7 +1491,12 @@ async function doLogin() {
   resetBtn();
 
   if (!user) {
-    errMsg.textContent = 'Invalid username or password.';
+    const currentGasUrl = localStorage.getItem('gas_url') || '';
+    if (!currentGasUrl) {
+      errMsg.textContent = 'No Google Sheets URL configured — only default accounts work offline. Click "Configure Google Sheets URL" below.';
+    } else {
+      errMsg.textContent = 'Invalid username or password. If your account is in Google Sheets, check your GAS URL is correct and try again.';
+    }
     errEl.classList.add('show');
     document.getElementById('login-password').value = '';
     return;
@@ -1461,6 +1534,42 @@ function doLogout() {
   toast('Signed out successfully', 'info');
 }
 
+function toggleLoginGasConfig() {
+  const sec = document.getElementById('login-gas-section');
+  if (sec) sec.classList.toggle('open');
+}
+
+function saveGasUrlFromLogin() {
+  const input = document.getElementById('login-gas-url-input');
+  const val   = input ? input.value.trim() : '';
+  if (!val) {
+    alert('Please paste your Google Apps Script URL first.');
+    return;
+  }
+  if (!val.startsWith('https://script.google.com/')) {
+    alert('URL must start with https://script.google.com/');
+    return;
+  }
+  GAS_URL = val;
+  localStorage.setItem('gas_url', GAS_URL);
+  // Sync to the settings page input too
+  const settingsInput = document.getElementById('gas-url-input');
+  if (settingsInput) settingsInput.value = GAS_URL;
+  // Hide offline hint
+  const offlineHint = document.getElementById('login-offline-hint');
+  if (offlineHint) offlineHint.classList.remove('show');
+  // Collapse the section
+  const sec = document.getElementById('login-gas-section');
+  if (sec) sec.classList.remove('open');
+  const errEl  = document.getElementById('login-error');
+  const errMsg = document.getElementById('login-error-msg');
+  errEl.classList.remove('show');
+  errMsg.textContent = 'Google Sheets URL saved. You can now sign in with your sheet credentials.';
+  errEl.style.cssText = 'display:flex;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:#22c55e;border-radius:8px;padding:10px 12px;font-size:12px;font-weight:600;margin-top:12px;align-items:center;gap:8px;';
+  errEl.classList.add('show');
+  setTimeout(() => { errEl.classList.remove('show'); errEl.style.cssText=''; }, 3500);
+}
+
 function restoreSession() {
   const saved = sessionStorage.getItem('pota_session');
   if (saved) {
@@ -1472,6 +1581,13 @@ function restoreSession() {
       return true;
     } catch (_) {}
   }
+  // Show offline hint if no GAS URL saved
+  const gasUrl = localStorage.getItem('gas_url') || '';
+  const offlineHint = document.getElementById('login-offline-hint');
+  if (!gasUrl && offlineHint) offlineHint.classList.add('show');
+  // Pre-fill GAS URL input if already saved
+  const gasInput = document.getElementById('login-gas-url-input');
+  if (gasInput && gasUrl) gasInput.value = gasUrl;
   return false;
 }
 
