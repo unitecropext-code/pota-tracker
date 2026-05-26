@@ -7,13 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 <style>
 /* ============ TOKENS ============ */
 :root {
-  --bg:#0a0e14; --bg2:#0f1520; --bg3:#141c2a; --card:#151e2e;
-  --card2:#1a2438; --border:#1f2d47; --border2:#263550;
+  --bg:#07090f; --bg2:#0c1119; --bg3:#111827; --card:#111827;
+  --card2:#161f30; --border:#1e2d45; --border2:#253350;
   --gold:#f0a500; --gold2:#ffbe3d; --gold-dim:rgba(240,165,0,.12);
   --green:#22c55e; --green-dim:rgba(34,197,94,.12);
   --red:#ef4444; --red-dim:rgba(239,68,68,.12);
@@ -21,13 +23,13 @@
   --purple:#a855f7; --purple-dim:rgba(168,85,247,.12);
   --orange:#f97316; --orange-dim:rgba(249,115,22,.12);
   --teal:#14b8a6; --teal-dim:rgba(20,184,166,.12);
-  --text:#e8edf5; --text2:#8899b4; --text3:#4a5a7a;
+  --text:#ecf0f8; --text2:#8899b4; --text3:#4a5a7a;
   --radius:14px; --radius-sm:8px;
   --shadow:0 4px 24px rgba(0,0,0,.5);
   --shadow-lg:0 8px 40px rgba(0,0,0,.7);
-  --glow-gold:0 0 24px rgba(240,165,0,.25);
-  --sidebar:260px;
-  --topbar:58px;
+  --glow-gold:0 0 28px rgba(240,165,0,.3);
+  --sidebar:268px;
+  --topbar:60px;
   --transition:cubic-bezier(.4,0,.2,1);
 }
 
@@ -42,34 +44,50 @@ a{color:inherit;text-decoration:none;}
 /* ============ SIDEBAR ============ */
 #sidebar{
   position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;
-  background:var(--bg2);border-right:1px solid var(--border);
+  background:linear-gradient(180deg,#0c1422 0%,#08111c 100%);
+  border-right:1px solid var(--border);
   display:flex;flex-direction:column;z-index:300;
   transform:translateX(-100%);transition:transform .3s var(--transition);
-  backdrop-filter:blur(20px);
 }
 #sidebar.open,body.sidebar-pinned #sidebar{transform:translateX(0);}
 @media(min-width:900px){#sidebar{transform:translateX(0);}}
 
-.logo-wrap{padding:20px 18px 16px;flex-shrink:0;border-bottom:1px solid var(--border);}
-.logo{display:flex;align-items:center;gap:10px;}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--orange));
-  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;
-  box-shadow:var(--glow-gold);flex-shrink:0;}
-.logo-text{font-weight:800;font-size:18px;letter-spacing:-.5px;}
+.logo-wrap{
+  padding:22px 18px 18px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(240,165,0,.06) 0%,transparent 60%);
+  position:relative;overflow:hidden;
+}
+.logo-wrap::before{
+  content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;
+  background:radial-gradient(circle,rgba(240,165,0,.08) 0%,transparent 70%);
+  border-radius:50%;
+}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{
+  width:42px;height:42px;flex-shrink:0;
+  filter:drop-shadow(0 0 8px rgba(240,165,0,.4));
+}
+.logo-text-wrap{}
+.logo-text{font-weight:800;font-size:19px;letter-spacing:-.5px;line-height:1.1;}
 .logo-text span{color:var(--gold);}
-.logo-sub{font-size:10px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+.logo-sub{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
 
-.nav-section{padding:10px 0;}
+.nav-section{padding:8px 0;}
 .nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text3);
   text-transform:uppercase;padding:6px 18px 4px;}
 .nav-item{
-  display:flex;align-items:center;gap:12px;padding:9px 16px;margin:1px 8px;
+  display:flex;align-items:center;gap:12px;padding:9px 14px;margin:1px 8px;
   border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;
   transition:all .18s;position:relative;user-select:none;
 }
-.nav-item i{width:18px;text-align:center;font-size:15px;}
-.nav-item:hover{background:var(--bg3);color:var(--text);}
-.nav-item.active{background:var(--gold-dim);color:var(--gold);font-weight:600;}
+.nav-item i{width:18px;text-align:center;font-size:14px;transition:color .18s;}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(240,165,0,.15) 0%,rgba(240,165,0,.06) 100%);
+  color:var(--gold);font-weight:600;
+  border:1px solid rgba(240,165,0,.15);
+}
 .nav-item.active i{color:var(--gold);}
 .nav-badge{
   margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;
@@ -80,28 +98,29 @@ a{color:inherit;text-decoration:none;}
 
 .sidebar-bottom{flex-shrink:0;border-top:1px solid var(--border);padding:12px;}
 .sync-pill{
-  display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg3);
-  border-radius:10px;cursor:pointer;transition:background .2s;
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;cursor:pointer;transition:all .2s;
 }
-.sync-pill:hover{background:var(--border);}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+.sync-pill:hover{background:rgba(255,255,255,.06);border-color:var(--border2);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0;}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4);}50%{box-shadow:0 0 0 6px rgba(34,197,94,0);}}
 .sync-pill-text{font-size:12px;font-weight:600;color:var(--text2);}
 
 /* ============ TOPBAR ============ */
 #topbar{
   position:fixed;top:0;right:0;left:0;height:var(--topbar);z-index:200;
-  background:rgba(10,14,20,.85);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;
+  background:rgba(7,9,15,.9);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:12px;
   transition:left .3s var(--transition);
 }
 @media(min-width:900px){#topbar{left:var(--sidebar);}}
 #hamburger{
-  background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;
+  background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;
   width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;
   transition:background .2s;flex-shrink:0;
 }
-#hamburger:hover{background:var(--bg3);color:var(--text);}
+#hamburger:hover{background:rgba(255,255,255,.06);color:var(--text);}
 @media(min-width:900px){#hamburger{display:none;}}
 .page-title-wrap{flex:1;min-width:0;}
 .page-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -112,18 +131,18 @@ a{color:inherit;text-decoration:none;}
 .btn{
   display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;
   border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;
-  transition:all .18s;position:relative;overflow:hidden;user-select:none;
+  transition:all .18s;position:relative;overflow:hidden;user-select:none;white-space:nowrap;
 }
 .btn::after{
-  content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);
+  content:'';position:absolute;inset:0;background:rgba(255,255,255,.08);
   opacity:0;transition:opacity .15s;
 }
 .btn:hover::after{opacity:1;}
 .btn:active{transform:scale(.97);}
-.btn-gold{background:var(--gold);color:#000;}
-.btn-gold:hover{background:var(--gold2);}
-.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
-.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#e09400);color:#000;box-shadow:0 2px 12px rgba(240,165,0,.25);}
+.btn-gold:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.08);}
 .btn-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.2);}
 .btn-green:hover{background:rgba(34,197,94,.2);}
 .btn-red{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.2);}
@@ -132,7 +151,7 @@ a{color:inherit;text-decoration:none;}
 .btn-blue:hover{background:rgba(59,130,246,.2);}
 .btn-icon{width:34px;height:34px;padding:0;border-radius:8px;justify-content:center;}
 .btn-icon-lg{width:42px;height:42px;padding:0;border-radius:10px;font-size:16px;}
-.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-sm{padding:5px 11px;font-size:12px;}
 
 /* ============ MAIN ============ */
 #main{
@@ -148,7 +167,7 @@ a{color:inherit;text-decoration:none;}
 .card{
   background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
   padding:18px;margin-bottom:16px;position:relative;overflow:hidden;
-  transition:border-color .2s;
+  transition:border-color .2s,box-shadow .2s;
 }
 .card:hover{border-color:var(--border2);}
 .card-title{
@@ -164,17 +183,22 @@ a{color:inherit;text-decoration:none;}
 @media(min-width:640px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
 .stat-card{
   background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:16px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;
+  padding:18px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;
 }
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
 .stat-card.gold::before{background:linear-gradient(90deg,var(--gold),var(--orange));}
 .stat-card.green::before{background:linear-gradient(90deg,var(--green),var(--teal));}
 .stat-card.blue::before{background:linear-gradient(90deg,var(--blue),var(--purple));}
 .stat-card.red::before{background:linear-gradient(90deg,var(--red),var(--orange));}
+.stat-card::after{
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s;
+  background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);
+}
 .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--border2);}
+.stat-card:hover::after{opacity:1;}
 .stat-card:active{transform:translateY(0);}
 .stat-icon{
-  width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+  width:38px;height:38px;border-radius:10px;display:flex;align-items:center;
   justify-content:center;font-size:16px;margin-bottom:10px;
 }
 .gold .stat-icon{background:var(--gold-dim);color:var(--gold);}
@@ -200,13 +224,13 @@ a{color:inherit;text-decoration:none;}
   letter-spacing:.5px;text-transform:uppercase;
 }
 .form-control{
-  width:100%;background:var(--bg3);border:1.5px solid var(--border);color:var(--text);
+  width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);color:var(--text);
   padding:10px 12px;border-radius:10px;font-size:13px;font-family:inherit;
-  outline:none;transition:border-color .2s,box-shadow .2s;
+  outline:none;transition:border-color .2s,box-shadow .2s,background .2s;
 }
-.form-control:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);}
+.form-control:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);background:rgba(255,255,255,.06);}
 .form-control::placeholder{color:var(--text3);}
-select.form-control option{background:var(--bg2);}
+select.form-control option{background:#0c1422;}
 textarea.form-control{resize:vertical;min-height:80px;}
 .form-row{display:grid;gap:12px;}
 .form-row-2{display:grid;gap:12px;grid-template-columns:1fr;}
@@ -221,21 +245,21 @@ textarea.form-control{resize:vertical;min-height:80px;}
 .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
 table{width:100%;border-collapse:collapse;min-width:560px;}
 thead th{
-  background:var(--bg3);color:var(--text2);font-size:10px;font-weight:700;
+  background:rgba(255,255,255,.03);color:var(--text2);font-size:10px;font-weight:700;
   text-transform:uppercase;letter-spacing:.8px;padding:10px 12px;
   border-bottom:1px solid var(--border);position:sticky;top:0;white-space:nowrap;
 }
 tbody td{
-  padding:11px 12px;border-bottom:1px solid rgba(31,45,71,.5);
+  padding:11px 12px;border-bottom:1px solid rgba(30,45,69,.5);
   vertical-align:middle;
 }
 tbody tr:last-child td{border-bottom:none;}
 tbody tr{transition:background .15s;}
-tbody tr:hover{background:var(--bg3);}
+tbody tr:hover{background:rgba(255,255,255,.03);}
 .row-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s;}
 tbody tr:hover .row-actions{opacity:1;}
-.empty-state{text-align:center;padding:40px 20px;color:var(--text2);}
-.empty-icon{font-size:40px;margin-bottom:12px;opacity:.4;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text2);}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:.35;}
 .empty-title{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--text);}
 .empty-sub{font-size:12px;color:var(--text2);}
 
@@ -255,14 +279,13 @@ tbody tr:hover .row-actions{opacity:1;}
   display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center;
   background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;
 }
-.filter-bar .form-control{flex:1;min-width:130px;background:var(--bg3);}
+.filter-bar .form-control{flex:1;min-width:130px;}
 .filter-chip{
   display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--gold-dim);
   color:var(--gold);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
   border:1px solid rgba(240,165,0,.2);transition:background .2s;
 }
 .filter-chip:hover{background:rgba(240,165,0,.2);}
-.filter-chip .remove{opacity:.6;font-size:11px;}
 
 /* ============ CHART BOX ============ */
 .chart-wrap{position:relative;border-radius:10px;overflow:hidden;}
@@ -275,7 +298,7 @@ tbody tr:hover .row-actions{opacity:1;}
 /* ============ SEV BARS ============ */
 .sev-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .sev-name{font-size:12px;color:var(--text2);min-width:100px;}
-.sev-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.sev-track{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;}
 .sev-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1);}
 .sev-fill.low{background:var(--green);}
 .sev-fill.moderate{background:var(--orange);}
@@ -287,10 +310,10 @@ tbody tr:hover .row-actions{opacity:1;}
 .pest-grid{display:grid;gap:8px;grid-template-columns:1fr;}
 @media(min-width:640px){.pest-grid{grid-template-columns:1fr 1fr;}}
 .pest-row-card{
-  background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;
-  display:flex;flex-direction:column;gap:8px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px;
+  display:flex;flex-direction:column;gap:8px;transition:border-color .2s;
 }
-.pest-row-card.has-data{border-color:rgba(240,165,0,.3);}
+.pest-row-card.has-data{border-color:rgba(240,165,0,.3);background:rgba(240,165,0,.04);}
 .pest-row-top{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;}
 .pest-row-top i{color:var(--gold);}
 .pest-row-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -298,60 +321,66 @@ tbody tr:hover .row-actions{opacity:1;}
 
 /* ============ YIELD CALC ============ */
 .yield-box{
-  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;
   padding:14px;margin-top:14px;
 }
-.yield-retention{
-  text-align:center;padding:16px 0 8px;
-}
+.yield-retention{text-align:center;padding:16px 0 8px;}
 .yield-pct{font-size:42px;font-weight:800;line-height:1;}
-.yield-bar-wrap{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden;margin-top:10px;}
+.yield-bar-wrap{height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden;margin-top:10px;}
 .yield-bar{height:100%;transition:width .5s cubic-bezier(.4,0,.2,1),background .3s;}
 .yield-factors-list{margin-top:10px;}
 .yf-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
 .yf-row:last-child{border-bottom:none;}
 .yf-name{font-size:12px;flex:1;}
-.yf-sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);
+.yf-sel{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);
   padding:4px 8px;border-radius:6px;font-size:12px;outline:none;}
 .yf-pct{font-size:12px;font-weight:700;min-width:36px;text-align:right;}
 
 /* ============ MAP ============ */
-#map-container{height:500px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);}
-@media(min-width:700px){#map-container{height:600px;}}
+#map-container{height:520px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);}
+@media(min-width:700px){#map-container{height:620px;}}
 .map-legend{
   background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;
   margin-top:14px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;
 }
 .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;}
 .legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
-.map-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.legend-sq{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+.map-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center;}
 .map-toggle{
-  display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;
+  display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;
   cursor:pointer;font-size:12px;font-weight:600;border:1px solid var(--border);
-  background:var(--bg3);color:var(--text2);transition:all .2s;user-select:none;
+  background:rgba(255,255,255,.04);color:var(--text2);transition:all .2s;user-select:none;
 }
 .map-toggle.on{background:var(--gold-dim);color:var(--gold);border-color:rgba(240,165,0,.3);}
+.map-toggle:hover{border-color:var(--border2);color:var(--text);}
+.map-toggle.on:hover{background:rgba(240,165,0,.18);}
+.draw-mode-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;
+  font-size:12px;font-weight:600;border:1px solid rgba(59,130,246,.3);
+  background:var(--blue-dim);color:var(--blue);
+}
 .zone-stats-grid{display:grid;gap:10px;grid-template-columns:repeat(2,1fr);}
 @media(min-width:700px){.zone-stats-grid{grid-template-columns:repeat(4,1fr);}}
 .zone-card{
-  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
-  padding:12px;text-align:center;transition:all .2s;cursor:pointer;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;
+  padding:14px;text-align:center;transition:all .2s;cursor:pointer;
 }
 .zone-card:hover{border-color:var(--gold);background:var(--gold-dim);}
-.zone-name{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text2);margin-bottom:4px;}
-.zone-val{font-size:22px;font-weight:800;color:var(--gold);}
+.zone-name{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;}
+.zone-val{font-size:24px;font-weight:800;color:var(--gold);}
 .zone-sub{font-size:11px;color:var(--text2);}
 
 /* ============ MODAL ============ */
 .modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  position:fixed;inset:0;background:rgba(0,0,0,.8);
   display:none;align-items:center;justify-content:center;z-index:500;padding:16px;
-  backdrop-filter:blur(6px);animation:modalFadeIn .2s ease;
+  backdrop-filter:blur(8px);
 }
+.modal-overlay.open{display:flex;animation:modalFadeIn .2s ease;}
 @keyframes modalFadeIn{from{opacity:0;}to{opacity:1;}}
-.modal-overlay.open{display:flex;}
 .modal{
-  background:var(--card2);border:1px solid var(--border2);border-radius:18px;
+  background:#131c2d;border:1px solid var(--border2);border-radius:18px;
   width:100%;max-width:620px;max-height:92vh;overflow-y:auto;
   animation:modalSlideUp .25s var(--transition);box-shadow:var(--shadow-lg);
 }
@@ -359,14 +388,14 @@ tbody tr:hover .row-actions{opacity:1;}
 .modal-header{
   padding:18px 20px;border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;background:var(--card2);z-index:1;border-radius:18px 18px 0 0;
+  position:sticky;top:0;background:#131c2d;z-index:1;border-radius:18px 18px 0 0;
 }
-.modal-title{font-size:16px;font-weight:700;}
+.modal-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;}
 .modal-body{padding:20px;}
 .modal-footer{
   padding:16px 20px;border-top:1px solid var(--border);
   display:flex;justify-content:flex-end;gap:8px;
-  position:sticky;bottom:0;background:var(--card2);border-radius:0 0 18px 18px;
+  position:sticky;bottom:0;background:#131c2d;border-radius:0 0 18px 18px;
 }
 
 /* ============ TOAST ============ */
@@ -379,32 +408,34 @@ tbody tr:hover .row-actions{opacity:1;}
 @keyframes toastIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
 .toast.out{animation:toastOut .3s var(--transition) forwards;}
 @keyframes toastOut{to{opacity:0;transform:translateX(30px);}}
-.toast.success{background:#0c2016;border-color:rgba(34,197,94,.3);color:var(--green);}
-.toast.error{background:#200c0c;border-color:rgba(239,68,68,.3);color:var(--red);}
-.toast.info{background:#0c1520;border-color:rgba(59,130,246,.3);color:var(--blue);}
-.toast.warning{background:#1a150a;border-color:rgba(240,165,0,.3);color:var(--gold);}
+.toast.success{background:#071810;border-color:rgba(34,197,94,.3);color:var(--green);}
+.toast.error{background:#180707;border-color:rgba(239,68,68,.3);color:var(--red);}
+.toast.info{background:#071020;border-color:rgba(59,130,246,.3);color:var(--blue);}
+.toast.warning{background:#150f02;border-color:rgba(240,165,0,.3);color:var(--gold);}
 .toast i{font-size:15px;flex-shrink:0;}
 
 /* ============ FAB ============ */
 #fab{
   position:fixed;bottom:24px;right:24px;z-index:400;
-  width:52px;height:52px;border-radius:16px;background:var(--gold);color:#000;
-  border:none;cursor:pointer;font-size:20px;box-shadow:var(--glow-gold),var(--shadow);
+  width:54px;height:54px;border-radius:16px;
+  background:linear-gradient(135deg,var(--gold),#e09400);color:#000;
+  border:none;cursor:pointer;font-size:20px;
+  box-shadow:var(--glow-gold),0 4px 20px rgba(0,0,0,.5);
   display:flex;align-items:center;justify-content:center;
   transition:all .2s;
 }
-#fab:hover{transform:scale(1.08);background:var(--gold2);}
+#fab:hover{transform:scale(1.08);}
 #fab:active{transform:scale(.95);}
 #fab-menu{
-  position:fixed;bottom:84px;right:24px;z-index:400;
+  position:fixed;bottom:86px;right:24px;z-index:400;
   display:flex;flex-direction:column;gap:8px;align-items:flex-end;
   opacity:0;transform:translateY(10px) scale(.95);
   pointer-events:none;transition:all .25s var(--transition);
 }
 #fab-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
 .fab-item{
-  display:flex;align-items:center;gap:10px;background:var(--card2);
-  border:1px solid var(--border2);border-radius:12px;padding:8px 14px;
+  display:flex;align-items:center;gap:10px;background:#131c2d;
+  border:1px solid var(--border2);border-radius:12px;padding:9px 16px;
   cursor:pointer;transition:all .18s;white-space:nowrap;
   box-shadow:var(--shadow);
 }
@@ -417,7 +448,7 @@ tbody tr:hover .row-actions{opacity:1;}
 @media(min-width:640px){.fort-grid{grid-template-columns:repeat(4,1fr);}}
 @media(min-width:900px){.fort-grid{grid-template-columns:repeat(6,1fr);}}
 .fort-cell{
-  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;
   padding:10px;text-align:center;transition:border-color .2s;
 }
 .fort-cell.has-data{border-color:rgba(240,165,0,.3);background:var(--gold-dim);}
@@ -426,19 +457,19 @@ tbody tr:hover .row-actions{opacity:1;}
 .fort-count{font-size:18px;font-weight:800;}
 
 /* ============ PROGRESS ============ */
-.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.progress-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
 .progress-fill{height:100%;border-radius:3px;transition:width .5s;}
 
 /* ============ DROP ZONE ============ */
 .drop-zone{
   border:2px dashed var(--border2);border-radius:10px;padding:20px;
-  text-align:center;cursor:pointer;background:var(--bg3);transition:all .2s;
+  text-align:center;cursor:pointer;background:rgba(255,255,255,.02);transition:all .2s;
   font-size:12px;color:var(--text2);
 }
 .drop-zone:hover,.drop-zone.over{border-color:var(--gold);background:var(--gold-dim);color:var(--gold);}
-.drop-zone i{font-size:22px;margin-bottom:8px;display:block;opacity:.6;}
+.drop-zone i{font-size:22px;margin-bottom:8px;display:block;opacity:.5;}
 .file-chip{
-  display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);
   border-radius:8px;padding:6px 10px;margin-top:6px;font-size:12px;
 }
 .file-chip .del{cursor:pointer;color:var(--red);margin-left:auto;opacity:.7;}
@@ -469,7 +500,7 @@ tbody tr:hover .row-actions{opacity:1;}
 [data-tip]{position:relative;}
 [data-tip]::before{
   content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
-  transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);
+  transform:translateX(-50%);background:#0c1422;border:1px solid var(--border2);
   color:var(--text);font-size:11px;padding:5px 9px;border-radius:7px;white-space:nowrap;
   opacity:0;pointer-events:none;transition:opacity .15s;z-index:100;font-weight:500;
 }
@@ -485,28 +516,48 @@ tbody tr:hover .row-actions{opacity:1;}
 /* ============ LEAFLET OVERRIDES ============ */
 .leaflet-tile{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(1.1);}
 .leaflet-control-attribution,.leaflet-control-zoom a{
-  background:var(--card2) !important;color:var(--text2) !important;border-color:var(--border) !important;
+  background:#0c1422 !important;color:var(--text2) !important;border-color:var(--border) !important;
 }
-.leaflet-popup-content-wrapper{background:var(--card2) !important;color:var(--text) !important;border:1px solid var(--border2) !important;border-radius:12px !important;}
-.leaflet-popup-tip{background:var(--card2) !important;}
+.leaflet-popup-content-wrapper{
+  background:#131c2d !important;color:var(--text) !important;
+  border:1px solid var(--border2) !important;border-radius:12px !important;
+  box-shadow:var(--shadow-lg) !important;
+}
+.leaflet-popup-tip{background:#131c2d !important;}
 .leaflet-popup-content{font-family:'Inter',sans-serif;font-size:13px;}
 .pop-name{font-weight:700;font-size:14px;margin-bottom:4px;}
 .pop-row{display:flex;gap:8px;color:var(--text2);font-size:12px;margin-bottom:2px;}
 .pop-sev{font-size:12px;font-weight:700;padding:3px 10px;border-radius:10px;display:inline-block;margin-top:6px;}
+.leaflet-draw-toolbar .leaflet-draw-toolbar-button-enabled,
+.leaflet-draw-toolbar a{
+  background-color:#0c1422 !important;color:var(--text2) !important;
+}
+.leaflet-draw-section{border-color:var(--border) !important;}
 
 /* ============ KEYBOARD SHORTCUT ============ */
 .kbd{
   display:inline-flex;align-items:center;justify-content:center;
-  background:var(--bg3);border:1px solid var(--border2);border-radius:5px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:5px;
   padding:2px 7px;font-size:10px;font-weight:700;color:var(--text2);font-family:monospace;
 }
 
 /* MISC */
 .divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
 @media(max-width:480px){.hide-xs{display:none;}}
-.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .section-header h2{font-size:18px;font-weight:800;}
 .section-header p{font-size:12px;color:var(--text2);}
+.draw-shapes-panel{
+  margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;
+}
+.draw-shapes-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;min-height:28px;}
+.shape-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+  background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,.2);
+  border-radius:8px;font-size:11px;font-weight:600;
+}
+.shape-chip .del{cursor:pointer;opacity:.7;font-size:10px;transition:opacity .15s;}
+.shape-chip .del:hover{opacity:1;color:var(--red);}
 </style>
 </head>
 <body>
@@ -515,10 +566,41 @@ tbody tr:hover .row-actions{opacity:1;}
 <aside id="sidebar">
   <div class="logo-wrap">
     <div class="logo">
-      <div class="logo-icon">🥔</div>
-      <div>
+      <!-- SVG Potato Logo -->
+      <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" aria-label="PoTa Tracker Logo">
+        <defs>
+          <radialGradient id="potatoGrad" cx="45%" cy="40%" r="55%">
+            <stop offset="0%" stop-color="#e8b96a"/>
+            <stop offset="60%" stop-color="#c49040"/>
+            <stop offset="100%" stop-color="#9e6e20"/>
+          </radialGradient>
+          <radialGradient id="potatoHigh" cx="35%" cy="30%" r="40%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.3)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+          <filter id="potatoShadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.35)"/>
+          </filter>
+        </defs>
+        <!-- Potato body -->
+        <ellipse cx="22" cy="25" rx="15" ry="12" fill="url(#potatoGrad)" filter="url(#potatoShadow)" transform="rotate(-12 22 25)"/>
+        <!-- Highlight -->
+        <ellipse cx="18" cy="20" rx="8" ry="5" fill="url(#potatoHigh)" transform="rotate(-12 18 20)"/>
+        <!-- Eye spots -->
+        <circle cx="15" cy="23" r="1.6" fill="#7a4e10" opacity="0.7"/>
+        <circle cx="24" cy="28" r="1.4" fill="#7a4e10" opacity="0.7"/>
+        <circle cx="28" cy="21" r="1.3" fill="#7a4e10" opacity="0.6"/>
+        <!-- Sprout stem -->
+        <path d="M22 13 Q22 8 22 5" stroke="#4a8c3f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Sprout leaves -->
+        <path d="M22 9 Q18 5 15 7 Q17 11 22 9Z" fill="#5aaa4a"/>
+        <path d="M22 7 Q26 3 29 5 Q27 9 22 7Z" fill="#4a9a3a"/>
+        <!-- Gold badge glow rim -->
+        <ellipse cx="22" cy="25" rx="15.5" ry="12.5" fill="none" stroke="rgba(240,165,0,0.35)" stroke-width="1" transform="rotate(-12 22 25)"/>
+      </svg>
+      <div class="logo-text-wrap">
         <div class="logo-text">PoTa <span>Tracker</span></div>
-        <div class="logo-sub">v2.0 Mauritius</div>
+        <div class="logo-sub">v2.0 · Mauritius</div>
       </div>
     </div>
   </div>
@@ -596,7 +678,6 @@ tbody tr:hover .row-actions{opacity:1;}
   </div>
 </header>
 
-<!-- ===== MAIN ===== -->
 <main id="main">
 
   <!-- ========== DASHBOARD ========== -->
@@ -669,15 +750,26 @@ tbody tr:hover .row-actions{opacity:1;}
 
   <!-- ========== MAP ========== -->
   <section id="sec-map" class="section">
-    <div class="section-header"><h2>Zone Map</h2><p>Interactive grower location map</p></div>
     <div class="zone-stats-grid" id="zone-stats" style="margin-bottom:14px;"></div>
     <div class="map-controls">
       <div class="map-toggle on" id="toggle-growers" onclick="toggleLayer('growers')"><i class="fas fa-users"></i> Growers</div>
       <div class="map-toggle on" id="toggle-zones" onclick="toggleLayer('zones')"><i class="fas fa-draw-polygon"></i> Zones</div>
       <div class="map-toggle on" id="toggle-severity" onclick="toggleLayer('severity')"><i class="fas fa-bug"></i> Pest Severity</div>
       <div class="map-toggle" id="toggle-plantations" onclick="toggleLayer('plantations')"><i class="fas fa-seedling"></i> Plantations</div>
+      <div style="flex:1;"></div>
+      <div class="draw-mode-badge"><i class="fas fa-pencil-alt"></i> Drawing enabled — use toolbar on map</div>
     </div>
     <div id="map-container"></div>
+    <div class="draw-shapes-panel">
+      <div class="card-title" style="margin-bottom:8px;"><i class="fas fa-shapes" style="color:var(--blue);"></i> Drawn Shapes <span class="badge badge-gold" id="shapes-count">0</span>
+        <div class="card-title-actions">
+          <button class="btn btn-red btn-sm" onclick="clearDrawnShapes()"><i class="fas fa-trash-alt"></i> Clear All</button>
+        </div>
+      </div>
+      <div class="draw-shapes-list" id="drawn-shapes-list">
+        <span style="font-size:12px;color:var(--text3);">No shapes drawn yet. Use the drawing toolbar on the map to add polygons, rectangles or markers.</span>
+      </div>
+    </div>
     <div class="map-legend">
       <strong style="font-size:12px;color:var(--text2);">LEGEND</strong>
       <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span>No/Low severity</span></div>
@@ -685,6 +777,10 @@ tbody tr:hover .row-actions{opacity:1;}
       <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div><span>High severity</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span>Season 1 plot</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:#a855f7;"></div><span>Season 2 plot</span></div>
+      <div class="legend-item"><div class="legend-sq" style="background:rgba(240,165,0,.25);border:2px solid #f0a500;"></div><span>Zone E1</span></div>
+      <div class="legend-item"><div class="legend-sq" style="background:rgba(59,130,246,.25);border:2px solid #3b82f6;"></div><span>Zone E2</span></div>
+      <div class="legend-item"><div class="legend-sq" style="background:rgba(34,197,94,.25);border:2px solid #22c55e;"></div><span>Zone E3</span></div>
+      <div class="legend-item"><div class="legend-sq" style="background:rgba(168,85,247,.25);border:2px solid #a855f7;"></div><span>Zone E4</span></div>
     </div>
   </section>
 
@@ -695,10 +791,10 @@ tbody tr:hover .row-actions{opacity:1;}
         <i class="fas fa-search input-icon"></i>
         <input class="form-control" id="grower-search" placeholder="Search growers…" oninput="filterGrowers()">
       </div>
-      <select class="form-control" id="filter-locality" onchange="filterGrowers()" style="flex:1;min-width:140px;background:var(--bg3);">
+      <select class="form-control" id="filter-locality" onchange="filterGrowers()" style="flex:1;min-width:140px;">
         <option value="">All Localities</option>
       </select>
-      <select class="form-control" id="filter-zone" onchange="filterGrowers()" style="min-width:110px;background:var(--bg3);">
+      <select class="form-control" id="filter-zone" onchange="filterGrowers()" style="min-width:110px;">
         <option value="">All Zones</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option>
       </select>
       <button class="btn btn-gold btn-sm" onclick="openModal('add-grower-modal')"><i class="fas fa-user-plus"></i> Add Grower</button>
@@ -707,7 +803,7 @@ tbody tr:hover .row-actions{opacity:1;}
       <div class="card-title"><i class="fas fa-users"></i> Grower Registry <span class="badge badge-gold" id="grower-count-badge">0</span></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Grower</th><th>Zone</th><th>Locality</th><th>Contact</th><th>Plots</th><th>Area (ha)</th><th>Varieties</th><th></th></tr></thead>
+          <thead><tr><th>Grower</th><th>Zone</th><th>Locality</th><th>Plots</th><th>Area (ha)</th><th>Varieties</th><th>Notes</th><th></th></tr></thead>
           <tbody id="growers-table"></tbody>
         </table>
       </div>
@@ -719,18 +815,18 @@ tbody tr:hover .row-actions{opacity:1;}
     <div class="filter-bar">
       <div class="input-group" style="flex:2;min-width:150px;">
         <i class="fas fa-search input-icon"></i>
-        <input class="form-control" id="plant-search" placeholder="Search…" oninput="filterPlantation()" style="background:var(--bg3);">
+        <input class="form-control" id="plant-search" placeholder="Search…" oninput="filterPlantation()">
       </div>
-      <select class="form-control" id="filter-variety" onchange="filterPlantation()" style="flex:1;min-width:120px;background:var(--bg3);">
+      <select class="form-control" id="filter-variety" onchange="filterPlantation()" style="flex:1;min-width:120px;">
         <option value="">All Varieties</option>
       </select>
-      <select class="form-control" id="filter-plant-locality" onchange="filterPlantation()" style="flex:1;min-width:130px;background:var(--bg3);">
+      <select class="form-control" id="filter-plant-locality" onchange="filterPlantation()" style="flex:1;min-width:130px;">
         <option value="">All Localities</option>
       </select>
-      <select class="form-control" id="filter-season" onchange="filterPlantation()" style="min-width:120px;background:var(--bg3);">
+      <select class="form-control" id="filter-season" onchange="filterPlantation()" style="min-width:120px;">
         <option value="">All Seasons</option><option>Season 1</option><option>Season 2</option>
       </select>
-      <input type="month" class="form-control" id="filter-month" onchange="filterPlantation()" style="min-width:140px;flex:none;background:var(--bg3);">
+      <input type="month" class="form-control" id="filter-month" onchange="filterPlantation()" style="min-width:140px;flex:none;">
       <button class="btn btn-ghost btn-sm" onclick="clearFilters()"><i class="fas fa-times"></i></button>
       <button class="btn btn-gold btn-sm" onclick="openModal('add-plantation-modal')"><i class="fas fa-plus"></i> Add</button>
     </div>
@@ -857,7 +953,7 @@ tbody tr:hover .row-actions{opacity:1;}
       <label class="form-label"><i class="fas fa-vials" style="color:var(--teal);margin-right:4px;"></i> 5 Sample Readings (kg per sqm)</label>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:8px 0 16px;" id="sample-inputs"></div>
       <div class="grid-2" style="margin-bottom:14px;">
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;">
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="yield-results">
             <div><div class="stat-label">Avg (kg/sqm)</div><div class="stat-val" id="ya-avg" style="font-size:20px;">—</div></div>
             <div><div class="stat-label">T / arpent</div><div class="stat-val" id="ya-arpent" style="font-size:20px;">—</div></div>
@@ -961,7 +1057,7 @@ tbody tr:hover .row-actions{opacity:1;}
         <button class="btn btn-gold" onclick="generateReport()"><i class="fas fa-magic"></i> Generate Report</button>
         <button class="btn btn-ghost" onclick="printReport()"><i class="fas fa-print"></i> Print</button>
         <button class="btn btn-ghost" onclick="exportReportCsv()"><i class="fas fa-file-csv"></i> Export CSV</button>
-        <button class="btn btn-ghost" onclick="saveReportToSheets()" style="color:var(--green);border-color:var(--green);"><i class="fas fa-cloud-upload-alt"></i> Save to Sheets</button>
+        <button class="btn btn-ghost" onclick="saveReportToSheets()" style="color:var(--green);border-color:rgba(34,197,94,.3);"><i class="fas fa-cloud-upload-alt"></i> Save to Sheets</button>
       </div>
     </div>
     <div id="report-preview"></div>
@@ -1030,16 +1126,17 @@ tbody tr:hover .row-actions{opacity:1;}
 </div>
 
 <!-- ===== MODALS ===== -->
+<!-- ADD GROWER (no contact field) -->
 <div class="modal-overlay" id="add-grower-modal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title"><i class="fas fa-user-plus" style="color:var(--gold);margin-right:8px;"></i>Add Grower</div>
+      <div class="modal-title"><i class="fas fa-user-plus" style="color:var(--gold);"></i> Add Grower</div>
       <button class="btn btn-ghost btn-icon" onclick="closeModal('add-grower-modal')"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
-      <div class="form-row-2">
-        <div class="form-group"><label class="form-label">Full Name *</label><input id="g-name" class="form-control" placeholder="Full name"></div>
-        <div class="form-group"><label class="form-label">Contact</label><input id="g-contact" class="form-control" placeholder="Phone number"></div>
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input id="g-name" class="form-control" placeholder="Full name of grower">
       </div>
       <div class="form-row-2">
         <div class="form-group"><label class="form-label">Zone *</label>
@@ -1047,9 +1144,13 @@ tbody tr:hover .row-actions{opacity:1;}
             <option value="">Select Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">Locality *</label><select id="g-locality" class="form-control"><option value="">Select Zone first</option></select></div>
+        <div class="form-group"><label class="form-label">Locality *</label>
+          <select id="g-locality" class="form-control"><option value="">Select Zone first</option></select>
+        </div>
       </div>
-      <div class="form-group"><label class="form-label">Notes</label><textarea id="g-notes" class="form-control" rows="2" placeholder="Additional information…"></textarea></div>
+      <div class="form-group"><label class="form-label">Notes</label>
+        <textarea id="g-notes" class="form-control" rows="2" placeholder="Additional information…"></textarea>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('add-grower-modal')">Cancel</button>
@@ -1058,10 +1159,11 @@ tbody tr:hover .row-actions{opacity:1;}
   </div>
 </div>
 
+<!-- ADD PLANTATION -->
 <div class="modal-overlay" id="add-plantation-modal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title"><i class="fas fa-seedling" style="color:var(--gold);margin-right:8px;"></i>Add Plantation Record</div>
+      <div class="modal-title"><i class="fas fa-seedling" style="color:var(--gold);"></i> Add Plantation Record</div>
       <button class="btn btn-ghost btn-icon" onclick="closeModal('add-plantation-modal')"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
@@ -1108,7 +1210,7 @@ tbody tr:hover .row-actions{opacity:1;}
 
 <script>
 // ============================================================
-//  ZONE → LOCALITY DATA
+//  ZONE → LOCALITY DATA  (corrected to cover all localities)
 // ============================================================
 const ZONE_LOCALITIES = {
   E1: ["Alma","Bagatelle Dam","Bar Le Duc","Beau Bois","Bell Village","Belle Rive","Bonne Veine","Camp Auguste","Circonstance","Cote D'Or","Dagotiere","Gentilly","Guibies","Helvetia","Hermitage","L'Agrement","L'Assurance","L'Avenir","L'Esperance","La Laura","Le Pouce","Malinga","Minissy","Moka","Nouvelle Decouverte","Petit Verger","Providence","Quartier Militaire","Reduit","Ripailles","Riviere Baptiste","Roselyn Cottage","Soreze","St Pierre","Valetta","Verdun"],
@@ -1117,94 +1219,267 @@ const ZONE_LOCALITIES = {
   E4: ["Balance John","Beau Champ","Beau Vallon","Bel Air Riviere Seche","Belle Rive","Camp de Masque Pave","Caroline","Deux Freres","Grand River South East","Ilot","La Laura","La Lucie Roy","La Nourrice","Laventure","L'Etoile","Mare aux Goyaves","Mare Carree","Mare Triton","Marie Jeanne","Olivia","Pellegrin","Petit Bois","Plaine Bananes","Pointe aux Feuilles","Pont Lardier","Quatre Soeurs","Sebastopol","Trois Ilots"]
 };
 
-// Approximate lat/lng for key localities by zone
+// ============================================================
+//  LOCALITY COORDINATES  (zone-prefixed keys for shared names)
+// ============================================================
+// Keys follow "Zone:Name" for localities that appear in multiple zones,
+// and plain "Name" for unambiguous ones.
 const LOCALITY_COORDS = {
-  // E1 - Central/West
-  "Moka":[-20.143,57.494],"Quartier Militaire":[-20.247,57.545],"St Pierre":[-20.307,57.485],
-  "Reduit":[-20.215,57.497],"Dagotiere":[-20.278,57.507],"Ripailles":[-20.192,57.498],
-  "Alma":[-20.176,57.512],"Belle Rive":[-20.331,57.477],"Verdun":[-20.258,57.521],
-  "Soreze":[-20.222,57.481],"Valetta":[-20.268,57.494],"Providence":[-20.254,57.535],
-  // E2 - Northeast
-  "Bon Accueil":[-20.172,57.648],"Camp de Masque":[-20.173,57.681],"Lallmatie":[-20.161,57.656],
-  "Belvedere":[-20.145,57.623],"Montagne Blanche":[-20.185,57.651],"Salazie":[-20.192,57.634],
-  "St Julien Village":[-20.153,57.664],"Quatre Bords":[-20.157,57.705],"Melrose":[-20.196,57.692],
-  // E3 - East/Flacq
-  "Centre de Flacq":[-20.200,57.712],"Belle Mare":[-20.180,57.769],"Trou d'Eau Douce":[-20.188,57.789],
-  "Palmar":[-20.171,57.779],"Poste de Flacq":[-20.199,57.721],"Quatre Cocos":[-20.162,57.757],
-  "Riche Mare":[-20.218,57.715],"Constance":[-20.214,57.728],"Bras d'Eau":[-20.195,57.754],
-  // E4 - Southeast
-  "Beau Champ":[-20.316,57.717],"Grand River South East":[-20.417,57.750],"Marie Jeanne":[-20.406,57.698],
-  "Pont Lardier":[-20.391,57.747],"Plaine Bananes":[-20.350,57.738],"Laventure":[-20.366,57.729],
-  "Deux Freres":[-20.340,57.718],"Mare Triton":[-20.380,57.710],"Quatre Soeurs":[-20.327,57.756],
-  // Zone approximate centers for fallback
-  "E1_center":[-20.24,57.50],"E2_center":[-20.17,57.65],"E3_center":[-20.20,57.73],"E4_center":[-20.36,57.73]
+  // ── E1: Central plateau / Moka / Plaines Wilhems ──
+  "E1:Moka":[-20.143,57.494],"E1:Reduit":[-20.215,57.497],"E1:St Pierre":[-20.307,57.485],
+  "E1:Quartier Militaire":[-20.247,57.545],"E1:Dagotiere":[-20.278,57.507],
+  "E1:Ripailles":[-20.192,57.498],"E1:Alma":[-20.176,57.512],"E1:Belle Rive":[-20.331,57.477],
+  "E1:Verdun":[-20.258,57.521],"E1:Soreze":[-20.222,57.481],"E1:Valetta":[-20.268,57.494],
+  "E1:Providence":[-20.254,57.535],"E1:Hermitage":[-20.185,57.476],"E1:Helvetia":[-20.200,57.468],
+  "E1:Le Pouce":[-20.153,57.503],"E1:Guibies":[-20.170,57.488],"E1:Bar Le Duc":[-20.240,57.461],
+  "E1:Circonstance":[-20.231,57.512],"E1:Bonne Veine":[-20.291,57.497],
+  "E1:Minissy":[-20.268,57.480],"E1:L'Assurance":[-20.314,57.490],
+  "E1:L'Avenir":[-20.319,57.503],"E1:Gentilly":[-20.231,57.497],"E1:Malinga":[-20.311,57.472],
+  "E1:Camp Auguste":[-20.261,57.531],"E1:Riviere Baptiste":[-20.194,57.534],
+  "E1:Beau Bois":[-20.248,57.527],"E1:Bagatelle Dam":[-20.162,57.463],
+  "E1:Bell Village":[-20.237,57.489],"E1:Cote D'Or":[-20.165,57.517],
+  "E1:L'Agrement":[-20.314,57.510],"E1:L'Esperance":[-20.328,57.518],
+  "E1:La Laura":[-20.287,57.522],"E1:Nouvelle Decouverte":[-20.246,57.524],
+  "E1:Petit Verger":[-20.238,57.476],"E1:Roselyn Cottage":[-20.252,57.500],
+
+  // ── E2: Northeast / Rivière du Rempart ──
+  "E2:Bon Accueil":[-20.172,57.648],"E2:Camp de Masque":[-20.173,57.681],
+  "E2:Lallmatie":[-20.161,57.656],"E2:Belvedere":[-20.145,57.623],
+  "E2:Montagne Blanche":[-20.185,57.651],"E2:Salazie":[-20.192,57.634],
+  "E2:St Julien Village":[-20.153,57.664],"E2:Quatre Bords":[-20.157,57.705],
+  "E2:Melrose":[-20.196,57.692],"E2:Brisee Verdiere":[-20.167,57.638],
+  "E2:Camp Thorel":[-20.148,57.631],"E2:Gibraltar":[-20.178,57.612],
+  "E2:Latapie":[-20.160,57.617],"E2:Mont Ida":[-20.202,57.641],
+  "E2:Bonne Mere":[-20.214,57.658],"E2:Sans Soucis":[-20.148,57.674],
+  "E2:Queen Victoria":[-20.164,57.690],"E2:Riche Fond":[-20.181,57.698],
+  "E2:St Julien d'Hotman":[-20.139,57.657],"E2:Beau Bois":[-20.165,57.643],
+  "E2:Balance John":[-20.200,57.623],"E2:Bel Etang":[-20.158,57.683],
+  "E2:Fuel":[-20.165,57.638],"E2:Grand Bas Fond":[-20.195,57.668],
+  "E2:L'Unite":[-20.175,57.629],"E2:Medine Camp de Masque":[-20.177,57.684],
+  "E2:Pellegrin":[-20.172,57.659],"E2:Petit Paquet":[-20.148,57.671],
+  "E2:Pont Bon Dieu":[-20.172,57.694],"E2:Providence":[-20.201,57.636],
+
+  // ── E3: East / Flacq coast ──
+  "E3:Centre de Flacq":[-20.200,57.712],"E3:Belle Mare":[-20.180,57.769],
+  "E3:Trou d'Eau Douce":[-20.188,57.789],"E3:Palmar":[-20.171,57.779],
+  "E3:Poste de Flacq":[-20.199,57.721],"E3:Quatre Cocos":[-20.162,57.757],
+  "E3:Riche Mare":[-20.218,57.715],"E3:Constance":[-20.214,57.728],
+  "E3:Bras d'Eau":[-20.195,57.754],"E3:Camp Garreau":[-20.167,57.722],
+  "E3:Camp Ithier":[-20.178,57.730],"E3:Victoria":[-20.228,57.736],
+  "E3:Laventure":[-20.243,57.745],"E3:Argy":[-20.233,57.711],
+  "E3:Bramsthan":[-20.156,57.732],"E3:Plaine de Gersigny":[-20.208,57.745],
+  "E3:Petite Retraite":[-20.221,57.758],"E3:Grande Retraite":[-20.225,57.768],
+  "E3:Camp Marcelin":[-20.186,57.741],"E3:Bois d'Oiseaux":[-20.147,57.762],
+  "E3:Beau Rivage":[-20.147,57.773],"E3:St Remy":[-20.240,57.722],
+  "E3:Pont Blanc":[-20.228,57.748],"E3:Mare Choisy":[-20.154,57.744],
+  "E3:Beau Bois":[-20.172,57.731],"E3:Belle Vue Allendy":[-20.167,57.738],
+  "E3:Camp Poorun":[-20.208,57.732],"E3:Hermitage":[-20.151,57.755],
+  "E3:Mare du Puits":[-20.225,57.755],"E3:Mare la Chaux":[-20.202,57.729],
+
+  // ── E4: Southeast / Grand Port ──
+  "E4:Beau Champ":[-20.316,57.717],"E4:Grand River South East":[-20.417,57.750],
+  "E4:Marie Jeanne":[-20.406,57.698],"E4:Pont Lardier":[-20.391,57.747],
+  "E4:Plaine Bananes":[-20.350,57.738],"E4:Laventure":[-20.366,57.729],
+  "E4:Deux Freres":[-20.340,57.718],"E4:Mare Triton":[-20.380,57.710],
+  "E4:Quatre Soeurs":[-20.327,57.756],"E4:Caroline":[-20.300,57.703],
+  "E4:Ilot":[-20.441,57.731],"E4:La Laura":[-20.357,57.703],
+  "E4:Beau Vallon":[-20.333,57.726],"E4:Sebastopol":[-20.423,57.718],
+  "E4:Trois Ilots":[-20.456,57.711],"E4:Mare Carree":[-20.371,57.693],
+  "E4:Olivia":[-20.431,57.741],"E4:Petit Bois":[-20.345,57.745],
+  "E4:Pointe aux Feuilles":[-20.467,57.737],"E4:La Nourrice":[-20.388,57.721],
+  "E4:L'Etoile":[-20.398,57.688],"E4:Mare aux Goyaves":[-20.362,57.758],
+  "E4:La Lucie Roy":[-20.379,57.733],"E4:Camp de Masque Pave":[-20.309,57.712],
+  "E4:Belle Rive":[-20.331,57.734],"E4:Balance John":[-20.346,57.720],
+  "E4:Pellegrin":[-20.371,57.710],"E4:Bel Air Riviere Seche":[-20.369,57.695],
+
+  // Fallback zone centres
+  "E1_center":[-20.240,57.503],"E2_center":[-20.173,57.660],
+  "E3_center":[-20.193,57.748],"E4_center":[-20.385,57.727]
 };
 
 const ZONE_COLORS = { E1:'#f0a500', E2:'#3b82f6', E3:'#22c55e', E4:'#a855f7' };
+
+// ============================================================
+//  ZONE POLYGONS — derived from actual locality bounding boxes
+//  E1 localities span lat -20.128→-20.346, lng 57.446→57.560
+//  E2 localities span lat -20.124→-20.229, lng 57.597→57.710
+//  E3 localities span lat -20.132→-20.258, lng 57.696→57.804
+//  E4 localities span lat -20.285→-20.482, lng 57.673→57.773
+// ============================================================
+const ZONE_POLYGONS = {
+  // E1 — Central plateau / Moka / Plaines Wilhems
+  E1: [
+    [-20.128, 57.446], [-20.128, 57.560],
+    [-20.346, 57.560], [-20.346, 57.446]
+  ],
+  // E2 — Northeast / Rivière du Rempart
+  // East edge set to 57.710 so it meets E3 with no gap/overlap
+  E2: [
+    [-20.124, 57.597], [-20.124, 57.710],
+    [-20.229, 57.710], [-20.229, 57.597]
+  ],
+  // E3 — East coast / Flacq
+  // West edge 57.710 matches E2 east; north edge clear of E2 south
+  E3: [
+    [-20.132, 57.710], [-20.132, 57.804],
+    [-20.258, 57.804], [-20.258, 57.710]
+  ],
+  // E4 — Southeast / Grand Port
+  // North edge 57.285 leaves a ~0.027° gap south of E3 (no overlap)
+  E4: [
+    [-20.285, 57.673], [-20.285, 57.773],
+    [-20.482, 57.773], [-20.482, 57.673]
+  ]
+};
+
+// ZONE_BOUNDS used for map.fitBounds() — matches polygon extents
 const ZONE_BOUNDS = {
-  E1:[[-20.35,57.44],[-20.10,57.57]],
-  E2:[[-20.22,57.60],[-20.12,57.73]],
-  E3:[[-20.25,57.70],[-20.13,57.80]],
-  E4:[[-20.44,57.68],[-20.30,57.79]]
+  E1:[[-20.346,57.446],[-20.128,57.560]],
+  E2:[[-20.229,57.597],[-20.124,57.710]],
+  E3:[[-20.258,57.710],[-20.132,57.804]],
+  E4:[[-20.482,57.673],[-20.285,57.773]]
 };
 
 // ============================================================
 //  STATE
 // ============================================================
 let GAS_URL = localStorage.getItem('gas_url') || '';
-let STATE = {
-  growers:          JSON.parse(localStorage.getItem('growers')          || '[]'),
-  plantation:       JSON.parse(localStorage.getItem('plantation')       || '[]'),
-  pestRecords:      JSON.parse(localStorage.getItem('pestRecords')      || '[]'),
-  yieldAssessments: JSON.parse(localStorage.getItem('yieldAssessments') || '[]'),
-  varieties:        JSON.parse(localStorage.getItem('varieties')        || '["Mondial","Spunta","Desiree","Innovator","Bartina","Lady Rosetta","Hermes"]'),
+
+const DEFAULT_STATE = {
+  growers:[], plantation:[], pestRecords:[], yieldAssessments:[],
+  varieties:['Mondial','Spunta','Desiree','Asterix','Hermes']
 };
+let STATE = JSON.parse(localStorage.getItem('pota_state')||'null') || {...DEFAULT_STATE};
+function saveLocal(){ localStorage.setItem('pota_state',JSON.stringify(STATE)); }
 
-function saveLocal() {
-  Object.keys(STATE).forEach(k => localStorage.setItem(k, JSON.stringify(STATE[k])));
-}
-
-// ============================================================
-//  GAS
-// ============================================================
-function saveGasUrl() {
-  const v = document.getElementById('gas-url-input').value.trim();
-  if (!v) { toast('Enter a valid URL', 'error'); return; }
-  GAS_URL = v; localStorage.setItem('gas_url', v);
-  toast('GAS URL saved', 'success');
-}
-async function initSheetsRemote() {
-  if (!GAS_URL) { toast('Set your GAS URL in Settings first', 'error'); return; }
-  toast('Initialising remote sheets…', 'info');
-  const r = await callGAS('initSheets', {});
-  r.success ? toast('Sheets initialised ✓', 'success') : toast('Init failed: '+(r.error||'unknown'), 'error');
-}
-async function callGAS(action, data={}) {
-  if (!GAS_URL) return {success:false};
-  data.action = action;
-  const ctrl = new AbortController();
-  const timer = setTimeout(()=>ctrl.abort(), 30000);
+async function callGAS(action, payload) {
+  if(!GAS_URL) return {success:false,error:'No GAS URL'};
   try {
-    const body = Object.keys(data).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(data[k]??'')).join('&');
-    const res = await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body,signal:ctrl.signal});
-    clearTimeout(timer);
-    return await res.json();
-  } catch(e) {
-    clearTimeout(timer);
-    if(e.name==='AbortError') { toast('GAS request timed out (30s) – check your URL', 'error'); }
-    else { toast('GAS sync error – check your URL in Settings', 'error'); }
-    return {success:false};
+    const r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...payload})});
+    return r.ok?await r.json():{success:false,error:'HTTP '+r.status};
+  } catch(e){ return {success:false,error:e.message}; }
+}
+function saveGasUrl(){
+  GAS_URL=document.getElementById('gas-url-input').value.trim();
+  localStorage.setItem('gas_url',GAS_URL);
+  toast('GAS URL saved','success');
+}
+async function initSheetsRemote(){
+  if(!GAS_URL){toast('Set GAS URL first','error');return;}
+  toast('Initialising Google Sheets…','info');
+  const r=await callGAS('initSheets',{});
+  r.success?toast('Sheets initialised ✓','success'):toast('Init failed: '+r.error,'error');
+}
+
+// ============================================================
+//  CHARTS
+// ============================================================
+const CHART_COLORS=['#f0a500','#3b82f6','#22c55e','#a855f7','#f97316','#14b8a6','#ef4444','#ffbe3d','#06b6d4'];
+const CHART_OPTS={
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#8899b4',font:{size:11},boxWidth:10}},tooltip:{backgroundColor:'#131c2d',titleColor:'#e8edf5',bodyColor:'#8899b4',borderColor:'#253350',borderWidth:1}},
+  scales:{
+    x:{grid:{color:'rgba(30,45,69,.5)'},ticks:{color:'#8899b4',font:{size:10}}},
+    y:{grid:{color:'rgba(30,45,69,.5)'},ticks:{color:'#8899b4',font:{size:10}}}
   }
+};
+const _charts={};
+function mkChart(id,cfg){
+  if(_charts[id]){_charts[id].destroy();}
+  const el=document.getElementById(id);
+  if(el) _charts[id]=new Chart(el,cfg);
+}
+
+// ============================================================
+//  DASHBOARD
+// ============================================================
+function renderDashboard(){
+  document.getElementById('sv-growers').textContent=STATE.growers.length;
+  const totalArea=STATE.plantation.reduce((s,r)=>s+(r.area||0),0);
+  document.getElementById('sv-area').textContent=totalArea.toFixed(1);
+  document.getElementById('sv-plots').textContent=STATE.plantation.length;
+  const totalProd=STATE.plantation.reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0);
+  document.getElementById('sv-prod').textContent=Math.round(totalProd);
+  const highAlerts=STATE.pestRecords.filter(r=>[...DISEASES,...PESTS].some(f=>r[f]?.sev==='High')).length;
+  document.getElementById('sv-alerts').textContent=highAlerts;
+  document.getElementById('sv-alert-label').innerHTML=highAlerts?`<span style="color:var(--red);">${highAlerts} plot(s) at high risk</span>`:`<span style="color:var(--green);">All clear</span>`;
+  renderLocalityChart(); renderVarietyChart(); renderFortnightlyChart(); renderPestOverview();
+  renderRecentTable();
+}
+
+function renderRecentTable(){
+  const tbody=document.getElementById('recent-table');
+  const rows=[...STATE.plantation].sort((a,b)=>new Date(b.datePlanted)-new Date(a.datePlanted)).slice(0,10);
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No records yet</div></div></td></tr>`;return;}
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td><strong>${r.grower}</strong></td>
+    <td>${r.locality}</td>
+    <td>${r.variety||'—'}</td>
+    <td>${r.datePlanted||'—'}</td>
+    <td><strong>${r.area}</strong></td>
+    <td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season}</span></td>
+    <td><span class="badge badge-active">Active</span></td>
+  </tr>`).join('');
+}
+
+function renderLocalityChart(){
+  const locs=[...new Set(STATE.plantation.map(r=>r.locality).filter(Boolean))].slice(0,10);
+  if(!locs.length) return;
+  const data=locs.map(l=>STATE.plantation.filter(r=>r.locality===l).reduce((s,r)=>s+(r.area||0),0));
+  mkChart('chart-locality',{
+    type:'bar',
+    data:{labels:locs,datasets:[{label:'Area (ha)',data,backgroundColor:CHART_COLORS.map(c=>c+'cc'),borderRadius:4}]},
+    options:{...CHART_OPTS,plugins:{...CHART_OPTS.plugins,legend:{display:false}}}
+  });
+}
+
+function renderVarietyChart(){
+  const vars=STATE.varieties;
+  const data=vars.map(v=>STATE.plantation.filter(r=>r.variety===v).length);
+  if(data.every(d=>d===0)) return;
+  mkChart('chart-variety',{
+    type:'doughnut',
+    data:{labels:vars,datasets:[{data,backgroundColor:CHART_COLORS,borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8899b4',font:{size:11},boxWidth:10}}},cutout:'65%'}
+  });
+}
+
+function renderFortnightlyChart(){
+  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const f1=MONTHS.map((_,mi)=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 1').length);
+  const f2=MONTHS.map((_,mi)=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 2').length);
+  mkChart('chart-fortnightly',{
+    type:'bar',
+    data:{labels:MONTHS,datasets:[
+      {label:'Fortnight 1',data:f1,backgroundColor:'rgba(240,165,0,.7)',borderRadius:4},
+      {label:'Fortnight 2',data:f2,backgroundColor:'rgba(59,130,246,.7)',borderRadius:4}
+    ]},
+    options:{...CHART_OPTS,scales:{...CHART_OPTS.scales,x:{...CHART_OPTS.scales.x,stacked:true},y:{...CHART_OPTS.scales.y,stacked:true}}}
+  });
+}
+
+function renderPestOverview(){
+  const el=document.getElementById('pest-overview-bars');
+  if(!el) return;
+  const sevScore={Low:1,Moderate:2,High:3};
+  el.innerHTML=[...DISEASES,...PESTS].map(f=>{
+    const recs=STATE.pestRecords.map(r=>r[f]?.sev).filter(v=>v&&v!=='');
+    if(!recs.length) return `<div class="sev-row"><span class="sev-name" style="font-size:11px;">${f}</span><div class="sev-track"><div class="sev-fill none" style="width:0%"></div></div><div class="sev-badge-wrap"><span style="font-size:10px;color:var(--text3);">No data</span></div></div>`;
+    const avg=recs.reduce((s,v)=>s+(sevScore[v]||0),0)/recs.length;
+    const pct=Math.round((avg/3)*100);
+    const cls=avg>=2.5?'high':avg>=1.5?'moderate':'low';
+    return `<div class="sev-row"><span class="sev-name" style="font-size:11px;">${PEST_ICONS[f]||''} ${f}</span><div class="sev-track"><div class="sev-fill ${cls}" style="width:${pct}%"></div></div><div class="sev-badge-wrap"><span class="badge badge-${cls}" style="font-size:10px;">${pct}%</span></div></div>`;
+  }).join('');
 }
 
 // ============================================================
 //  UI HELPERS
 // ============================================================
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
 
 const PAGE_META = {
   dashboard:    {title:'Dashboard',sub:'Overview & key metrics'},
-  map:          {title:'Zone Map',sub:'Interactive grower locations'},
+  map:          {title:'Zone Map',sub:'Interactive grower locations — draw custom shapes on the map'},
   growers:      {title:'Growers',sub:'Grower registry & management'},
   plantation:   {title:'Plantation Records',sub:'Field planting records'},
   pests:        {title:'Pests & Diseases',sub:'Incidence recording & analysis'},
@@ -1217,63 +1492,60 @@ const PAGE_META = {
 
 let mapInitialised = false;
 
-function showSection(id) {
+function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const sec = document.getElementById('sec-'+id);
-  if (!sec) return;
+  const sec=document.getElementById('sec-'+id);
+  if(!sec) return;
   sec.classList.add('active');
-  const nav = document.getElementById('nav-'+id);
-  if (nav) nav.classList.add('active');
-  const m = PAGE_META[id]||{title:id,sub:''};
-  document.getElementById('page-title').textContent = m.title;
-  document.getElementById('page-sub').textContent   = m.sub;
-  if (id==='dashboard')    { renderDashboard(); }
-  if (id==='map')          { initMap(); }
-  if (id==='growers')      { renderGrowersTable(); populateFilterLocality(); }
-  if (id==='plantation')   { renderPlantationTable(); }
-  if (id==='pests')        { populateSelects(); renderPestTable(); }
-  if (id==='yield-assess') { populateSelects(); renderYieldTable(); }
-  if (id==='trends')       { renderTrends(); }
-  if (id==='production')   { renderProduction(); }
-  if (id==='settings')     { renderSettings(); }
-  if (window.innerWidth<900) document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('main').scrollTop=0;
+  const nav=document.getElementById('nav-'+id);
+  if(nav) nav.classList.add('active');
+  const m=PAGE_META[id]||{title:id,sub:''};
+  document.getElementById('page-title').textContent=m.title;
+  document.getElementById('page-sub').textContent=m.sub;
+  if(id==='dashboard')    renderDashboard();
+  if(id==='map')          initMap();
+  if(id==='growers')      { renderGrowersTable(); populateFilterLocality(); }
+  if(id==='plantation')   renderPlantationTable();
+  if(id==='pests')        { populateSelects(); renderPestTable(); }
+  if(id==='yield-assess') { populateSelects(); renderYieldTable(); }
+  if(id==='trends')       renderTrends();
+  if(id==='production')   renderProduction();
+  if(id==='settings')     renderSettings();
+  if(window.innerWidth<900) document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0,0);
 }
 
-// Toast
 let _tid=0;
-function toast(msg, type='success') {
-  const stack = document.getElementById('toast-stack');
-  const icons = {success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle',warning:'fa-exclamation-triangle'};
-  const el = document.createElement('div');
+function toast(msg, type='success'){
+  const stack=document.getElementById('toast-stack');
+  const icons={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle',warning:'fa-exclamation-triangle'};
+  const el=document.createElement('div');
   el.className='toast '+type;
   el.innerHTML=`<i class="fas ${icons[type]||icons.info}"></i><span>${msg}</span>`;
   stack.appendChild(el);
   setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),350);},3500);
 }
 
-function openModal(id) { document.getElementById(id).classList.add('open'); populateSelects(); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); populateSelects(); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-// FAB
 let fabOpen=false;
-function toggleFab() {
+function toggleFab(){
   fabOpen=!fabOpen;
   document.getElementById('fab-menu').classList.toggle('open',fabOpen);
   document.getElementById('fab').querySelector('i').className=fabOpen?'fas fa-times':'fas fa-plus';
 }
 
-function updateLocalityDropdown(zoneId, locId) {
+function updateLocalityDropdown(zoneId, locId){
   const zone=document.getElementById(zoneId)?.value;
   const sel=document.getElementById(locId);
-  if (!sel) return;
+  if(!sel) return;
   sel.innerHTML='<option value="">Select locality</option>';
-  (ZONE_LOCALITIES[zone]||[]).forEach(l=>{sel.innerHTML+=`<option value="${l}">${l}</option>`;});
+  (ZONE_LOCALITIES[zone]||[]).forEach(l=>{ sel.innerHTML+=`<option value="${l}">${l}</option>`; });
 }
 
-function populateSelects() {
+function populateSelects(){
   const gOpts=STATE.growers.map(g=>`<option value="${g.name}">${g.name}</option>`).join('');
   const vOpts=STATE.varieties.map(v=>`<option value="${v}">${v}</option>`).join('');
   ['pl-grower','pd-grower','ya-grower'].forEach(id=>{
@@ -1286,77 +1558,75 @@ function populateSelects() {
   });
   const allLoc=[...new Set(Object.values(ZONE_LOCALITIES).flat())].sort();
   const lOpts='<option value="">All Localities</option>'+allLoc.map(l=>`<option value="${l}">${l}</option>`).join('');
-  ['filter-locality','filter-plant-locality'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.innerHTML=lOpts;
-  });
+  ['filter-locality','filter-plant-locality'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=lOpts; });
   const fv=document.getElementById('filter-variety');
   if(fv) fv.innerHTML='<option value="">All Varieties</option>'+vOpts;
   const gasInput=document.getElementById('gas-url-input');
   if(gasInput&&GAS_URL) gasInput.value=GAS_URL;
 }
 
-function autofillPdLocality() {
+function autofillPdLocality(){
   const name=document.getElementById('pd-grower').value;
   const g=STATE.growers.find(x=>x.name===name);
   if(g) document.getElementById('pd-locality').value=g.locality||'';
 }
-function autofillPlantLocality() {
+function autofillPlantLocality(){
   const name=document.getElementById('pl-grower').value;
   const g=STATE.growers.find(x=>x.name===name);
-  if(g&&g.zone) {
+  if(g&&g.zone){
     document.getElementById('pl-zone').value=g.zone;
     updateLocalityDropdown('pl-zone','pl-locality');
     setTimeout(()=>{ document.getElementById('pl-locality').value=g.locality||''; },50);
   }
 }
 
-function populateFilterLocality() {
+function populateFilterLocality(){
   const allLoc=[...new Set(STATE.growers.map(g=>g.locality).filter(Boolean))].sort();
   const el=document.getElementById('filter-locality');
   if(el) el.innerHTML='<option value="">All Localities</option>'+allLoc.map(l=>`<option value="${l}">${l}</option>`).join('');
 }
 
 // ============================================================
-//  GROWERS
+//  GROWERS  (contact removed)
 // ============================================================
-async function saveGrower() {
+async function saveGrower(){
   const name=document.getElementById('g-name').value.trim();
   const zone=document.getElementById('g-zone').value;
   const locality=document.getElementById('g-locality').value;
-  const contact=document.getElementById('g-contact').value.trim();
   const notes=document.getElementById('g-notes').value.trim();
-  if(!name||!zone||!locality) { toast('Name, Zone and Locality required','error'); return; }
-  const g={id:Date.now(),name,zone,locality,contact,notes};
+  if(!name||!zone||!locality){ toast('Name, Zone and Locality required','error'); return; }
+  const g={id:Date.now(),name,zone,locality,notes};
   STATE.growers.push(g); saveLocal();
   closeModal('add-grower-modal'); renderGrowersTable(); renderDashboard(); updateAlertBadge();
   toast('Grower "'+name+'" added','success');
-  ['g-name','g-contact','g-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('g-name').value='';
+  document.getElementById('g-notes').value='';
   document.getElementById('g-zone').value='';
   document.getElementById('g-locality').innerHTML='<option value="">Select Zone first</option>';
   if(GAS_URL){
-    const r=await callGAS('saveGrower',{Grower_Name:name,Zone:zone,Locality:locality,Contact:contact,Registration_Date:new Date().toISOString().split('T')[0],Status:'Active',Notes:notes});
+    const r=await callGAS('saveGrower',{Grower_Name:name,Zone:zone,Locality:locality,Registration_Date:new Date().toISOString().split('T')[0],Status:'Active',Notes:notes});
     if(r.success) toast('Synced to Google Sheets ✓','success');
     else if(r.error) toast('Sheets sync failed: '+r.error,'warning');
   }
 }
 
-function filterGrowers() {
+function filterGrowers(){
   const q=(document.getElementById('grower-search')?.value||'').toLowerCase();
   const loc=document.getElementById('filter-locality')?.value||'';
   const zone=document.getElementById('filter-zone')?.value||'';
   let rows=STATE.growers;
-  if(q) rows=rows.filter(g=>g.name.toLowerCase().includes(q)||(g.contact||'').includes(q));
+  if(q) rows=rows.filter(g=>g.name.toLowerCase().includes(q));
   if(loc) rows=rows.filter(g=>g.locality===loc);
   if(zone) rows=rows.filter(g=>g.zone===zone);
   renderGrowersTable(rows);
 }
 
-function renderGrowersTable(rows) {
+function renderGrowersTable(rows){
   rows=rows||STATE.growers;
   const el=document.getElementById('grower-count-badge');
   if(el) el.textContent=rows.length;
   const tbody=document.getElementById('growers-table');
-  if(!rows.length) {
+  if(!rows.length){
     tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No growers yet</div><div class="empty-sub">Add your first grower to get started</div></div></td></tr>`;
     return;
   }
@@ -1366,19 +1636,19 @@ function renderGrowersTable(rows) {
     const vars=[...new Set(STATE.plantation.filter(p=>p.grower===g.name).map(p=>p.variety).filter(Boolean))];
     const zoneColor=ZONE_COLORS[g.zone]||'#888';
     return `<tr>
-      <td><div style="font-weight:700;font-size:13px;">${g.name}</div>${g.contact?`<div style="font-size:11px;color:var(--text2);">${g.contact}</div>`:''}</td>
-      <td><span style="display:inline-block;background:${zoneColor}20;color:${zoneColor};border-radius:6px;padding:2px 10px;font-size:12px;font-weight:700;">${g.zone}</span></td>
+      <td><div style="font-weight:700;font-size:13px;">${g.name}</div></td>
+      <td><span style="display:inline-block;background:${zoneColor}22;color:${zoneColor};border-radius:6px;padding:2px 10px;font-size:12px;font-weight:700;">${g.zone}</span></td>
       <td>${g.locality}</td>
-      <td>${g.contact||'—'}</td>
       <td><span class="badge badge-gold">${plots}</span></td>
       <td><span style="font-weight:700;">${area}</span></td>
       <td style="font-size:11px;">${vars.length?vars.map(v=>`<span class="badge badge-none" style="margin:1px;">${v}</span>`).join(''):'—'}</td>
+      <td style="font-size:11px;color:var(--text2);max-width:140px;">${g.notes||'—'}</td>
       <td><div class="row-actions"><button class="btn btn-ghost btn-icon btn-sm" onclick="deleteGrower(${g.id})" data-tip="Delete"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button></div></td>
     </tr>`;
   }).join('');
 }
 
-function deleteGrower(id) {
+function deleteGrower(id){
   if(!confirm('Delete this grower? Their plantation records will remain.')) return;
   STATE.growers=STATE.growers.filter(g=>g.id!=id);
   saveLocal(); renderGrowersTable(); renderDashboard(); toast('Grower deleted','warning');
@@ -1387,11 +1657,11 @@ function deleteGrower(id) {
 // ============================================================
 //  PLANTATION
 // ============================================================
-function getFortnight(d) { return new Date(d).getDate()<=15?'Fortnight 1':'Fortnight 2'; }
-function getMonthAbbr(d) { return new Date(d).toLocaleString('default',{month:'short'}); }
-function getMonthYear(d) { const dt=new Date(d); return dt.toLocaleString('default',{month:'short',year:'numeric'}); }
+function getFortnight(d){ return new Date(d).getDate()<=15?'Fortnight 1':'Fortnight 2'; }
+function getMonthAbbr(d){ return new Date(d).toLocaleString('default',{month:'short'}); }
+function getMonthYear(d){ const dt=new Date(d); return dt.toLocaleString('default',{month:'short',year:'numeric'}); }
 
-async function savePlantation() {
+async function savePlantation(){
   const grower=document.getElementById('pl-grower').value;
   const zone=document.getElementById('pl-zone').value;
   const locality=document.getElementById('pl-locality').value;
@@ -1400,7 +1670,7 @@ async function savePlantation() {
   const area=parseFloat(document.getElementById('pl-area').value)||0;
   const estYield=parseFloat(document.getElementById('pl-est-yield').value)||0;
   const season=document.getElementById('pl-season').value;
-  if(!grower||!zone||!locality||!planted) { toast('Grower, Zone, Locality and Date required','error'); return; }
+  if(!grower||!zone||!locality||!planted){ toast('Grower, Zone, Locality and Date required','error'); return; }
   const rec={
     id:Date.now(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,
     fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),monthYear:getMonthYear(planted),
@@ -1417,17 +1687,13 @@ async function savePlantation() {
   document.getElementById('pl-area').value='';
   document.getElementById('pl-est-yield').value='';
   if(GAS_URL){
-    const r=await callGAS('savePlantation',{
-      Grower_Name:grower,Locality:locality,Variety:variety,Date_Planted:planted,
-      Production_Area_Ha:area,Season:season,Fortnightly_Period:rec.fortnight,
-      Estimated_Yield_T_Ha:estYield,Status:'Active',Officer_Comments:rec.comments
-    });
+    const r=await callGAS('savePlantation',{Grower_Name:grower,Locality:locality,Variety:variety,Date_Planted:planted,Production_Area_Ha:area,Season:season,Fortnightly_Period:rec.fortnight,Estimated_Yield_T_Ha:estYield,Status:'Active',Officer_Comments:rec.comments});
     if(r.success) toast('Synced to Google Sheets ✓','success');
     else if(r.error) toast('Sheets sync failed: '+r.error,'warning');
   }
 }
 
-function filteredPlantation() {
+function filteredPlantation(){
   let rows=STATE.plantation;
   const q=(document.getElementById('plant-search')?.value||'').toLowerCase();
   const varF=document.getElementById('filter-variety')?.value||'';
@@ -1442,18 +1708,18 @@ function filteredPlantation() {
   return rows;
 }
 
-function filterPlantation() { renderPlantationTable(); }
-function clearFilters() {
-  ['plant-search','filter-variety','filter-plant-locality','filter-season','filter-month'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+function filterPlantation(){ renderPlantationTable(); }
+function clearFilters(){
+  ['plant-search','filter-variety','filter-plant-locality','filter-season','filter-month'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   renderPlantationTable();
 }
 
-function renderPlantationTable() {
+function renderPlantationTable(){
   const rows=filteredPlantation();
   const el=document.getElementById('plant-count-badge');
   if(el) el.textContent=rows.length;
   const tbody=document.getElementById('plantation-table');
-  if(!rows.length) {
+  if(!rows.length){
     tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records</div><div class="empty-sub">Add a plantation record to get started</div></div></td></tr>`;
     renderFortGrid(); return;
   }
@@ -1461,7 +1727,7 @@ function renderPlantationTable() {
     const zc=ZONE_COLORS[r.zone]||'#888';
     return `<tr>
       <td><div style="font-weight:700;">${r.grower}</div></td>
-      <td><span style="display:inline-block;background:${zc}20;color:${zc};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">${r.zone}</span></td>
+      <td><span style="display:inline-block;background:${zc}22;color:${zc};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">${r.zone}</span></td>
       <td>${r.locality}</td>
       <td>${r.variety||'—'}</td>
       <td>${r.datePlanted||'—'}</td>
@@ -1475,13 +1741,13 @@ function renderPlantationTable() {
   renderFortGrid();
 }
 
-function deletePlant(id) {
+function deletePlant(id){
   if(!confirm('Delete this plantation record?')) return;
   STATE.plantation=STATE.plantation.filter(r=>r.id!=id);
   saveLocal(); renderPlantationTable(); renderDashboard(); toast('Record deleted','warning');
 }
 
-function renderFortGrid() {
+function renderFortGrid(){
   const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const el=document.getElementById('fort-grid');
   if(!el) return;
@@ -1504,14 +1770,12 @@ const DISEASES=['Late Blight','Early Blight','Soft Rot','Bacterial Wilt','Scab']
 const PESTS=['Leaf Miner','Thrips','Nematodes'];
 const PEST_ICONS={'Late Blight':'🍂','Early Blight':'🍃','Soft Rot':'🦠','Bacterial Wilt':'💧','Scab':'🪨','Leaf Miner':'🐛','Thrips':'🦟','Nematodes':'🪱'};
 
-function pdKey(name) { return name.toLowerCase().replace(/\s/g,'').replace(/\./g,''); }
+function pdKey(name){ return name.toLowerCase().replace(/\s/g,'').replace(/\./g,''); }
 
-function buildPestInputs() {
-  const makeCard=(name,isDisease)=>`
+function buildPestInputs(){
+  const makeCard=(name)=>`
     <div class="pest-row-card" id="pcard-${pdKey(name)}">
-      <div class="pest-row-top">
-        <span>${PEST_ICONS[name]||'🔍'} ${name}</span>
-      </div>
+      <div class="pest-row-top"><span>${PEST_ICONS[name]||'🔍'} ${name}</span></div>
       <div class="pest-row-fields">
         <div>
           <div class="form-label" style="text-transform:none;letter-spacing:0;">Severity</div>
@@ -1525,18 +1789,18 @@ function buildPestInputs() {
         </div>
       </div>
     </div>`;
-  document.getElementById('disease-inputs').innerHTML=DISEASES.map(d=>makeCard(d,true)).join('');
-  document.getElementById('pest-inputs').innerHTML=PESTS.map(p=>makeCard(p,false)).join('');
+  document.getElementById('disease-inputs').innerHTML=DISEASES.map(d=>makeCard(d)).join('');
+  document.getElementById('pest-inputs').innerHTML=PESTS.map(p=>makeCard(p)).join('');
 }
 
-function updatePestCard(key) {
+function updatePestCard(key){
   const sev=document.getElementById(`pd-${key}-sev`)?.value;
   const card=document.getElementById(`pcard-${key}`);
   if(!card) return;
   card.classList.toggle('has-data',!!sev);
 }
 
-function buildYieldFactors() {
+function buildYieldFactors(){
   const all=[...DISEASES,...PESTS];
   document.getElementById('yield-factors').innerHTML=`<div class="yield-factors-list">`+
     all.map(f=>{
@@ -1554,7 +1818,7 @@ function buildYieldFactors() {
     }).join('')+'</div>';
 }
 
-function calcYieldRetention() {
+function calcYieldRetention(){
   let total=0;
   const all=[...DISEASES,...PESTS];
   document.querySelectorAll('.yf-sel').forEach((sel,i)=>{
@@ -1571,9 +1835,9 @@ function calcYieldRetention() {
   if(bar){ bar.style.width=ret+'%'; bar.style.background=ret>70?'var(--green)':ret>40?'var(--orange)':'var(--red)'; }
 }
 
-async function savePestRecord() {
+async function savePestRecord(){
   const grower=document.getElementById('pd-grower').value;
-  if(!grower) { toast('Select a grower','error'); return; }
+  if(!grower){ toast('Select a grower','error'); return; }
   const rec={
     id:Date.now(),grower,
     locality:document.getElementById('pd-locality').value,
@@ -1591,31 +1855,24 @@ async function savePestRecord() {
   document.getElementById('pd-comments').value='';
   [...DISEASES,...PESTS].forEach(f=>{
     const key=pdKey(f);
-    const s=document.getElementById(`pd-${key}-sev`);
-    const p=document.getElementById(`pd-${key}-pct`);
+    const s=document.getElementById(`pd-${key}-sev`); const p=document.getElementById(`pd-${key}-pct`);
     if(s) s.value=''; if(p) p.value='';
     const card=document.getElementById(`pcard-${key}`);
     if(card) card.classList.remove('has-data');
   });
   if(GAS_URL){
-    let ok=0,fail=0;
-    for(const f of [...DISEASES,...PESTS]) {
+    for(const f of [...DISEASES,...PESTS]){
       const d=rec[f];
-      if(d.sev&&d.sev!=='') {
-        const r=await callGAS('savePestDisease',{Grower_Name:rec.grower,Locality:rec.locality,Date_Observed:rec.date,Pest_Disease_Name:f,Severity:d.sev,Severity_Pct:d.pct||0,Officer_Comments:rec.comments});
-        r.success?ok++:fail++;
-      }
+      if(d.sev&&d.sev!=='') await callGAS('savePestDisease',{Grower_Name:rec.grower,Locality:rec.locality,Date_Observed:rec.date,Pest_Disease_Name:f,Severity:d.sev,Severity_Pct:d.pct||0,Officer_Comments:rec.comments});
     }
-    if(fail===0&&ok>0) toast('Synced '+ok+' observation(s) to Google Sheets ✓','success');
-    else if(fail>0) toast('Sheets sync: '+ok+' ok, '+fail+' failed','warning');
   }
 }
 
-function renderPestTable() {
+function renderPestTable(){
   const el=document.getElementById('pest-count-badge');
   if(el) el.textContent=STATE.pestRecords.length;
   const tbody=document.getElementById('pest-table');
-  if(!STATE.pestRecords.length) {
+  if(!STATE.pestRecords.length){
     tbody.innerHTML=`<tr><td colspan="14"><div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-title">No pest records yet</div><div class="empty-sub">Record field observations to track incidence</div></div></td></tr>`;
     return;
   }
@@ -1630,13 +1887,13 @@ function renderPestTable() {
   </tr>`).join('');
 }
 
-function deletePestRecord(id) {
+function deletePestRecord(id){
   if(!confirm('Delete this pest/disease record?')) return;
   STATE.pestRecords=STATE.pestRecords.filter(r=>r.id!=id);
   saveLocal(); renderPestTable(); renderDashboard(); updateAlertBadge(); toast('Record deleted','warning');
 }
 
-function updateAlertBadge() {
+function updateAlertBadge(){
   const high=STATE.pestRecords.filter(r=>[...DISEASES,...PESTS].some(f=>r[f]?.sev==='High')).length;
   const badge=document.getElementById('alert-badge');
   if(badge){ badge.style.display=high?'inline-flex':'none'; badge.textContent=high; }
@@ -1645,7 +1902,16 @@ function updateAlertBadge() {
 // ============================================================
 //  YIELD ASSESSMENT
 // ============================================================
-function calcYield() {
+function buildSampleInputs(){
+  const el=document.getElementById('sample-inputs');
+  if(!el) return;
+  el.innerHTML=[1,2,3,4,5].map(n=>`<div>
+    <div class="form-label">Sample ${n}</div>
+    <input type="number" step="0.001" class="form-control sample-kg" placeholder="kg/sqm" oninput="calcYield()">
+  </div>`).join('');
+}
+
+function calcYield(){
   const samples=[...document.querySelectorAll('.sample-kg')].map(i=>parseFloat(i.value)||0).filter(v=>v>0);
   if(!samples.length){ ['ya-avg','ya-arpent','ya-ha','ya-acre'].forEach(id=>document.getElementById(id).innerText='—'); return; }
   const avg=samples.reduce((a,b)=>a+b,0)/samples.length;
@@ -1655,203 +1921,103 @@ function calcYield() {
   document.getElementById('ya-acre').innerText=(avg*4046.86/1000).toFixed(2);
 }
 
-async function saveYieldAssessment() {
+async function saveYieldAssessment(){
   const grower=document.getElementById('ya-grower').value;
   const zone=document.getElementById('ya-zone').value;
   const locality=document.getElementById('ya-locality').value;
   const date=document.getElementById('ya-date').value;
   const area=parseFloat(document.getElementById('ya-area').value)||0;
   const season=document.getElementById('ya-season').value;
+  const variety=document.getElementById('ya-variety').value;
   const samples=[...document.querySelectorAll('.sample-kg')].map(i=>parseFloat(i.value)||0);
-  if(!grower||!zone||!locality||!date){ toast('Grower, Zone, Locality and Date required','error'); return; }
-  const valid=samples.filter(v=>v>0);
-  const avg=valid.length?valid.reduce((a,b)=>a+b,0)/valid.length:0;
+  const validSamples=samples.filter(v=>v>0);
+  if(!grower||!date){ toast('Grower and date required','error'); return; }
+  const avg=validSamples.length?validSamples.reduce((a,b)=>a+b,0)/validSamples.length:0;
   const rec={
-    id:Date.now(),date,grower,zone,locality,
-    variety:document.getElementById('ya-variety').value,
-    area,samples,season,
+    id:Date.now(),grower,zone,locality,date,area,season,variety,samples,
     avg:avg.toFixed(3),
-    yieldHa:(avg*10).toFixed(2),
     yieldArpent:(avg*4218.24/1000).toFixed(2),
+    yieldHa:(avg*10000/1000).toFixed(2),
     yieldAcre:(avg*4046.86/1000).toFixed(2),
     comments:document.getElementById('ya-comments').value.trim()
   };
   STATE.yieldAssessments.push(rec); saveLocal();
-  renderYieldTable(); clearYieldForm();
+  renderYieldTable(); renderDashboard();
   toast('Yield assessment saved','success');
-  if(GAS_URL){
-    const r=await callGAS('saveYieldAssessment',{
-      Grower_Name:rec.grower,Locality:rec.locality,Variety:rec.variety,Assessment_Date:rec.date,
-      Area_Sqm:rec.area,Sample1_Kg_Sqm:samples[0]||0,Sample2_Kg_Sqm:samples[1]||0,
-      Sample3_Kg_Sqm:samples[2]||0,Sample4_Kg_Sqm:samples[3]||0,Sample5_Kg_Sqm:samples[4]||0,
-      Officer_Comments:rec.comments
-    });
-    if(r.success) toast('Synced to Google Sheets ✓','success');
-    else if(r.error) toast('Sheets sync failed: '+r.error,'warning');
-  }
 }
 
-function renderYieldTable() {
+function clearYieldForm(){
+  ['ya-date','ya-area','ya-comments'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('ya-grower').value='';
+  document.querySelectorAll('.sample-kg').forEach(el=>el.value='');
+  ['ya-avg','ya-arpent','ya-ha','ya-acre'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerText='—'; });
+}
+
+function renderYieldTable(){
   const el=document.getElementById('yield-count-badge');
   if(el) el.textContent=STATE.yieldAssessments.length;
   const tbody=document.getElementById('yield-table');
   if(!STATE.yieldAssessments.length){
-    tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-title">No assessments yet</div><div class="empty-sub">Complete a yield exercise to record data</div></div></td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-title">No yield assessments yet</div><div class="empty-sub">Record field sample data to estimate yields</div></div></td></tr>`;
     return;
   }
   tbody.innerHTML=STATE.yieldAssessments.map(r=>`<tr>
-    <td>${r.date}</td><td><strong>${r.grower}</strong></td>
-    <td>${r.locality}</td><td>${r.variety||'—'}</td><td>${r.area||'—'}</td>
-    <td>${r.avg}</td><td>${r.yieldArpent}</td>
-    <td><strong style="color:var(--gold);">${r.yieldHa}</strong></td>
+    <td>${r.date||'—'}</td>
+    <td><strong>${r.grower}</strong></td>
+    <td>${r.locality||'—'}</td>
+    <td>${r.variety||'—'}</td>
+    <td>${r.area}</td>
+    <td>${r.avg}</td>
+    <td>${r.yieldArpent}</td>
+    <td style="color:var(--gold);font-weight:700;">${r.yieldHa}</td>
     <td>${r.yieldAcre}</td>
     <td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season||'—'}</span></td>
     <td><div class="row-actions"><button class="btn btn-ghost btn-icon btn-sm" onclick="deleteYield(${r.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button></div></td>
   </tr>`).join('');
 }
 
-function deleteYield(id) {
+function deleteYield(id){
   if(!confirm('Delete this yield assessment?')) return;
   STATE.yieldAssessments=STATE.yieldAssessments.filter(r=>r.id!=id);
-  saveLocal(); renderYieldTable(); toast('Assessment deleted','warning');
+  saveLocal(); renderYieldTable(); toast('Deleted','warning');
 }
 
-function clearYieldForm() {
-  ['ya-grower','ya-zone','ya-area','ya-comments','ya-stage'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('ya-locality').innerHTML='<option value="">Select Zone first</option>';
-  document.getElementById('ya-variety').value='';
-  document.getElementById('ya-season').value='Season 1';
-  document.querySelectorAll('.sample-kg').forEach(i=>i.value='');
-  ['ya-avg','ya-arpent','ya-ha','ya-acre'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerText='—';});
-  document.getElementById('ya-files').innerHTML='';
-  document.getElementById('ya-date').value=new Date().toISOString().split('T')[0];
-}
-
-// ============================================================
-//  DASHBOARD
-// ============================================================
-const charts={};
-function mkChart(id,cfg) {
-  if(charts[id]){ charts[id].destroy(); delete charts[id]; }
-  const ctx=document.getElementById(id)?.getContext('2d');
-  if(ctx) charts[id]=new Chart(ctx,cfg);
-}
-
-const CHART_COLORS=['#f0a500','#3b82f6','#22c55e','#a855f7','#f97316','#ef4444','#14b8a6','#ec4899','#84cc16','#06b6d4'];
-const CHART_OPTS={
-  responsive:true,maintainAspectRatio:false,
-  plugins:{legend:{labels:{color:'#8899b4',font:{size:11}}}},
-  scales:{
-    x:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(31,45,71,.5)'}},
-    y:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(31,45,71,.5)'}}
-  }
-};
-
-function animateCounter(el,target) {
-  if(!el) return;
-  const start=0,dur=600;
-  const startTime=performance.now();
-  const isFloat=String(target).includes('.');
-  function step(now) {
-    const p=Math.min((now-startTime)/dur,1);
-    const ease=1-Math.pow(1-p,3);
-    el.textContent=isFloat?(start+(target-start)*ease).toFixed(1):Math.round(start+(target-start)*ease);
-    if(p<1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-function renderDashboard() {
-  const totalArea=STATE.plantation.reduce((s,r)=>s+(r.area||0),0);
-  const totalProd=STATE.plantation.reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0);
-  const alerts=STATE.pestRecords.filter(r=>[...DISEASES,...PESTS].some(f=>r[f]?.sev==='High')).length;
-  // Update static stat card values with animated counters
-  animateCounter(document.getElementById('sv-growers'),STATE.growers.length);
-  animateCounter(document.getElementById('sv-area'),parseFloat(totalArea.toFixed(1)));
-  animateCounter(document.getElementById('sv-prod'),Math.round(totalProd));
-  animateCounter(document.getElementById('sv-alerts'),alerts);
-  const plotsEl=document.getElementById('sv-plots');
-  if(plotsEl) plotsEl.textContent=STATE.plantation.length;
-  const alertLabelEl=document.getElementById('sv-alert-label');
-  if(alertLabelEl) alertLabelEl.innerHTML=alerts?'<span style="color:var(--red);">Action required</span>':'<span style="color:var(--green);">All clear</span>';
-
-  const recent=[...STATE.plantation].reverse().slice(0,8);
-  const tbody=document.getElementById('recent-table');
-  if(!recent.length) tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No records yet</div><div class="empty-sub">Click "Add Record" to get started</div></div></td></tr>`;
-  else tbody.innerHTML=recent.map(r=>`<tr>
-    <td><strong>${r.grower}</strong></td><td>${r.locality}</td><td>${r.variety||'—'}</td>
-    <td>${r.datePlanted||'—'}</td><td>${r.area}</td>
-    <td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season}</span></td>
-    <td><span class="badge badge-active">Active</span></td>
-  </tr>`).join('');
-
-  renderLocalityChart(); renderVarietyChart(); renderFortnightlyChart(); renderPestOverview();
-}
-
-function renderLocalityChart() {
-  const locs=[...new Set(STATE.plantation.map(r=>r.locality||'Unknown'))];
-  if(!locs.length) return;
-  const data=locs.map(l=>STATE.plantation.filter(r=>r.locality===l).reduce((s,r)=>s+(r.area||0),0));
-  mkChart('chart-locality',{
-    type:'bar',
-    data:{labels:locs,datasets:[{label:'Area (ha)',data,backgroundColor:CHART_COLORS.map(c=>c+'bb'),borderRadius:4}]},
-    options:{...CHART_OPTS,plugins:{...CHART_OPTS.plugins,legend:{display:false}}}
+// File handling
+function onDragOver(e,id){ e.preventDefault(); document.getElementById(id).classList.add('over'); }
+function onDragLeave(e,id){ document.getElementById(id).classList.remove('over'); }
+function onDrop(e,dropId,listId){ e.preventDefault(); document.getElementById(dropId).classList.remove('over'); addFilesToList(e.dataTransfer.files,listId); }
+function handleFiles(input,listId){ addFilesToList(input.files,listId); }
+function addFilesToList(files,listId){
+  const el=document.getElementById(listId); if(!el) return;
+  [...files].forEach(f=>{
+    const chip=document.createElement('div'); chip.className='file-chip';
+    chip.innerHTML=`<i class="fas fa-file"></i><span>${f.name}</span><span class="del" onclick="this.parentElement.remove()">✕</span>`;
+    el.appendChild(chip);
   });
 }
 
-function renderVarietyChart() {
-  const vars=STATE.varieties;
-  const data=vars.map(v=>STATE.plantation.filter(r=>r.variety===v).length);
-  if(data.every(d=>d===0)) return;
-  mkChart('chart-variety',{
-    type:'doughnut',
-    data:{labels:vars,datasets:[{data,backgroundColor:CHART_COLORS,borderWidth:0,hoverOffset:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8899b4',font:{size:11},boxWidth:10}}},cutout:'65%'}
-  });
-}
-
-function renderFortnightlyChart() {
-  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const f1=MONTHS.map((_,mi)=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 1').length);
-  const f2=MONTHS.map((_,mi)=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 2').length);
-  mkChart('chart-fortnightly',{
-    type:'bar',
-    data:{labels:MONTHS,datasets:[
-      {label:'Fortnight 1',data:f1,backgroundColor:'rgba(240,165,0,.7)',borderRadius:4},
-      {label:'Fortnight 2',data:f2,backgroundColor:'rgba(59,130,246,.7)',borderRadius:4}
-    ]},
-    options:{...CHART_OPTS,scales:{...CHART_OPTS.scales,x:{...CHART_OPTS.scales.x,stacked:true},y:{...CHART_OPTS.scales.y,stacked:true}}}
-  });
-}
-
-function renderPestOverview() {
-  const el=document.getElementById('pest-overview-bars');
-  if(!el) return;
-  const sevScore={Low:1,Moderate:2,High:3};
-  el.innerHTML=[...DISEASES,...PESTS].map(f=>{
-    const recs=STATE.pestRecords.map(r=>r[f]?.sev).filter(v=>v&&v!=='');
-    if(!recs.length) return `<div class="sev-row"><span class="sev-name" style="font-size:11px;">${f}</span><div class="sev-track"><div class="sev-fill none" style="width:0%"></div></div><div class="sev-badge-wrap"><span style="font-size:10px;color:var(--text3);">No data</span></div></div>`;
-    const avg=recs.reduce((s,v)=>s+(sevScore[v]||0),0)/recs.length;
-    const pct=Math.round((avg/3)*100);
-    const cls=avg>=2.5?'high':avg>=1.5?'moderate':'low';
-    return `<div class="sev-row"><span class="sev-name" style="font-size:11px;">${PEST_ICONS[f]||''} ${f}</span><div class="sev-track"><div class="sev-fill ${cls}" style="width:${pct}%"></div></div><div class="sev-badge-wrap"><span class="badge badge-${cls}" style="font-size:10px;">${pct}%</span></div></div>`;
-  }).join('');
-}
-
 // ============================================================
-//  INTERACTIVE MAP
+//  INTERACTIVE MAP  (with polygon zones + Leaflet.draw)
 // ============================================================
 let map=null, mapLayers={growers:null,zones:null,severity:null,plantations:null};
 let layerState={growers:true,zones:true,severity:true,plantations:false};
+let drawnItems=null;
+let drawShapeCount=0;
 
-function getLocalityCoords(locality, zone) {
-  if(LOCALITY_COORDS[locality]) return LOCALITY_COORDS[locality];
-  const center=LOCALITY_COORDS[zone+'_center']||[-20.25,57.58];
-  // Jitter slightly so overlapping markers are visible
-  return [center[0]+(Math.random()-.5)*.04, center[1]+(Math.random()-.5)*.04];
+function getLocalityCoords(locality, zone){
+  // Try zone-specific key first (handles shared locality names across zones)
+  const zoneKey = zone + ':' + locality;
+  if(LOCALITY_COORDS[zoneKey]) return LOCALITY_COORDS[zoneKey];
+  // Fallback: scan all keys for zone-prefixed match
+  for(const k of Object.keys(LOCALITY_COORDS)){
+    if(k === zone+':'+locality) return LOCALITY_COORDS[k];
+  }
+  // Last resort: zone centre with small jitter
+  const center = LOCALITY_COORDS[zone+'_center'] || [-20.25,57.58];
+  return [center[0]+(Math.random()-.5)*.025, center[1]+(Math.random()-.5)*.025];
 }
 
-function getGrowerSeverity(growerName) {
+function getGrowerSeverity(growerName){
   const recs=STATE.pestRecords.filter(r=>r.grower===growerName);
   if(!recs.length) return 'none';
   let maxScore=0;
@@ -1862,49 +2028,125 @@ function getGrowerSeverity(growerName) {
   return maxScore>=3?'high':maxScore>=2?'moderate':maxScore>=1?'low':'none';
 }
 
-function sevColor(sev) {
+function sevColor(sev){
   return {high:'#ef4444',moderate:'#f97316',low:'#22c55e',none:'#3b82f6'}[sev]||'#3b82f6';
 }
 
-function initMap() {
+function initMap(){
   const container=document.getElementById('map-container');
   if(!container) return;
-  if(map) { setTimeout(()=>map.invalidateSize(),100); renderMapLayers(); return; }
-  map=L.map('map-container',{center:[-20.25,57.58],zoom:10,zoomControl:true});
+  if(map){ setTimeout(()=>map.invalidateSize(),100); renderMapLayers(); return; }
+
+  // Centre chosen to frame all four zones: E1 (lng~57.50), E2 (lng~57.65), E3 (lng~57.76), E4 (lat~57.72)
+  map=L.map('map-container',{center:[-20.30,57.63],zoom:10,zoomControl:true});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'© OpenStreetMap contributors',maxZoom:18
   }).addTo(map);
+
+  // === Leaflet.draw setup ===
+  drawnItems=new L.FeatureGroup();
+  map.addLayer(drawnItems);
+
+  const drawControl=new L.Control.Draw({
+    position:'topright',
+    edit:{ featureGroup:drawnItems, remove:true },
+    draw:{
+      polygon:{
+        shapeOptions:{ color:'#f0a500', fillColor:'#f0a500', fillOpacity:0.15, weight:2 },
+        showArea:true
+      },
+      rectangle:{
+        shapeOptions:{ color:'#3b82f6', fillColor:'#3b82f6', fillOpacity:0.12, weight:2 }
+      },
+      circle:{
+        shapeOptions:{ color:'#22c55e', fillColor:'#22c55e', fillOpacity:0.12, weight:2 }
+      },
+      marker:true,
+      polyline:false,
+      circlemarker:false
+    }
+  });
+  map.addControl(drawControl);
+
+  map.on(L.Draw.Event.CREATED, function(e){
+    const layer=e.layer;
+    const type=e.layerType;
+    drawnItems.addLayer(layer);
+    drawShapeCount++;
+    updateDrawnShapesList();
+    toast(`${type.charAt(0).toUpperCase()+type.slice(1)} drawn on map ✓`,'success');
+  });
+
+  map.on(L.Draw.Event.DELETED, function(){
+    updateDrawnShapesList();
+  });
+
   renderMapLayers();
   renderZoneStats();
   setTimeout(()=>map.invalidateSize(),200);
 }
 
-function renderMapLayers() {
+function updateDrawnShapesList(){
+  const el=document.getElementById('drawn-shapes-list');
+  const countEl=document.getElementById('shapes-count');
+  let count=0;
+  if(!el||!drawnItems) return;
+  const layers=drawnItems.getLayers();
+  count=layers.length;
+  if(countEl) countEl.textContent=count;
+  if(!count){
+    el.innerHTML='<span style="font-size:12px;color:var(--text3);">No shapes drawn yet. Use the drawing toolbar on the map to add polygons, rectangles or markers.</span>';
+    return;
+  }
+  el.innerHTML=layers.map((layer,i)=>{
+    let typeLabel='Shape';
+    if(layer instanceof L.Polygon && !(layer instanceof L.Rectangle)) typeLabel='Polygon';
+    else if(layer instanceof L.Rectangle) typeLabel='Rectangle';
+    else if(layer instanceof L.Circle) typeLabel='Circle';
+    else if(layer instanceof L.Marker) typeLabel='Marker';
+    return `<span class="shape-chip">${typeLabel} ${i+1}</span>`;
+  }).join('');
+}
+
+function clearDrawnShapes(){
+  if(!drawnItems){ toast('No shapes to clear','info'); return; }
+  if(!drawnItems.getLayers().length){ toast('No shapes to clear','info'); return; }
+  if(!confirm('Clear all drawn shapes?')) return;
+  drawnItems.clearLayers();
+  drawShapeCount=0;
+  updateDrawnShapesList();
+  toast('All drawn shapes cleared','warning');
+}
+
+function renderMapLayers(){
   if(!map) return;
-  Object.values(mapLayers).forEach(l=>{ if(l) { try{map.removeLayer(l);}catch(e){} } });
+  Object.values(mapLayers).forEach(l=>{ if(l){ try{ map.removeLayer(l); }catch(e){} } });
   mapLayers={growers:null,zones:null,severity:null,plantations:null};
 
-  // Zone polygons
-  if(layerState.zones) {
+  // Zone polygons — use ZONE_POLYGONS for accurate coverage
+  if(layerState.zones){
     const zoneLayer=L.layerGroup();
-    Object.entries(ZONE_BOUNDS).forEach(([zone,[sw,ne]])=>{
+    Object.entries(ZONE_POLYGONS).forEach(([zone, coords])=>{
       const color=ZONE_COLORS[zone];
-      L.rectangle([sw,ne],{color,weight:2,fillColor:color,fillOpacity:.08}).bindPopup(`
-        <div class="pop-name">Zone ${zone}</div>
+      L.polygon(coords,{color,weight:2.5,fillColor:color,fillOpacity:.1,dashArray:null}).bindPopup(`
+        <div class="pop-name" style="color:${color};">Zone ${zone}</div>
         <div class="pop-row"><i class="fas fa-users"></i> ${STATE.growers.filter(g=>g.zone===zone).length} growers</div>
         <div class="pop-row"><i class="fas fa-seedling"></i> ${STATE.plantation.filter(p=>p.zone===zone).length} plots</div>
-        <div class="pop-row"><i class="fas fa-map"></i> ${STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div>
+        <div class="pop-row"><i class="fas fa-map"></i> ${STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha total</div>
+        <div class="pop-row" style="margin-top:6px;font-size:11px;color:var(--text3);">${(ZONE_LOCALITIES[zone]||[]).length} localities registered</div>
       `).addTo(zoneLayer);
-      L.marker([
-        (sw[0]+ne[0])/2,(sw[1]+ne[1])/2
-      ],{icon:L.divIcon({className:'',html:`<div style="color:${color};font-weight:800;font-size:14px;text-shadow:0 0 6px #000;white-space:nowrap;">Zone ${zone}</div>`,iconAnchor:[20,10]})}).addTo(zoneLayer);
+      // Zone label at centroid
+      const lats=coords.map(c=>c[0]), lngs=coords.map(c=>c[1]);
+      const cLat=(Math.min(...lats)+Math.max(...lats))/2;
+      const cLng=(Math.min(...lngs)+Math.max(...lngs))/2;
+      L.marker([cLat,cLng],{icon:L.divIcon({className:'',html:`<div style="color:${color};font-weight:800;font-size:15px;text-shadow:0 1px 4px #000,0 0 8px #000;white-space:nowrap;pointer-events:none;">Zone ${zone}</div>`,iconAnchor:[28,10]})}).addTo(zoneLayer);
     });
     mapLayers.zones=zoneLayer;
-    if(layerState.zones) zoneLayer.addTo(map);
+    zoneLayer.addTo(map);
   }
 
   // Grower markers
-  if(layerState.growers&&STATE.growers.length) {
+  if(layerState.growers&&STATE.growers.length){
     const growerLayer=L.layerGroup();
     STATE.growers.forEach(g=>{
       const sev=getGrowerSeverity(g.name);
@@ -1914,31 +2156,30 @@ function renderMapLayers() {
       const totalArea=plots.reduce((s,r)=>s+(r.area||0),0);
       const icon=L.divIcon({
         className:'',
-        html:`<div style="width:16px;height:16px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5);"></div>`,
+        html:`<div style="width:16px;height:16px;border-radius:50%;background:${color};border:2.5px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.6);"></div>`,
         iconAnchor:[8,8]
       });
       L.marker(coords,{icon}).bindPopup(`
         <div class="pop-name">👤 ${g.name}</div>
         <div class="pop-row"><i class="fas fa-map-marker-alt"></i> ${g.locality} (Zone ${g.zone})</div>
-        ${g.contact?`<div class="pop-row"><i class="fas fa-phone"></i> ${g.contact}</div>`:''}
-        <div class="pop-row"><i class="fas fa-seedling"></i> ${plots.length} plots / ${totalArea.toFixed(2)} ha</div>
-        <div><span class="pop-sev" style="background:${color}20;color:${color};">Pest: ${sev.charAt(0).toUpperCase()+sev.slice(1)}</span></div>
+        <div class="pop-row"><i class="fas fa-seedling"></i> ${plots.length} plots · ${totalArea.toFixed(2)} ha</div>
+        <div><span class="pop-sev" style="background:${color}22;color:${color};">Pest Risk: ${sev.charAt(0).toUpperCase()+sev.slice(1)}</span></div>
       `).addTo(growerLayer);
     });
     mapLayers.growers=growerLayer;
-    if(layerState.growers) growerLayer.addTo(map);
+    growerLayer.addTo(map);
   }
 
   // Plantation plot markers
-  if(layerState.plantations&&STATE.plantation.length) {
+  if(layerState.plantations&&STATE.plantation.length){
     const plantLayer=L.layerGroup();
     STATE.plantation.forEach(p=>{
       const coords=getLocalityCoords(p.locality,p.zone);
-      const jitter=[coords[0]+(Math.random()-.5)*.008,coords[1]+(Math.random()-.5)*.008];
+      const jitter=[coords[0]+(Math.random()-.5)*.008, coords[1]+(Math.random()-.5)*.008];
       const color=p.season==='Season 1'?'#3b82f6':'#a855f7';
       const icon=L.divIcon({
         className:'',
-        html:`<div style="width:10px;height:10px;border-radius:3px;background:${color};border:1.5px solid #fff;opacity:.8;"></div>`,
+        html:`<div style="width:10px;height:10px;border-radius:3px;background:${color};border:1.5px solid rgba(255,255,255,.7);opacity:.85;"></div>`,
         iconAnchor:[5,5]
       });
       L.marker(jitter,{icon}).bindPopup(`
@@ -1950,26 +2191,26 @@ function renderMapLayers() {
       `).addTo(plantLayer);
     });
     mapLayers.plantations=plantLayer;
-    if(layerState.plantations) plantLayer.addTo(map);
+    plantLayer.addTo(map);
   }
 }
 
-function toggleLayer(name) {
+function toggleLayer(name){
   layerState[name]=!layerState[name];
   const btn=document.getElementById('toggle-'+name);
   if(btn) btn.classList.toggle('on',layerState[name]);
   renderMapLayers();
 }
 
-function renderZoneStats() {
+function renderZoneStats(){
   const el=document.getElementById('zone-stats');
   if(!el) return;
   el.innerHTML=Object.keys(ZONE_LOCALITIES).map(zone=>{
     const growerCount=STATE.growers.filter(g=>g.zone===zone).length;
     const area=STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0);
     const color=ZONE_COLORS[zone];
-    return `<div class="zone-card" onclick="if(map){map.fitBounds(${JSON.stringify(ZONE_BOUNDS[zone])})}" style="border-top:3px solid ${color};">
-      <div class="zone-name" style="color:${color};">ZONE ${zone}</div>
+    return `<div class="zone-card" onclick="if(map){map.fitBounds(${JSON.stringify(ZONE_BOUNDS[zone])});}" style="border-top:3px solid ${color};">
+      <div class="zone-name" style="color:${color};">Zone ${zone}</div>
       <div class="zone-val" style="color:${color};">${growerCount}</div>
       <div class="zone-sub">${growerCount===1?'grower':'growers'} · ${area.toFixed(1)} ha</div>
     </div>`;
@@ -1979,21 +2220,21 @@ function renderZoneStats() {
 // ============================================================
 //  TRENDS
 // ============================================================
-function renderTrends() {
+function renderTrends(){
   const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   requestAnimationFrame(()=>{
     const prod=MONTHS.map((_,mi)=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi).reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0));
     mkChart('chart-trend',{type:'line',data:{labels:MONTHS,datasets:[{label:'Est. Production (T)',data:prod,borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,.08)',fill:true,tension:.35,pointBackgroundColor:'#f0a500',pointRadius:4}]},options:{...CHART_OPTS}});
 
     const locs=[...new Set(STATE.plantation.map(r=>r.locality).filter(Boolean))];
-    const yieldData=locs.map(l=>{const ya=STATE.yieldAssessments.filter(r=>r.locality===l);return ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0;});
+    const yieldData=locs.map(l=>{ const ya=STATE.yieldAssessments.filter(r=>r.locality===l); return ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0; });
     mkChart('chart-locality-yield',{type:'bar',data:{labels:locs,datasets:[{label:'Avg Yield (T/ha)',data:yieldData,backgroundColor:CHART_COLORS.map(c=>c+'bb'),borderRadius:4}]},options:{...CHART_OPTS,plugins:{...CHART_OPTS.plugins,legend:{display:false}}}});
 
     const pestTrend=MONTHS.map((_,mi)=>{
       const recs=STATE.pestRecords.filter(r=>r.date&&new Date(r.date).getMonth()===mi);
       if(!recs.length) return 0;
       let tot=0,cnt=0;
-      recs.forEach(r=>[...DISEASES,...PESTS].forEach(f=>{if(r[f]?.sev){tot+={Low:33,Moderate:66,High:100}[r[f].sev]||0;cnt++;}}));
+      recs.forEach(r=>[...DISEASES,...PESTS].forEach(f=>{ if(r[f]?.sev){ tot+={Low:33,Moderate:66,High:100}[r[f].sev]||0; cnt++; } }));
       return cnt?Math.round(tot/cnt):0;
     });
     mkChart('chart-pest-trend',{type:'line',data:{labels:MONTHS,datasets:[{label:'Avg Severity Score',data:pestTrend,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.35,pointBackgroundColor:'#ef4444',pointRadius:4}]},options:{...CHART_OPTS}});
@@ -2010,7 +2251,7 @@ function renderTrends() {
 // ============================================================
 //  PRODUCTION FORECAST
 // ============================================================
-function renderProduction() {
+function renderProduction(){
   const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const tbody=document.getElementById('prod-tbody');
   if(tbody) tbody.innerHTML=MONTHS.map((m,i)=>{
@@ -2050,7 +2291,7 @@ function renderProduction() {
       const zc=ZONE_COLORS[zone]||'#888';
       return `<tr>
         <td><strong>${l}</strong></td>
-        <td><span style="background:${zc}20;color:${zc};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">${zone}</span></td>
+        <td><span style="background:${zc}22;color:${zc};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">${zone}</span></td>
         <td>${recs.length}</td><td>${area.toFixed(2)}</td>
         <td>${avgYa?avgYa.toFixed(1)+' T/ha':'<span style="color:var(--text3)">est. 20 T/ha</span>'}</td>
         <td><strong style="color:var(--gold);">${Math.round(prod)}</strong></td>
@@ -2063,7 +2304,7 @@ function renderProduction() {
 // ============================================================
 //  WEEKLY REPORT
 // ============================================================
-function generateReport() {
+function generateReport(){
   const weekStr=document.getElementById('rpt-week').value||new Date().toISOString().split('T')[0];
   const season=document.getElementById('rpt-season').value;
   const officer=document.getElementById('rpt-officer').value.trim()||'Field Officer';
@@ -2104,7 +2345,7 @@ function generateReport() {
   preview.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function printReport() {
+function printReport(){
   const c=document.getElementById('report-preview').innerHTML;
   if(!c){ toast('Generate a report first','error'); return; }
   const w=window.open('','_blank');
@@ -2114,7 +2355,7 @@ function printReport() {
   w.document.close(); w.focus(); setTimeout(()=>w.print(),400);
 }
 
-async function saveReportToSheets() {
+async function saveReportToSheets(){
   if(!GAS_URL){ toast('Set your GAS URL in Settings first','error'); return; }
   const weekStr=document.getElementById('rpt-week').value||new Date().toISOString().split('T')[0];
   const season=document.getElementById('rpt-season').value;
@@ -2126,17 +2367,12 @@ async function saveReportToSheets() {
   const endDate=new Date(weekDate); endDate.setDate(endDate.getDate()+6);
   const endStr=endDate.toISOString().split('T')[0];
   toast('Saving report to Sheets…','info');
-  const r=await callGAS('saveWeeklyReport',{
-    Report_Date:new Date().toISOString().split('T')[0],
-    Week_Start:weekStr, Week_End:endStr,
-    Season:season, Report_Text:comments,
-    Generated_By:officer
-  });
+  const r=await callGAS('saveWeeklyReport',{Report_Date:new Date().toISOString().split('T')[0],Week_Start:weekStr,Week_End:endStr,Season:season,Report_Text:comments,Generated_By:officer});
   if(r.success) toast('Report saved to Sheets ✓','success');
   else toast('Save failed: '+(r.error||'unknown'),'error');
 }
 
-function exportReportCsv() {
+function exportReportCsv(){
   const rows=STATE.plantation;
   if(!rows.length){ toast('No plantation data to export','error'); return; }
   const headers=['Grower','Zone','Locality','Variety','Date Planted','Area (ha)','Est Yield (T/ha)','Season','Fortnight'];
@@ -2151,12 +2387,12 @@ function exportReportCsv() {
 // ============================================================
 //  SETTINGS
 // ============================================================
-function renderSettings() {
+function renderSettings(){
   renderVarietyList();
   const gasInput=document.getElementById('gas-url-input');
   if(gasInput&&GAS_URL) gasInput.value=GAS_URL;
 }
-function addVariety() {
+function addVariety(){
   const v=document.getElementById('new-variety').value.trim();
   if(!v){ toast('Enter a variety name','error'); return; }
   if(STATE.varieties.includes(v)){ toast('Variety already exists','warning'); return; }
@@ -2165,12 +2401,12 @@ function addVariety() {
   renderVarietyList(); populateSelects();
   toast('Variety "'+v+'" added','success');
 }
-function renderVarietyList() {
+function renderVarietyList(){
   const el=document.getElementById('variety-list');
   if(!el) return;
   el.innerHTML=STATE.varieties.map((v,i)=>`<div class="variety-tag">${v}<span class="del" onclick="removeVariety(${i})">✕</span></div>`).join('');
 }
-function removeVariety(i) {
+function removeVariety(i){
   STATE.varieties.splice(i,1); saveLocal();
   renderVarietyList(); populateSelects();
   toast('Variety removed','warning');
@@ -2179,20 +2415,20 @@ function removeVariety(i) {
 // ============================================================
 //  SYNC
 // ============================================================
-async function syncToSheets() {
+async function syncToSheets(){
   if(!GAS_URL){ toast('Set your GAS URL in Settings first','error'); return; }
   document.getElementById('sync-label').textContent='Syncing…';
   toast('Syncing to Google Sheets…','info');
   let ok=0,fail=0;
   for(const g of STATE.growers){
-    const r=await callGAS('saveGrower',{Grower_Name:g.name,Zone:g.zone||'',Locality:g.locality,Contact:g.contact||'',Registration_Date:g.registrationDate||new Date().toISOString().split('T')[0],Status:'Active',Notes:g.notes||''});
+    const r=await callGAS('saveGrower',{Grower_Name:g.name,Zone:g.zone||'',Locality:g.locality,Registration_Date:g.registrationDate||new Date().toISOString().split('T')[0],Status:'Active',Notes:g.notes||''});
     r.success?ok++:fail++;
   }
   for(const p of STATE.plantation){
     const r=await callGAS('savePlantation',{Grower_Name:p.grower,Locality:p.locality,Variety:p.variety,Date_Planted:p.datePlanted,Production_Area_Ha:p.area,Season:p.season,Fortnightly_Period:p.fortnight,Estimated_Yield_T_Ha:p.estYield,Status:'Active',Officer_Comments:p.comments||''});
     r.success?ok++:fail++;
   }
-  for(const rec of STATE.pestRecords) for(const f of [...DISEASES,...PESTS]) if(rec[f]?.sev&&rec[f].sev!=='') {
+  for(const rec of STATE.pestRecords) for(const f of [...DISEASES,...PESTS]) if(rec[f]?.sev&&rec[f].sev!==''){
     const r=await callGAS('savePestDisease',{Grower_Name:rec.grower,Locality:rec.locality,Date_Observed:rec.date,Pest_Disease_Name:f,Severity:rec[f].sev,Severity_Pct:rec[f].pct||0,Officer_Comments:rec.comments||''});
     r.success?ok++:fail++;
   }
@@ -2204,46 +2440,35 @@ async function syncToSheets() {
   toast(fail?`Sync: ${ok} ok, ${fail} failed`:`Synced ${ok} records ✓`,fail?'error':'success');
 }
 
-function exportAllData() {
+// ============================================================
+//  DATA MANAGEMENT
+// ============================================================
+function exportAllData(){
   const a=document.createElement('a');
   a.href='data:application/json,'+encodeURIComponent(JSON.stringify(STATE,null,2));
   a.download=`pota-backup-${new Date().toISOString().split('T')[0]}.json`;
   a.click(); toast('Backup downloaded','success');
 }
 function importData(){ document.getElementById('import-file').click(); }
-function handleImport(input) {
+function handleImport(input){
   const file=input.files[0]; if(!file) return;
   const reader=new FileReader();
   reader.onload=e=>{
     try{
       const data=JSON.parse(e.target.result);
-      Object.assign(STATE,data); saveLocal(); populateSelects(); renderDashboard();
-      toast('Data imported successfully','success');
-    }catch(e){ toast('Invalid backup file','error'); }
+      if(data.growers&&data.plantation){
+        STATE={...DEFAULT_STATE,...data};
+        saveLocal(); renderDashboard();
+        toast('Data imported successfully ✓','success');
+      } else { toast('Invalid backup file','error'); }
+    } catch(err){ toast('Failed to parse backup: '+err.message,'error'); }
   };
-  reader.readAsText(file); input.value='';
+  reader.readAsText(file);
 }
-function clearAllData() {
-  if(!confirm('This will permanently delete ALL local data. Are you sure?')) return;
-  STATE.growers=[]; STATE.plantation=[]; STATE.pestRecords=[]; STATE.yieldAssessments=[];
-  saveLocal(); renderDashboard(); updateAlertBadge();
-  toast('All local data cleared','warning');
-}
-
-// ============================================================
-//  ATTACHMENTS
-// ============================================================
-function onDragOver(e,id){ e.preventDefault(); document.getElementById(id).classList.add('over'); }
-function onDragLeave(e,id){ document.getElementById(id).classList.remove('over'); }
-function onDrop(e,id,fid){ e.preventDefault(); document.getElementById(id).classList.remove('over'); handleFiles({files:e.dataTransfer.files},fid); }
-function handleFiles(input,containerId) {
-  const el=document.getElementById(containerId);
-  [...(input.files||[])].forEach(f=>{
-    const chip=document.createElement('div');
-    chip.className='file-chip';
-    chip.innerHTML=`<i class="fas fa-file" style="color:var(--blue);"></i><span>${f.name}</span><span class="del" onclick="this.parentElement.remove()">✕</span>`;
-    el.appendChild(chip);
-  });
+function clearAllData(){
+  if(!confirm('This will permanently delete ALL local data. This cannot be undone. Continue?')) return;
+  STATE={...DEFAULT_STATE}; saveLocal(); renderDashboard();
+  toast('All data cleared','warning');
 }
 
 // ============================================================
@@ -2251,41 +2476,36 @@ function handleFiles(input,containerId) {
 // ============================================================
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
-  if(e.key==='Escape'){ document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); if(fabOpen)toggleFab(); }
-  if(e.key==='n'||e.key==='N'){ e.preventDefault(); openModal('add-plantation-modal'); }
+  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+  if(e.key==='n'||e.key==='N') openModal('add-plantation-modal');
   if(e.key==='g'||e.key==='G') showSection('growers');
   if(e.key==='p'||e.key==='P') showSection('pests');
   if(e.key==='m'||e.key==='M') showSection('map');
   if(e.key==='r'||e.key==='R') showSection('weekly-report');
 });
 
-// Close FAB on outside click
+// Close sidebar when clicking overlay on mobile
 document.addEventListener('click',e=>{
-  if(fabOpen&&!document.getElementById('fab').contains(e.target)&&!document.getElementById('fab-menu').contains(e.target)) toggleFab();
-});
-
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+  if(window.innerWidth<900&&!e.target.closest('#sidebar')&&!e.target.closest('#hamburger')){
+    document.getElementById('sidebar').classList.remove('open');
+  }
+  if(!e.target.closest('#fab')&&!e.target.closest('#fab-menu')&&fabOpen) toggleFab();
 });
 
 // ============================================================
 //  INIT
 // ============================================================
-function init() {
-  // Sample inputs
-  const si=document.getElementById('sample-inputs');
-  for(let i=1;i<=5;i++) si.innerHTML+=`<div><div class="form-label">Sample ${i}</div><input type="number" class="form-control sample-kg" placeholder="kg/sqm" step="0.001" min="0" oninput="calcYield()" style="text-align:center;font-size:16px;font-weight:700;"></div>`;
-  buildPestInputs(); buildYieldFactors(); populateSelects();
-  renderDashboard(); updateAlertBadge();
+window.addEventListener('DOMContentLoaded',()=>{
+  renderDashboard();
+  updateAlertBadge();
+  buildPestInputs();
+  buildYieldFactors();
+  buildSampleInputs();
+  populateSelects();
+  // Set today as default date for relevant fields
   const today=new Date().toISOString().split('T')[0];
-  document.getElementById('ya-date').value=today;
-  document.getElementById('pd-date').value=today;
-  document.getElementById('rpt-week').value=today;
-  if(GAS_URL) document.getElementById('gas-url-input').value=GAS_URL;
-}
-
-document.addEventListener('DOMContentLoaded',init);
+  ['pd-date','ya-date','rpt-week'].forEach(id=>{ const el=document.getElementById(id); if(el&&!el.value) el.value=today; });
+});
 </script>
 </body>
 </html>
