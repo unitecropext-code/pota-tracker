@@ -80,6 +80,7 @@ a{color:inherit;text-decoration:none;}
 }
 .login-btn:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:var(--glow-gold);}
 .login-btn:active{transform:scale(.98);}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 #login-error{color:var(--red);font-size:12px;margin-top:10px;min-height:18px;text-align:center;}
 .login-spinner{display:none;width:20px;height:20px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -324,7 +325,7 @@ tr:hover .row-actions{opacity:1;}
 .legend-sq{width:12px;height:8px;border-radius:2px;flex-shrink:0;}
 .zone-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
 @media(max-width:640px){.zone-stats-grid{grid-template-columns:repeat(2,1fr);}}
-.zone-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;text-align:center;}
+.zone-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:all .15px;text-align:center;}
 .zone-card:hover{border-color:var(--border2);transform:translateY(-2px);}
 .zone-name{font-weight:800;font-size:13px;font-family:var(--font-display);}
 .zone-val{font-size:22px;font-weight:800;line-height:1;margin:3px 0;}
@@ -468,24 +469,23 @@ tr:hover .row-actions{opacity:1;}
       </svg>
       <div>
         <div class="login-title">PoTa <span>Tracker</span></div>
-      
       </div>
     </div>
-    <div id="login-offline-indicator" class="login-offline-badge" style="display:none;">
-      
-    </div>
+    <div id="login-offline-indicator" class="login-offline-badge" style="display:none;"></div>
     <div class="login-field">
       <label class="login-label">Username</label>
-      <input class="login-input" id="login-user" placeholder="Enter username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <input class="login-input" id="login-user" placeholder="Enter username" autocomplete="username"
+        onkeydown="if(event.key==='Enter'){var p=document.getElementById('login-pass');if(p.value.trim())doLogin();else p.focus();}">
     </div>
     <div class="login-field">
       <label class="login-label">Password</label>
-      <input class="login-input" id="login-pass" type="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input class="login-input" id="login-pass" type="password" placeholder="Enter password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div id="login-error"></div>
     <button class="login-btn" onclick="doLogin()" id="login-btn-el">Sign In</button>
     <div class="login-spinner" id="login-spinner"></div>
-    <div class="login-version">PoTa Tracker v3.0 · </div>
+    <div class="login-version">PoTa Tracker v3.0 &middot; Mauritius</div>
     <div class="login-hint" id="login-hint-box" style="display:none;"></div>
   </div>
 </div>
@@ -509,7 +509,7 @@ tr:hover .row-actions{opacity:1;}
       </svg>
       <div>
         <div class="logo-text">PoTa <span>Tracker</span></div>
-        <div class="logo-sub">v3.0 · Mauritius</div>
+        <div class="logo-sub">v3.0 &middot; Mauritius</div>
       </div>
     </div>
   </div>
@@ -717,7 +717,6 @@ tr:hover .row-actions{opacity:1;}
   <div class="grid-2">
     <div class="card">
       <div class="card-title"><i class="fas fa-plus-circle"></i> Record Incidence</div>
-      <!-- Visit tabs -->
       <div class="visits-tabs" id="visit-tabs">
         <div class="visit-tab active" data-visit="1" onclick="switchVisitTab(1)"><i class="fas fa-calendar-check"></i> Visit 1</div>
         <div class="visit-tab" data-visit="2" onclick="switchVisitTab(2)"><i class="fas fa-calendar-check"></i> Visit 2 <span class="badge badge-blue" id="v2-badge" style="display:none">New</span></div>
@@ -747,7 +746,6 @@ tr:hover .row-actions{opacity:1;}
           <button class="btn btn-gold" style="flex:2;" onclick="savePestRecord()"><i class="fas fa-save"></i> Save Record</button>
         </div>
       </div>
-      <!-- Visit 2 panel (cloned by JS) -->
       <div class="visit-panel" id="visit-panel-2"></div>
       <div class="visit-panel" id="visit-panel-3"></div>
     </div>
@@ -766,7 +764,6 @@ tr:hover .row-actions{opacity:1;}
       </div>
     </div>
   </div>
-  <!-- Records with visit grouping -->
   <div class="card">
     <div class="card-title"><i class="fas fa-table"></i> Pest &amp; Disease Records <span class="badge badge-gold" id="pest-count-badge">0</span>
       <div class="card-title-actions">
@@ -980,7 +977,6 @@ tr:hover .row-actions{opacity:1;}
 </div>
 
 <!-- ===== MODALS ===== -->
-<!-- ADD GROWER -->
 <div class="modal-overlay" id="add-grower-modal">
   <div class="modal">
     <div class="modal-header">
@@ -1011,7 +1007,6 @@ tr:hover .row-actions{opacity:1;}
   </div>
 </div>
 
-<!-- ADD PLANTATION -->
 <div class="modal-overlay" id="add-plantation-modal">
   <div class="modal">
     <div class="modal-header">
@@ -1044,8 +1039,6 @@ tr:hover .row-actions{opacity:1;}
   </div>
 </div>
 
-<!-- EDIT GROWER (reuses add-grower-modal dynamically) -->
-
 <!-- MOBILE BOTTOM NAV -->
 <nav id="mobile-nav">
   <div class="mob-nav-item active" id="mob-nav-dashboard" onclick="showSection('dashboard')"><i class="fas fa-chart-pie"></i>Dash</div>
@@ -1069,10 +1062,10 @@ const PESTS    = ['Leaf Miner','Thrips','Whitefly','Aphids','Cutworm','Flea Beet
 const PEST_ICONS = {'Late Blight (Phytophthora)':'🍂','Early Blight (Alternaria)':'🌿','Soft Rot (Erwinia)':'💧','Bacterial Wilt':'🦠','Common Scab':'⚫','Blackleg':'⬛','Rhizoctonia':'🔵','Powdery Scab':'⚪','Leaf Miner':'🔀','Thrips':'🦟','Whitefly':'🦋','Aphids':'🐛','Cutworm':'🪱','Flea Beetle':'🪲','Root-knot Nematode':'🔴','Mite':'🕷️'};
 const ZONE_COLORS = {E1:'#f0a500',E2:'#3b82f6',E3:'#22c55e',E4:'#a855f7'};
 const ZONE_LOCALITIES = {
-  E1:['Alma','Bagatelle Dam','Bar Le Duc','Beau Bois','Bell Village','Belle Rive','Bonne Veine','Camp Auguste','Circonstance','Cote D'Or','Dagotiere','Gentilly','Guibies','Helvetia','Hermitage','L'Agrement','L'Assurance','L'Avenir','L'Escalier Br Rd','L'Esperance','La Laura','Le Pouce','Malinga','Minissy','Moka','Nouvelle Decouverte','Petit Verger','Providence','Quartier Militaire','Reduit','Ripailles','Riviere Baptiste','Roselyn Cottage','Soreze','St Pierre','Valetta','Verdun'],
-  E2:['Balance John','Beau Bois','Bel Etang','Belvédère','Bon Accueil','Bonne Mere','Brisée Verdière','Camp de Masque','Camp Thorel','Fuel','Gaulettes Serrées','Gibraltar','Grand Bas Fond','Lallmatie','Latapie','L'Unité','Médine Camp de Masque','Melrose','Mission Cross Rd','Mont Ida','Montagne Blanche','Pellegrin','Petit Paquet','Pont Bon Dieu','Providence','Quatre Bords','Queen Victoria','Riche Fond','Salazie','Salazie Rd','Sans Soucis','St Julien d'Hotman','St Julien Village'],
-  E3:['Argy','Beau Bois','Beau Rivage','Belle Mare','Belle Vue Allendy','Bois d'Oiseaux','Bramsthan','Bras d'Eau','Camp Garreau','Camp Ithier','Camp Marcelin','Camp Poorun','Camp Raffia','Camp Ranoo','Centre de Flacq','Constance','Grande Retraite','Hermitage','Isidore Rose','Kashinath','La Porte Providence','Laventure','Mare Choisy','Mare du Puits','Mare la Chaux','Mare Providence','Mare Tapsy','Morc Constance','Nehru Nagar','Palmar','Petite Retraite','Plaine de Gersigny','Pont Blanc','Poste de Flacq','Quatre Cocos','Riche Mare','Sept Croisées','St Rémy','Trou d'Eau Douce','Victoria'],
-  E4:['Balance John','Beau Champ','Beau Vallon','Bel Air Rivière Sèche','Belle Rive','Belle Rose','Bois Marchand','Camp Beau Bois','Camp de Masque Pavé','Camp Jackerie','Caroline','Cent Gaulettes','Clavet','Clémencia','Deep River','Deux Frères','Ecroignard','Ernest Florent','Grand River South East','Ilot','Kewal Nagar','La Laura','La Lucie Roy','La Nourrice','Laventure','Lesur','L'Etoile','Mare aux Goyaves','Mare Carrée','Mare Triton','Marie Jeanne','Morc Roy','Morc Sohawon','Olivia','Pellegrin','Petit Bois','Petite Cabane','Plaine Bananes','Pointe aux Feuilles','Pont Lardier','Quatre Soeurs','Sebastopol','Trois Ilots']
+  E1:['Alma','Bagatelle Dam','Bar Le Duc','Beau Bois','Bell Village','Belle Rive','Bonne Veine','Camp Auguste','Circonstance','Cote D\'Or','Dagotiere','Gentilly','Guibies','Helvetia','Hermitage','L\'Agrement','L\'Assurance','L\'Avenir','L\'Escalier Br Rd','L\'Esperance','La Laura','Le Pouce','Malinga','Minissy','Moka','Nouvelle Decouverte','Petit Verger','Providence','Quartier Militaire','Reduit','Ripailles','Riviere Baptiste','Roselyn Cottage','Soreze','St Pierre','Valetta','Verdun'],
+  E2:['Balance John','Beau Bois','Bel Etang','Belvédère','Bon Accueil','Bonne Mere','Brisée Verdière','Camp de Masque','Camp Thorel','Fuel','Gaulettes Serrées','Gibraltar','Grand Bas Fond','Lallmatie','Latapie','L\'Unité','Médine Camp de Masque','Melrose','Mission Cross Rd','Mont Ida','Montagne Blanche','Pellegrin','Petit Paquet','Pont Bon Dieu','Providence','Quatre Bords','Queen Victoria','Riche Fond','Salazie','Salazie Rd','Sans Soucis','St Julien d\'Hotman','St Julien Village'],
+  E3:['Argy','Beau Bois','Beau Rivage','Belle Mare','Belle Vue Allendy','Bois d\'Oiseaux','Bramsthan','Bras d\'Eau','Camp Garreau','Camp Ithier','Camp Marcelin','Camp Poorun','Camp Raffia','Camp Ranoo','Centre de Flacq','Constance','Grande Retraite','Hermitage','Isidore Rose','Kashinath','La Porte Providence','Laventure','Mare Choisy','Mare du Puits','Mare la Chaux','Mare Providence','Mare Tapsy','Morc Constance','Nehru Nagar','Palmar','Petite Retraite','Plaine de Gersigny','Pont Blanc','Poste de Flacq','Quatre Cocos','Riche Mare','Sept Croisées','St Rémy','Trou d\'Eau Douce','Victoria'],
+  E4:['Balance John','Beau Champ','Beau Vallon','Bel Air Rivière Sèche','Belle Rive','Belle Rose','Bois Marchand','Camp Beau Bois','Camp de Masque Pavé','Camp Jackerie','Caroline','Cent Gaulettes','Clavet','Clémencia','Deep River','Deux Frères','Ecroignard','Ernest Florent','Grand River South East','Ilot','Kewal Nagar','La Laura','La Lucie Roy','La Nourrice','Laventure','Lesur','L\'Etoile','Mare aux Goyaves','Mare Carrée','Mare Triton','Marie Jeanne','Morc Roy','Morc Sohawon','Olivia','Pellegrin','Petit Bois','Petite Cabane','Plaine Bananes','Pointe aux Feuilles','Pont Lardier','Quatre Soeurs','Sebastopol','Trois Ilots']
 };
 const ZONE_POLYGONS = {
   E1:[[-20.10,57.42],[-20.10,57.56],[-20.28,57.56],[-20.28,57.42]],
@@ -1081,63 +1074,21 @@ const ZONE_POLYGONS = {
   E4:[[-20.28,57.54],[-20.28,57.82],[-20.45,57.82],[-20.45,57.54]]
 };
 const LOCALITY_COORDS = {
-  // Zone E1 — Moka District (western localities)
   'E1:Moka':[-20.1730,57.4890],'E1:Quartier Militaire':[-20.2040,57.4630],'E1:St Pierre':[-20.2670,57.4620],
   'E1:Alma':[-20.2250,57.4900],'E1:Reduit':[-20.1980,57.4920],'E1:Helvetia':[-20.2150,57.4800],
   'E1:Providence':[-20.2080,57.4840],'E1:Dagotiere':[-20.2350,57.4700],'E1:Verdun':[-20.2450,57.4820],
   'E1:Soreze':[-20.2550,57.4950],'E1:Valetta':[-20.2100,57.4960],'E1:Guibies':[-20.2000,57.5100],
   'E1:Hermitage':[-20.2300,57.5050],'E1:Gentilly':[-20.2180,57.4750],'E1:Minissy':[-20.2280,57.5020],
   'E1:Malinga':[-20.2400,57.5100],'E1:Ripailles':[-20.2480,57.5030],'E1:Nouvelle Decouverte':[-20.2550,57.5150],
-  'E1:L'Agrement':[-20.1900,57.5050],'E1:L'Assurance':[-20.2050,57.5180],'E1:L'Avenir':[-20.2150,57.5250],
-  'E1:L'Esperance':[-20.2600,57.5000],'E1:La Laura':[-20.2700,57.5100],'E1:Le Pouce':[-20.1850,57.5020],
-  'E1:Bagatelle Dam':[-20.1950,57.4850],'E1:Bar Le Duc':[-20.2050,57.4780],'E1:Beau Bois':[-20.2250,57.5180],
-  'E1:Bell Village':[-20.2400,57.4920],'E1:Belle Rive':[-20.2620,57.5200],'E1:Bonne Veine':[-20.2380,57.5080],
-  'E1:Camp Auguste':[-20.2500,57.4850],'E1:Circonstance':[-20.2200,57.4900],'E1:Cote D'Or':[-20.2300,57.4780],
-  'E1:L'Escalier Br Rd':[-20.2700,57.5050],'E1:Petit Verger':[-20.2650,57.4900],'E1:Riviere Baptiste':[-20.2350,57.5150],
-  'E1:Roselyn Cottage':[-20.2480,57.5200],
-  // Zone E2 — East Moka / West Flacq border
   'E2:Camp de Masque':[-20.2300,57.5880],'E2:Lallmatie':[-20.2050,57.5950],'E2:Bon Accueil':[-20.2150,57.5750],
-  'E2:Montagne Blanche':[-20.2000,57.5800],'E2:Brisée Verdière':[-20.1900,57.5850],'E2:Médine Camp de Masque':[-20.2420,57.5950],
-  'E2:Melrose':[-20.2350,57.5700],'E2:Quatre Bords':[-20.2100,57.5820],'E2:Providence':[-20.2250,57.5780],
-  'E2:Bel Etang':[-20.1950,57.6050],'E2:Belvédère':[-20.2080,57.6100],'E2:Balance John':[-20.2450,57.6000],
-  'E2:Beau Bois':[-20.2200,57.5900],'E2:Bonne Mere':[-20.2300,57.5820],'E2:Camp Thorel':[-20.1880,57.5950],
-  'E2:Fuel':[-20.2550,57.5850],'E2:Gaulettes Serrées':[-20.2150,57.6050],'E2:Gibraltar':[-20.2480,57.5780],
-  'E2:Grand Bas Fond':[-20.2000,57.5900],'E2:Latapie':[-20.2380,57.5900],'E2:L'Unité':[-20.2620,57.5950],
-  'E2:Mission Cross Rd':[-20.2280,57.5850],'E2:Mont Ida':[-20.2500,57.5900],'E2:Pellegrin':[-20.2700,57.5950],
-  'E2:Petit Paquet':[-20.1820,57.6050],'E2:Pont Bon Dieu':[-20.2750,57.6000],'E2:Queen Victoria':[-20.2050,57.5700],
-  'E2:Riche Fond':[-20.2600,57.5800],'E2:Salazie':[-20.1780,57.6100],'E2:Salazie Rd':[-20.1850,57.6080],
-  'E2:Sans Soucis':[-20.2650,57.5700],'E2:St Julien d'Hotman':[-20.2800,57.6050],'E2:St Julien Village':[-20.2850,57.6000],
-  // Zone E3 — Central Flacq District
+  'E2:Montagne Blanche':[-20.2000,57.5800],'E2:Brisée Verdière':[-20.1900,57.5850],
+  'E2:Melrose':[-20.2350,57.5700],'E2:Quatre Bords':[-20.2100,57.5820],
   'E3:Centre de Flacq':[-20.2080,57.7050],'E3:Poste de Flacq':[-20.2300,57.7150],'E3:Belle Mare':[-20.1880,57.7750],
-  'E3:Trou d'Eau Douce':[-20.1950,57.7880],'E3:Quatre Cocos':[-20.1820,57.7650],'E3:Palmar':[-20.1700,57.7800],
+  'E3:Trou d\'Eau Douce':[-20.1950,57.7880],'E3:Quatre Cocos':[-20.1820,57.7650],'E3:Palmar':[-20.1700,57.7800],
   'E3:Victoria':[-20.2200,57.7050],'E3:Riche Mare':[-20.2350,57.7200],'E3:Constance':[-20.2580,57.7000],
-  'E3:Camp Ithier':[-20.2450,57.6900],'E3:Laventure':[-20.2100,57.7350],'E3:Mare Choisy':[-20.1950,57.7400],
-  'E3:Bras d'Eau':[-20.1750,57.7700],'E3:Argy':[-20.2650,57.6850],'E3:Beau Bois':[-20.2280,57.6800],
-  'E3:Beau Rivage':[-20.2420,57.7300],'E3:Belle Vue Allendy':[-20.2000,57.7200],'E3:Bois d'Oiseaux':[-20.2150,57.7550],
-  'E3:Bramsthan':[-20.2350,57.6750],'E3:Camp Garreau':[-20.2500,57.7100],'E3:Camp Marcelin':[-20.2050,57.7150],
-  'E3:Camp Poorun':[-20.2180,57.6950],'E3:Camp Raffia':[-20.2280,57.7250],'E3:Camp Ranoo':[-20.2380,57.7050],
-  'E3:Grande Retraite':[-20.1950,57.7350],'E3:Hermitage':[-20.2050,57.6850],'E3:Isidore Rose':[-20.2480,57.7350],
-  'E3:Kashinath':[-20.2550,57.7150],'E3:La Porte Providence':[-20.2150,57.7050],'E3:Mare du Puits':[-20.2300,57.7450],
-  'E3:Mare la Chaux':[-20.2250,57.7600],'E3:Mare Providence':[-20.2050,57.7450],'E3:Mare Tapsy':[-20.2400,57.7400],
-  'E3:Morc Constance':[-20.2620,57.7050],'E3:Nehru Nagar':[-20.2150,57.7200],'E3:Petite Retraite':[-20.1880,57.7300],
-  'E3:Plaine de Gersigny':[-20.2680,57.7200],'E3:Pont Blanc':[-20.2550,57.7300],'E3:Riche Mare':[-20.2350,57.7200],
-  'E3:Sept Croisées':[-20.2450,57.7250],'E3:St Rémy':[-20.2480,57.6950],
-  // Zone E4 — South-East Flacq (coastal SE)
   'E4:Bel Air Rivière Sèche':[-20.3050,57.7350],'E4:Beau Champ':[-20.3400,57.7200],'E4:Olivia':[-20.3200,57.7050],
-  'E4:Grand River South East':[-20.3750,57.7600],'E4:Quatre Soeurs':[-20.3550,57.7400],'E4:Pointe aux Feuilles':[-20.3900,57.7800],
-  'E4:Mare Carrée':[-20.3100,57.7200],'E4:Sebastopol':[-20.3650,57.7350],'E4:Trois Ilots':[-20.4050,57.7650],
-  'E4:Beau Vallon':[-20.2950,57.7450],'E4:Belle Rive':[-20.3250,57.7150],'E4:Belle Rose':[-20.3350,57.7050],
-  'E4:Bois Marchand':[-20.3450,57.7000],'E4:Camp Beau Bois':[-20.3550,57.7100],'E4:Camp de Masque Pavé':[-20.3000,57.7050],
-  'E4:Camp Jackerie':[-20.2880,57.6950],'E4:Caroline':[-20.3150,57.7350],'E4:Cent Gaulettes':[-20.3250,57.7600],
-  'E4:Clavet':[-20.3450,57.7350],'E4:Clémencia':[-20.3580,57.7550],'E4:Deep River':[-20.3800,57.7700],
-  'E4:Deux Frères':[-20.3700,57.7450],'E4:Ecroignard':[-20.2800,57.7050],'E4:Ernest Florent':[-20.3100,57.7500],
-  'E4:Ilot':[-20.3950,57.7800],'E4:Kewal Nagar':[-20.3050,57.6950],'E4:La Laura':[-20.3300,57.6900],
-  'E4:La Lucie Roy':[-20.3200,57.7400],'E4:La Nourrice':[-20.3400,57.7450],'E4:Laventure':[-20.3500,57.7200],
-  'E4:Lesur':[-20.3650,57.7250],'E4:L'Etoile':[-20.3750,57.7350],'E4:Mare aux Goyaves':[-20.3850,57.7500],
-  'E4:Mare Triton':[-20.4000,57.7600],'E4:Marie Jeanne':[-20.3150,57.7600],'E4:Morc Roy':[-20.2950,57.7200],
-  'E4:Morc Sohawon':[-20.3050,57.7150],'E4:Pellegrin':[-20.3250,57.7050],'E4:Petit Bois':[-20.3450,57.7500],
-  'E4:Petite Cabane':[-20.3600,57.7600],'E4:Plaine Bananes':[-20.3700,57.7500],'E4:Pont Lardier':[-20.3850,57.7650],
-  'E4:Balance John':[-20.2850,57.7100]
+  'E4:Grand River South East':[-20.3750,57.7600],'E4:Quatre Soeurs':[-20.3550,57.7400],
+  'E4:Mare Carrée':[-20.3100,57.7200],'E4:Sebastopol':[-20.3650,57.7350]
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6','#f97316','#ec4899'];
@@ -1146,8 +1097,10 @@ const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6
 //  STATE & PERSISTENCE
 // ============================================================
 const DEFAULT_STATE = {
-  growers:[],plantation:[],pestRecords:[],yieldAssessments:[],varieties:['Delaware','Jelly','Mondial','Panamera','Spunta Imported','Spunta Local'],
-  campaignData:{},weeklyReports:[],users:[
+  growers:[],plantation:[],pestRecords:[],yieldAssessments:[],
+  varieties:['Delaware','Jelly','Mondial','Panamera','Spunta Imported','Spunta Local'],
+  campaignData:{},weeklyReports:[],
+  users:[
     {username:'superadmin',fullName:'Super Administrator',role:'Administrator',zoneAccess:'All',password:'KOPS@1353',status:'Active'},
     {username:'admin',fullName:'Administrator',role:'Administrator',zoneAccess:'All',password:'pota2024',status:'Active'},
     {username:'eoseokg',fullName:'Keshav Gangadin',role:'Field Officer',zoneAccess:'East',password:'GAN@3522',status:'Active'},
@@ -1165,7 +1118,6 @@ function loadLocal(){
     const d = localStorage.getItem('pota_state_v3');
     if(d) STATE = {...DEFAULT_STATE,...JSON.parse(d)};
     if(!STATE.users || !STATE.users.length) STATE.users = DEFAULT_STATE.users;
-    // Always ensure correct varieties are available (add new ones if missing)
     if(!STATE.varieties || !STATE.varieties.length) STATE.varieties = [...DEFAULT_STATE.varieties];
     DEFAULT_STATE.varieties.forEach(v=>{ if(!STATE.varieties.includes(v)) STATE.varieties.push(v); });
     STATE.varieties.sort();
@@ -1179,50 +1131,61 @@ function saveLocal(){
 }
 
 // ============================================================
-//  LOGIN
+//  LOGIN  —  FIX: timeout + finally guard prevents freeze
 // ============================================================
+function setLoginBusy(busy){
+  const btn     = document.getElementById('login-btn-el');
+  const spinner = document.getElementById('login-spinner');
+  btn.disabled        = busy;
+  btn.style.display   = busy ? 'none' : 'block';
+  spinner.style.display = busy ? 'block' : 'none';
+}
+
 async function doLogin(){
   const user = document.getElementById('login-user').value.trim().toLowerCase();
   const pass = document.getElementById('login-pass').value.trim();
   const errEl = document.getElementById('login-error');
-  const btn = document.getElementById('login-btn-el');
-  const spinner = document.getElementById('login-spinner');
   errEl.textContent = '';
-  if(!user || !pass){ errEl.textContent = 'Please enter username and password.'; return; }
-  btn.disabled = true;
-  btn.style.opacity = '0.7';
-  btn.style.display = 'none';
-  spinner.style.display = 'block';
+
+  if(!user || !pass){
+    errEl.textContent = 'Please enter username and password.';
+    return;
+  }
+
+  setLoginBusy(true);
   let result = null;
 
-  // Try GAS first if URL set
-  if(GAS_URL){
-    try{
-      const r = await callGAS('login', {username:user, password:pass});
-      if(r.success && r.user){
-        result = r.user;
-      } else if(r.error === 'INVALID_CREDENTIALS' || r.error === 'ACCOUNT_INACTIVE'){
-        // Definitive fail from GAS - still try local
-        result = null;
+  try {
+    // ── 1. Try GAS only if URL is set ──────────────────────────
+    if(GAS_URL){
+      try{
+        const r = await callGAS('login', {username:user, password:pass});
+        if(r && r.success && r.user) result = r.user;
+        // Any other GAS response: fall through to local auth silently
+      } catch(gasErr){
+        // Network error / timeout: fall through to local auth
+        console.warn('GAS login attempt failed, using local auth:', gasErr.message);
       }
-      // USER_NOT_FOUND or network error: fall through to local
-    } catch(e){
-      // Network error: fall through to local auth
     }
-  }
 
-  // Local fallback
-  if(!result){
-    const localUser = STATE.users.find(u => u.username.toLowerCase() === user.toLowerCase());
-    if(localUser && localUser.status === 'Active' && localUser.password.trim() === pass){
-      result = {username:localUser.username, fullName:localUser.fullName, role:localUser.role, zoneAccess:localUser.zoneAccess};
+    // ── 2. Local auth fallback ─────────────────────────────────
+    if(!result){
+      const localUser = STATE.users.find(
+        u => u.username.toLowerCase() === user
+      );
+      if(localUser && localUser.status === 'Active' && localUser.password.trim() === pass){
+        result = {
+          username: localUser.username,
+          fullName: localUser.fullName,
+          role:     localUser.role,
+          zoneAccess: localUser.zoneAccess
+        };
+      }
     }
+  } finally {
+    // ── Always re-enable the button, no matter what happened ──
+    setLoginBusy(false);
   }
-
-  spinner.style.display = 'none';
-  btn.style.display = 'block';
-  btn.disabled = false;
-  btn.style.opacity = '1';
 
   if(result){
     CURRENT_USER = result;
@@ -1268,44 +1231,57 @@ function initApp(){
 }
 
 // ============================================================
-//  GAS API
+//  GAS API  —  FIX: AbortController 8-second timeout
 // ============================================================
 async function callGAS(action, data = {}){
   if(!GAS_URL) return {success:false, error:'No GAS URL configured'};
-  const params = new URLSearchParams({action, ...Object.fromEntries(Object.entries(data).map(([k,v])=>[k,v===null||v===undefined?'':String(v)]))});
+
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(() => controller.abort(), 8000); // 8 s max
+
+  const params = new URLSearchParams({
+    action,
+    ...Object.fromEntries(
+      Object.entries(data).map(([k,v]) => [k, v == null ? '' : String(v)])
+    )
+  });
+
   try{
     const resp = await fetch(GAS_URL, {
-      method:'POST',
-      body:params,
-      redirect:'follow'
+      method: 'POST',
+      body: params,
+      redirect: 'follow',
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     const text = await resp.text();
-    // Handle GAS redirect or HTML error response
     try{
-      const json = JSON.parse(text);
-      return json;
+      return JSON.parse(text);
     } catch(e){
-      // GAS sometimes returns HTML on auth error
-      if(text.includes('Signin') || text.includes('sign in')) return {success:false, error:'GAS authentication required. Check deployment settings.'};
-      return {success:false, error:'Invalid response from GAS: '+text.slice(0,100)};
+      if(text.includes('Signin') || text.includes('sign in'))
+        return {success:false, error:'GAS authentication required. Check deployment settings.'};
+      return {success:false, error:'Invalid GAS response: ' + text.slice(0,120)};
     }
   } catch(e){
-    return {success:false, error:e.message};
+    clearTimeout(timeoutId);
+    if(e.name === 'AbortError')
+      return {success:false, error:'Request timed out (>8 s). Check GAS URL and network.'};
+    return {success:false, error: e.message};
   }
 }
 
 function updateSyncStatus(status){
-  const dot = document.getElementById('sync-dot');
+  const dot   = document.getElementById('sync-dot');
   const label = document.getElementById('sync-label');
-  const bar = document.getElementById('sync-status-bar');
-  const colors = {ok:'var(--green)', error:'var(--red)', syncing:'var(--gold)', saved:'var(--green)'};
-  const labels = {ok:'Synced ✓', error:'Sync failed', syncing:'Syncing…', saved:'GAS URL saved'};
-  if(dot) dot.style.background = colors[status] || 'var(--text3)';
-  if(label) label.textContent = labels[status] || status;
+  const bar   = document.getElementById('sync-status-bar');
+  const colors  = {ok:'var(--green)',error:'var(--red)',syncing:'var(--gold)',saved:'var(--green)'};
+  const labels  = {ok:'Synced ✓',error:'Sync failed',syncing:'Syncing…',saved:'GAS URL saved'};
+  if(dot)   dot.style.background = colors[status] || 'var(--text3)';
+  if(label) label.textContent    = labels[status]  || status;
   if(bar && (status === 'ok' || status === 'error')){
     bar.className = 'sync-status-bar show' + (status === 'error' ? ' error' : '');
     document.getElementById('sync-status-text').textContent = labels[status];
-    setTimeout(()=>{ bar.classList.remove('show'); }, 3000);
+    setTimeout(() => bar.classList.remove('show'), 3000);
   }
 }
 
@@ -1316,11 +1292,17 @@ const _charts = {};
 function mkChart(id, cfg){
   const canvas = document.getElementById(id);
   if(!canvas) return;
-  if(_charts[id]) try{ _charts[id].destroy(); } catch(e){}
+  if(_charts[id]) try{ _charts[id].destroy(); }catch(e){}
   const CHART_OPTS = {
     responsive:true, maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:'#7a8daa',font:{size:11}}},tooltip:{backgroundColor:'#131c2d',borderColor:'#223354',borderWidth:1,titleColor:'#e8edf8',bodyColor:'#7a8daa',padding:10}},
-    scales:{x:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}
+    plugins:{
+      legend:{labels:{color:'#7a8daa',font:{size:11}}},
+      tooltip:{backgroundColor:'#131c2d',borderColor:'#223354',borderWidth:1,titleColor:'#e8edf8',bodyColor:'#7a8daa',padding:10}
+    },
+    scales:{
+      x:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+      y:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}
+    }
   };
   cfg.options = deepMerge(CHART_OPTS, cfg.options || {});
   _charts[id] = new Chart(canvas, cfg);
@@ -1328,9 +1310,9 @@ function mkChart(id, cfg){
 function deepMerge(base, override){
   const out = {...base};
   for(const k in override){
-    if(override[k] && typeof override[k] === 'object' && !Array.isArray(override[k]) && base[k]){
+    if(override[k] && typeof override[k]==='object' && !Array.isArray(override[k]) && base[k])
       out[k] = deepMerge(base[k], override[k]);
-    } else { out[k] = override[k]; }
+    else out[k] = override[k];
   }
   return out;
 }
@@ -1340,23 +1322,26 @@ function deepMerge(base, override){
 // ============================================================
 function renderDashboard(){
   const totalArea = STATE.plantation.reduce((s,r)=>s+(r.area||0),0);
-  const estProd = STATE.plantation.reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0);
-  const highAlerts = STATE.pestRecords.filter(r=>r.visits && r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
+  const estProd   = STATE.plantation.reduce((s,r)=>s+(r.area||0)*(r.estYield||20),0);
+  const highAlerts= STATE.pestRecords.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
   document.getElementById('sv-growers').textContent = STATE.growers.length;
-  document.getElementById('sv-area').textContent = totalArea.toFixed(1);
-  document.getElementById('sv-plots').textContent = STATE.plantation.length;
-  document.getElementById('sv-prod').textContent = Math.round(estProd);
-  document.getElementById('sv-alerts').textContent = highAlerts;
-  document.getElementById('sv-alert-label').innerHTML = highAlerts ? `<span style="color:var(--red);">${highAlerts} active alerts</span>` : `<span style="color:var(--green);">All clear</span>`;
+  document.getElementById('sv-area').textContent    = totalArea.toFixed(1);
+  document.getElementById('sv-plots').textContent   = STATE.plantation.length;
+  document.getElementById('sv-prod').textContent    = Math.round(estProd);
+  document.getElementById('sv-alerts').textContent  = highAlerts;
+  document.getElementById('sv-alert-label').innerHTML = highAlerts
+    ? `<span style="color:var(--red);">${highAlerts} active alerts</span>`
+    : `<span style="color:var(--green);">All clear</span>`;
   requestAnimationFrame(()=>{
-    renderLocalityChart();
-    renderVarietyChart();
-    renderFortnightlyChart();
-    renderPestOverview();
+    renderLocalityChart(); renderVarietyChart();
+    renderFortnightlyChart(); renderPestOverview();
   });
-  const tbody = document.getElementById('recent-table');
+  const tbody  = document.getElementById('recent-table');
   const recent = [...STATE.plantation].sort((a,b)=>b.id-a.id).slice(0,8);
-  if(!recent.length){ tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records yet</div></div></td></tr>`; return; }
+  if(!recent.length){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records yet</div></div></td></tr>`;
+    return;
+  }
   tbody.innerHTML = recent.map(r=>`<tr>
     <td><strong>${r.grower}</strong></td>
     <td>${r.locality||'—'}</td>
@@ -1401,11 +1386,11 @@ function renderPestOverview(){
 function updateAlertBadge(){
   const high = STATE.pestRecords.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
   const badge = document.getElementById('alert-badge');
-  if(badge){ badge.textContent = high; badge.style.display = high ? 'inline-flex' : 'none'; }
+  if(badge){ badge.textContent=high; badge.style.display=high?'inline-flex':'none'; }
 }
 
 // ============================================================
-//  UI
+//  UI HELPERS
 // ============================================================
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
 const PAGE_META = {
@@ -1421,7 +1406,6 @@ const PAGE_META = {
   'weekly-report':{title:'Weekly Report',sub:'Generate & export reports'},
   settings:{title:'Settings',sub:'Configuration & data management'},
 };
-let mapInitialised = false;
 function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1433,19 +1417,19 @@ function showSection(id){
   if(nav) nav.classList.add('active');
   const mobNav = document.getElementById('mob-nav-'+id);
   if(mobNav) mobNav.classList.add('active');
-  const m = PAGE_META[id] || {title:id,sub:''};
+  const m = PAGE_META[id]||{title:id,sub:''};
   document.getElementById('page-title').textContent = m.title;
-  document.getElementById('page-sub').textContent = m.sub;
-  if(id==='dashboard') renderDashboard();
-  if(id==='map') initMap();
-  if(id==='growers'){ renderGrowersTable(); populateFilterLocality(); }
-  if(id==='plantation') renderPlantationTable();
-  if(id==='pests'){ populateSelects(); renderPestTable(); }
-  if(id==='yield-assess'){ populateSelects(); renderYieldTable(); }
-  if(id==='trends') renderTrends();
-  if(id==='production') renderProduction();
-  if(id==='campaign') renderCampaignTable();
-  if(id==='settings'){ renderSettings(); renderUsersList(); }
+  document.getElementById('page-sub').textContent   = m.sub;
+  if(id==='dashboard')    renderDashboard();
+  if(id==='map')          initMap();
+  if(id==='growers')      { renderGrowersTable(); populateFilterLocality(); }
+  if(id==='plantation')   renderPlantationTable();
+  if(id==='pests')        { populateSelects(); renderPestTable(); }
+  if(id==='yield-assess') { populateSelects(); renderYieldTable(); }
+  if(id==='trends')       renderTrends();
+  if(id==='production')   renderProduction();
+  if(id==='campaign')     renderCampaignTable();
+  if(id==='settings')     { renderSettings(); renderUsersList(); }
   if(window.innerWidth<900) document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0,0);
 }
@@ -1456,7 +1440,7 @@ function toast(msg, type='success'){
   el.className = 'toast '+type;
   el.innerHTML = `<i class="fas ${icons[type]||icons.info}"></i><span>${msg}</span>`;
   stack.appendChild(el);
-  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); }, 3500);
+  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); },3500);
 }
 function openModal(id){ document.getElementById(id).classList.add('open'); populateSelects(); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
@@ -1468,7 +1452,7 @@ function toggleFab(){
 }
 function updateLocalityDropdown(zoneId, locId){
   const zone = document.getElementById(zoneId)?.value;
-  const sel = document.getElementById(locId);
+  const sel  = document.getElementById(locId);
   if(!sel) return;
   sel.innerHTML = '<option value="">Select locality</option>';
   (ZONE_LOCALITIES[zone]||[]).forEach(l=>{ sel.innerHTML+=`<option value="${l}">${l}</option>`; });
@@ -1478,30 +1462,25 @@ function populateSelects(){
   const vOpts = STATE.varieties.map(v=>`<option value="${v}">${v}</option>`).join('');
   ['pl-grower','pd-grower','ya-grower'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select grower…</option>'+gOpts; });
   ['pl-variety','ya-variety'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select variety…</option>'+vOpts; });
-  const allLoc = [...new Set(Object.values(ZONE_LOCALITIES).flat())].sort();
-  const lOpts = '<option value="">All Localities</option>'+allLoc.map(l=>`<option value="${l}">${l}</option>`).join('');
+  const allLoc=[...new Set(Object.values(ZONE_LOCALITIES).flat())].sort();
+  const lOpts='<option value="">All Localities</option>'+allLoc.map(l=>`<option value="${l}">${l}</option>`).join('');
   ['filter-locality','filter-plant-locality'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=lOpts; });
   const fv=document.getElementById('filter-variety');
   if(fv) fv.innerHTML='<option value="">All Varieties</option>'+vOpts;
-  const gasInput=document.getElementById('gas-url-input');
-  if(gasInput&&GAS_URL) gasInput.value=GAS_URL;
-  // pest filter growers
-  const pgrower=document.getElementById('pest-filter-grower');
-  if(pgrower) pgrower.innerHTML='<option value="">All Growers</option>'+gOpts;
+  if(document.getElementById('gas-url-input')&&GAS_URL) document.getElementById('gas-url-input').value=GAS_URL;
+  const pg=document.getElementById('pest-filter-grower');
+  if(pg) pg.innerHTML='<option value="">All Growers</option>'+gOpts;
 }
 function autofillPdLocality(){
-  const name=document.getElementById('pd-grower').value;
-  const g=STATE.growers.find(x=>x.name===name);
-  if(g){ document.getElementById('pd-locality').value=g.locality||''; }
+  const g=STATE.growers.find(x=>x.name===document.getElementById('pd-grower').value);
+  if(g) document.getElementById('pd-locality').value=g.locality||'';
 }
 function autofillPlantLocality(){
-  const name=document.getElementById('pl-grower').value;
-  const g=STATE.growers.find(x=>x.name===name);
+  const g=STATE.growers.find(x=>x.name===document.getElementById('pl-grower').value);
   if(g&&g.zone){ document.getElementById('pl-zone').value=g.zone; updateLocalityDropdown('pl-zone','pl-locality'); setTimeout(()=>{ document.getElementById('pl-locality').value=g.locality||''; },50); }
 }
 function autofillYaLocality(){
-  const name=document.getElementById('ya-grower').value;
-  const g=STATE.growers.find(x=>x.name===name);
+  const g=STATE.growers.find(x=>x.name===document.getElementById('ya-grower').value);
   if(g&&g.zone){ document.getElementById('ya-zone').value=g.zone; updateLocalityDropdown('ya-zone','ya-locality'); setTimeout(()=>{ document.getElementById('ya-locality').value=g.locality||''; },50); }
 }
 function populateFilterLocality(){
@@ -1514,7 +1493,7 @@ function populateFilterLocality(){
 //  GROWERS
 // ============================================================
 async function saveGrower(){
-  const editId = document.getElementById('g-edit-id').value;
+  const editId=document.getElementById('g-edit-id').value;
   const name=document.getElementById('g-name').value.trim();
   const zone=document.getElementById('g-zone').value;
   const locality=document.getElementById('g-locality').value;
@@ -1526,23 +1505,23 @@ async function saveGrower(){
   if(!name||!zone||!locality){ toast('Name, Zone and Locality required','error'); return; }
   if(editId){
     const idx=STATE.growers.findIndex(g=>String(g.id)===editId);
-    if(idx>-1){ STATE.growers[idx]={...STATE.growers[idx],name,zone,locality,contact,registrationDate:regDate,status,totalArea,notes}; }
-    toast('Grower updated ✓','success');
+    if(idx>-1) STATE.growers[idx]={...STATE.growers[idx],name,zone,locality,contact,registrationDate:regDate,status,totalArea,notes};
+    toast('Grower updated ✓');
   } else {
-    if(STATE.growers.find(g=>g.name.toLowerCase()===name.toLowerCase())){ toast('Grower with this name already exists','warning'); return; }
+    if(STATE.growers.find(g=>g.name.toLowerCase()===name.toLowerCase())){ toast('Grower already exists','warning'); return; }
     STATE.growers.push({id:Date.now(),name,zone,locality,contact,registrationDate:regDate,status,totalArea,notes});
-    toast(`Grower "${name}" added`,'success');
+    toast(`Grower "${name}" added`);
   }
-  saveLocal(); closeModal('add-grower-modal'); renderGrowersTable(); renderDashboard(); updateAlertBadge();
-  resetGrowerForm();
-  if(GAS_URL){ const r=await callGAS('saveGrower',{Grower_Name:name,Zone:zone,Locality:locality,Contact:contact,Total_Area_Ha:totalArea,Registration_Date:regDate,Status:status,Notes:notes,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓','success'); }
+  saveLocal(); closeModal('add-grower-modal'); renderGrowersTable(); renderDashboard(); updateAlertBadge(); resetGrowerForm();
+  if(GAS_URL){ const r=await callGAS('saveGrower',{Grower_Name:name,Zone:zone,Locality:locality,Contact:contact,Total_Area_Ha:totalArea,Registration_Date:regDate,Status:status,Notes:notes,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓'); }
 }
 function resetGrowerForm(){
   document.getElementById('g-edit-id').value='';
   document.getElementById('grower-modal-title').textContent='Add Grower';
-  document.getElementById('grower-save-btn').textContent=' Save Grower';
+  document.getElementById('grower-save-btn').innerHTML='<i class="fas fa-save"></i> Save Grower';
   ['g-name','g-contact','g-notes','g-area'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('g-zone').value=''; document.getElementById('g-locality').innerHTML='<option value="">Select Zone first</option>';
+  document.getElementById('g-zone').value='';
+  document.getElementById('g-locality').innerHTML='<option value="">Select Zone first</option>';
   if(document.getElementById('g-status')) document.getElementById('g-status').value='Active';
   if(document.getElementById('g-reg-date')) document.getElementById('g-reg-date').value=new Date().toISOString().split('T')[0];
 }
@@ -1555,7 +1534,7 @@ function editGrower(id){
   document.getElementById('g-name').value=g.name||'';
   document.getElementById('g-zone').value=g.zone||'';
   updateLocalityDropdown('g-zone','g-locality');
-  setTimeout(()=>{ document.getElementById('g-locality').value=g.locality||''; }, 60);
+  setTimeout(()=>{ document.getElementById('g-locality').value=g.locality||''; },60);
   document.getElementById('g-contact').value=g.contact||'';
   if(document.getElementById('g-reg-date')) document.getElementById('g-reg-date').value=g.registrationDate||'';
   if(document.getElementById('g-status')) document.getElementById('g-status').value=g.status||'Active';
@@ -1575,13 +1554,12 @@ function filterGrowers(){
 }
 function renderGrowersTable(rows){
   rows=rows||STATE.growers;
-  const el=document.getElementById('grower-count-badge');
-  if(el) el.textContent=rows.length;
+  const el=document.getElementById('grower-count-badge'); if(el) el.textContent=rows.length;
   const tbody=document.getElementById('growers-table');
-  if(!rows.length){ tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No growers yet</div><div class="empty-sub">Add your first grower to get started</div></div></td></tr>`; return; }
+  if(!rows.length){ tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No growers yet</div></div></td></tr>`; return; }
   tbody.innerHTML=rows.map(g=>{
     const plots=STATE.plantation.filter(p=>p.grower===g.name).length;
-    const area=STATE.plantation.filter(p=>p.grower===g.name).reduce((s,p)=>s+(p.area||0),0).toFixed(2);
+    const area =STATE.plantation.filter(p=>p.grower===g.name).reduce((s,p)=>s+(p.area||0),0).toFixed(2);
     const zc=ZONE_COLORS[g.zone]||'#888';
     const sc={Active:'var(--green)',Inactive:'var(--text3)',Suspended:'var(--red)'}[g.status]||'var(--text3)';
     return `<tr>
@@ -1594,14 +1572,14 @@ function renderGrowersTable(rows){
       <td><span style="font-size:11px;font-weight:700;color:${sc};">${g.status||'Active'}</span></td>
       <td style="font-size:11px;color:var(--text2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${g.notes||''}">${g.notes||'—'}</td>
       <td><div class="row-actions">
-        <button class="btn btn-ghost btn-icon btn-sm" onclick="editGrower(${g.id})" data-tip="Edit"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
-        <button class="btn btn-ghost btn-icon btn-sm" onclick="deleteGrower(${g.id})" data-tip="Delete"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button>
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="editGrower(${g.id})"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="deleteGrower(${g.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button>
       </div></td>
     </tr>`;
   }).join('');
 }
 function deleteGrower(id){
-  if(!confirm('Delete this grower? Plantation records will remain.')) return;
+  if(!confirm('Delete this grower?')) return;
   STATE.growers=STATE.growers.filter(g=>g.id!=id);
   saveLocal(); renderGrowersTable(); renderDashboard(); toast('Grower deleted','warning');
 }
@@ -1625,28 +1603,24 @@ async function savePlantation(){
   const comments=document.getElementById('pl-comments')?.value.trim()||'';
   if(!grower||!zone||!locality||!planted){ toast('Grower, Zone, Locality and Date required','error'); return; }
   if(editId){
-    // Update existing record
     const idx=STATE.plantation.findIndex(r=>String(r.id)===editId);
-    if(idx>-1){ STATE.plantation[idx]={...STATE.plantation[idx],grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments}; }
-    toast('Plantation record updated ✓','success');
+    if(idx>-1) STATE.plantation[idx]={...STATE.plantation[idx],grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments};
+    toast('Record updated ✓');
     delete growerEl.dataset.editId;
-    // Reset button
-    const saveBtn=document.querySelector('#add-plantation-modal .btn-gold');
-    if(saveBtn){ saveBtn.innerHTML='<i class="fas fa-save"></i> Save'; delete saveBtn.dataset.editMode; }
-    const titleEl=document.querySelector('#add-plantation-modal .modal-title');
-    if(titleEl) titleEl.textContent='Add Plantation Record';
+    const sb=document.querySelector('#add-plantation-modal .btn-gold');
+    if(sb) sb.innerHTML='<i class="fas fa-save"></i> Save';
+    const ti=document.querySelector('#add-plantation-modal .modal-title');
+    if(ti) ti.textContent='Add Plantation Record';
   } else {
-    const rec={id:Date.now(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments};
-    STATE.plantation.push(rec);
-    toast('Plantation record saved ✓','success');
+    STATE.plantation.push({id:Date.now(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments});
+    toast('Plantation record saved ✓');
   }
-  saveLocal();
-  closeModal('add-plantation-modal'); renderPlantationTable(); renderDashboard(); updateAlertBadge();
+  saveLocal(); closeModal('add-plantation-modal'); renderPlantationTable(); renderDashboard(); updateAlertBadge();
   ['pl-comments'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('pl-grower').value=''; document.getElementById('pl-zone').value='';
   document.getElementById('pl-locality').innerHTML='<option value="">Select Zone first</option>';
   document.getElementById('pl-variety').value=''; document.getElementById('pl-area').value=''; document.getElementById('pl-est-yield').value='';
-  if(GAS_URL){ const r=await callGAS('savePlantation',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Date_Planted:planted,Production_Area_Ha:area,Season:season,Fortnightly_Period:getFortnight(planted),Estimated_Yield_T_Ha:estYield,Officer_Comments:comments,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓','success'); }
+  if(GAS_URL){ const r=await callGAS('savePlantation',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Date_Planted:planted,Production_Area_Ha:area,Season:season,Fortnightly_Period:getFortnight(planted),Estimated_Yield_T_Ha:estYield,Officer_Comments:comments,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓'); }
 }
 function filteredPlantation(){
   let rows=STATE.plantation;
@@ -1659,7 +1633,7 @@ function filteredPlantation(){
   if(varF) rows=rows.filter(r=>r.variety===varF);
   if(locF) rows=rows.filter(r=>r.locality===locF);
   if(seasonF) rows=rows.filter(r=>r.season===seasonF);
-  if(monthF){ const [yr,mo]=monthF.split('-').map(Number); rows=rows.filter(r=>{ if(!r.datePlanted) return false; const d=new Date(r.datePlanted); return d.getFullYear()===yr&&(d.getMonth()+1)===mo; }); }
+  if(monthF){ const[yr,mo]=monthF.split('-').map(Number); rows=rows.filter(r=>{ if(!r.datePlanted) return false; const d=new Date(r.datePlanted); return d.getFullYear()===yr&&(d.getMonth()+1)===mo; }); }
   return rows;
 }
 function filterPlantation(){ renderPlantationTable(); }
@@ -1670,10 +1644,9 @@ function clearFilters(){
 }
 function renderPlantationTable(){
   const rows=filteredPlantation();
-  const badge=document.getElementById('plant-count-badge');
-  if(badge) badge.textContent=rows.length;
+  const badge=document.getElementById('plant-count-badge'); if(badge) badge.textContent=rows.length;
   const tbody=document.getElementById('plantation-table');
-  if(!rows.length){ tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records</div></div></td></tr>`; }
+  if(!rows.length) tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records</div></div></td></tr>`;
   else tbody.innerHTML=rows.map(r=>`<tr>
     <td><strong>${r.grower}</strong></td>
     <td><span style="color:${ZONE_COLORS[r.zone]||'#888'};font-weight:700;">${r.zone}</span></td>
@@ -1685,12 +1658,12 @@ function renderPlantationTable(){
     <td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season||'—'}</span></td>
     <td style="font-size:11px;">${r.fortnight||'—'}</td>
     <td><div class="row-actions">
-      <button class="btn btn-ghost btn-icon btn-sm" onclick="editPlantation(${r.id})" title="Edit"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
-      <button class="btn btn-ghost btn-icon btn-sm" onclick="deletePlantation(${r.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button></div></td>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="editPlantation(${r.id})"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="deletePlantation(${r.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button>
+    </div></td>
   </tr>`).join('');
-  // Fortnightly grid
   const fGrid=document.getElementById('fort-grid');
-  if(fGrid){ fGrid.innerHTML=MONTHS.map((m,mi)=>{
+  if(fGrid) fGrid.innerHTML=MONTHS.map((m,mi)=>{
     const f1=STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 1').length;
     const f2=STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 2').length;
     return `<div class="fort-cell ${(f1||f2)?'has-data':''}">
@@ -1698,12 +1671,11 @@ function renderPlantationTable(){
       <div class="fort-count">${f1+f2}</div>
       <div style="font-size:10px;color:var(--text3);">F1:${f1} F2:${f2}</div>
     </div>`;
-  }).join(''); }
+  }).join('');
 }
 function editPlantation(id){
   const r=STATE.plantation.find(x=>x.id==id);
   if(!r){ toast('Record not found','error'); return; }
-  // Open modal and populate fields
   openModal('add-plantation-modal');
   setTimeout(()=>{
     document.getElementById('pl-grower').value=r.grower||'';
@@ -1716,12 +1688,11 @@ function editPlantation(id){
     document.getElementById('pl-est-yield').value=r.estYield||'';
     document.getElementById('pl-season').value=r.season||'Season 1';
     if(document.getElementById('pl-comments')) document.getElementById('pl-comments').value=r.comments||'';
-    // Mark as edit
     document.getElementById('pl-grower').dataset.editId=id;
-    const saveBtn=document.querySelector('#add-plantation-modal .btn-gold');
-    if(saveBtn){ saveBtn.innerHTML='<i class="fas fa-save"></i> Update Record'; saveBtn.dataset.editMode='1'; }
-    const titleEl=document.querySelector('#add-plantation-modal .modal-title');
-    if(titleEl) titleEl.textContent='Edit Plantation Record';
+    const sb=document.querySelector('#add-plantation-modal .btn-gold');
+    if(sb) sb.innerHTML='<i class="fas fa-save"></i> Update Record';
+    const ti=document.querySelector('#add-plantation-modal .modal-title');
+    if(ti) ti.textContent='Edit Plantation Record';
   },80);
 }
 function deletePlantation(id){
@@ -1740,7 +1711,7 @@ function buildPestInputs(){
   dEl.innerHTML=DISEASES.map(f=>buildPestCard(f,'disease')).join('');
   pEl.innerHTML=PESTS.map(f=>buildPestCard(f,'pest')).join('');
 }
-function buildPestCard(name, type){
+function buildPestCard(name){
   const id=name.replace(/[\s\(\)\/]/g,'_');
   return `<div class="pest-card" id="pc-${id}">
     <div class="pest-card-name">${PEST_ICONS[name]||''} ${name}</div>
@@ -1751,7 +1722,7 @@ function buildPestCard(name, type){
         </select>
       </div>
       <div><div class="pest-input-label">Affected %</div>
-        <select class="pest-select" id="pct-${id}" onchange="calcYieldImpact()">
+        <select class="pest-select" id="pct-${id}">
           <option value="0">0%</option><option value="10">10%</option><option value="25">25%</option>
           <option value="40">40%</option><option value="50">50%</option><option value="60">60%</option>
           <option value="75">75%</option><option value="90">90%</option><option value="100">100%</option>
@@ -1761,10 +1732,9 @@ function buildPestCard(name, type){
   </div>`;
 }
 function updatePestCardStyle(id){
-  const sevEl=document.getElementById('sev-'+id);
-  const card=document.getElementById('pc-'+id);
-  if(!sevEl||!card) return;
-  card.style.borderColor = sevEl.value==='High'?'var(--red)':sevEl.value==='Moderate'?'var(--orange)':sevEl.value==='Low'?'var(--green)':'var(--border)';
+  const s=document.getElementById('sev-'+id);
+  const c=document.getElementById('pc-'+id);
+  if(s&&c) c.style.borderColor=s.value==='High'?'var(--red)':s.value==='Moderate'?'var(--orange)':s.value==='Low'?'var(--green)':'var(--border)';
 }
 function buildYieldFactors(){
   const el=document.getElementById('yield-factors');
@@ -1781,52 +1751,44 @@ function calcYieldImpact(){
     const sev=document.getElementById('sev-'+id)?.value||'';
     const pct=parseFloat(document.getElementById('pct-'+id)?.value)||0;
     let impact=0;
-    if(sev) {
-      if(pct<10) impact=0;
-      else if(pct<25) impact=Math.round(pct*0.3);
-      else if(pct<50) impact=Math.round(pct*0.5);
-      else if(pct<75) impact=Math.round(pct*0.65);
-      else impact=Math.round(pct*0.8);
-      if(sev==='Low') impact=Math.round(impact*0.5);
+    if(sev){
+      if(pct>=10) impact=Math.round(pct*(pct<25?.3:pct<50?.5:pct<75?.65:.8));
+      if(sev==='Low') impact=Math.round(impact*.5);
       if(sev==='High') impact=Math.round(impact*1.3);
       impact=Math.min(impact,95);
     }
-    const barEl=document.getElementById('yf-bar-'+id);
-    const valEl=document.getElementById('yf-val-'+id);
-    if(barEl){ barEl.style.width=impact+'%'; barEl.className='sev-fill '+(impact>50?'high':impact>20?'moderate':'low'); }
-    if(valEl) valEl.textContent=impact+'%';
+    const b=document.getElementById('yf-bar-'+id), v=document.getElementById('yf-val-'+id);
+    if(b){ b.style.width=impact+'%'; b.className='sev-fill '+(impact>50?'high':impact>20?'moderate':'low'); }
+    if(v) v.textContent=impact+'%';
     if(sev){ total+=impact; count++; }
   });
-  const avgImpact=count?Math.min(Math.round(total/count*1.2),100):0;
-  const retention=Math.max(0,100-avgImpact);
-  const retEl=document.getElementById('yield-retention');
-  const barEl=document.getElementById('yield-bar');
-  if(retEl) retEl.textContent=retention+'%';
-  if(barEl){ barEl.style.width=retention+'%'; barEl.style.background=retention>66?'var(--green)':retention>33?'var(--orange)':'var(--red)'; }
+  const avg=count?Math.min(Math.round(total/count*1.2),100):0;
+  const ret=Math.max(0,100-avg);
+  const re=document.getElementById('yield-retention'), rb=document.getElementById('yield-bar');
+  if(re) re.textContent=ret+'%';
+  if(rb){ rb.style.width=ret+'%'; rb.style.background=ret>66?'var(--green)':ret>33?'var(--orange)':'var(--red)'; }
 }
 
-// Visit management
-let activeVisit = 1;
+let activeVisit=1;
 function switchVisitTab(n){
-  activeVisit = n;
-  document.querySelectorAll('.visit-tab').forEach(t=>t.classList.toggle('active', parseInt(t.dataset.visit)===n));
-  document.querySelectorAll('.visit-panel').forEach(p=>p.classList.toggle('active', p.id==='visit-panel-'+n));
+  activeVisit=n;
+  document.querySelectorAll('.visit-tab').forEach(t=>t.classList.toggle('active',parseInt(t.dataset.visit)===n));
+  document.querySelectorAll('.visit-panel').forEach(p=>p.classList.toggle('active',p.id==='visit-panel-'+n));
 }
 function addVisit(){
-  const nextVisit = activeVisit < 3 ? activeVisit + 1 : 3;
-  const panel = document.getElementById('visit-panel-'+nextVisit);
-  if(panel && !panel.innerHTML.trim()){
-    panel.innerHTML = buildVisitPanel(nextVisit);
-    const badge = document.getElementById('v'+nextVisit+'-badge');
-    if(badge) badge.style.display='inline-flex';
+  const next=activeVisit<3?activeVisit+1:3;
+  const panel=document.getElementById('visit-panel-'+next);
+  if(panel&&!panel.innerHTML.trim()){
+    panel.innerHTML=buildVisitPanel(next);
+    const b=document.getElementById('v'+next+'-badge'); if(b) b.style.display='inline-flex';
   }
-  switchVisitTab(nextVisit);
-  toast('Visit '+nextVisit+' panel ready','info');
+  switchVisitTab(next);
+  toast('Visit '+next+' panel ready','info');
 }
 function buildVisitPanel(n){
   const today=new Date().toISOString().split('T')[0];
-  let dis=DISEASES.map(f=>buildPestCard2(f,'v'+n)).join('');
-  let pes=PESTS.map(f=>buildPestCard2(f,'v'+n)).join('');
+  const dis=DISEASES.map(f=>buildPestCard2(f,'v'+n)).join('');
+  const pes=PESTS.map(f=>buildPestCard2(f,'v'+n)).join('');
   return `<div style="padding-top:4px;">
     <div class="form-row-2">
       <div class="form-group"><label class="form-label">Date Observed</label><input type="date" id="pd-date-v${n}" class="form-control" value="${today}"></div>
@@ -1850,21 +1812,18 @@ function buildPestCard2(name, prefix){
     </div>
   </div>`;
 }
-function collectVisitData(n, prefix){
-  const suffix = prefix || (n===1?'':'_v'+n);
-  const date = n===1 ? (document.getElementById('pd-date')?.value||new Date().toISOString().split('T')[0]) : (document.getElementById('pd-date-v'+n)?.value||'');
-  const stage = n===1 ? (document.getElementById('pd-stage')?.value||'') : (document.getElementById('pd-stage-v'+n)?.value||'');
-  const areaEl = n===1 ? document.getElementById('pd-affected-area') : document.getElementById('pd-area-v'+n);
-  const commentsEl = n===1 ? document.getElementById('pd-comments') : document.getElementById('pd-comments-v'+n);
-  const pests = {};
-  const allfp = [...DISEASES,...PESTS];
-  allfp.forEach(f=>{
-    const id=f.replace(/[\s\(\)\/]/g,'_')+(suffix?suffix:'');
-    const sevEl=document.getElementById('sev-'+id);
-    const pctEl=document.getElementById('pct-'+id);
-    if(sevEl?.value) pests[f]={sev:sevEl.value,pct:parseFloat(pctEl?.value)||0};
+function collectVisitData(n, suffix){
+  const date=n===1?(document.getElementById('pd-date')?.value||new Date().toISOString().split('T')[0]):(document.getElementById('pd-date-v'+n)?.value||'');
+  const stage=n===1?(document.getElementById('pd-stage')?.value||''):(document.getElementById('pd-stage-v'+n)?.value||'');
+  const areaEl=n===1?document.getElementById('pd-affected-area'):document.getElementById('pd-area-v'+n);
+  const comEl =n===1?document.getElementById('pd-comments'):document.getElementById('pd-comments-v'+n);
+  const pests={};
+  [...DISEASES,...PESTS].forEach(f=>{
+    const id=f.replace(/[\s\(\)\/]/g,'_')+(suffix||'');
+    const se=document.getElementById('sev-'+id), pe=document.getElementById('pct-'+id);
+    if(se?.value) pests[f]={sev:se.value,pct:parseFloat(pe?.value)||0};
   });
-  return {visitNo:n,date,stage,affectedArea:parseFloat(areaEl?.value)||0,comments:commentsEl?.value||'',pests};
+  return {visitNo:n,date,stage,affectedArea:parseFloat(areaEl?.value)||0,comments:comEl?.value||'',pests};
 }
 async function savePestRecord(){
   const grower=document.getElementById('pd-grower').value;
@@ -1873,17 +1832,13 @@ async function savePestRecord(){
   const control=document.getElementById('pd-control')?.value||'';
   if(!grower){ toast('Select a grower','error'); return; }
   const visits=[collectVisitData(1,'')];
-  const p2=document.getElementById('visit-panel-2');
-  const p3=document.getElementById('visit-panel-3');
+  const p2=document.getElementById('visit-panel-2'), p3=document.getElementById('visit-panel-3');
   if(p2&&p2.innerHTML.trim()) visits.push(collectVisitData(2,'_v2'));
   if(p3&&p3.innerHTML.trim()) visits.push(collectVisitData(3,'_v3'));
-  const hasData=visits.some(v=>Object.keys(v.pests).length>0);
-  if(!hasData){ toast('Record at least one pest/disease severity','error'); return; }
-  const rec={id:Date.now(),grower,locality,season,controlMeasure:control,visits,recordedBy:CURRENT_USER?.username||''};
-  STATE.pestRecords.push(rec); saveLocal();
-  renderPestTable(); renderDashboard(); updateAlertBadge();
-  toast('Pest record saved ('+visits.length+' visit'+( visits.length>1?'s':'')+') ✓','success');
-  // Reset form
+  if(!visits.some(v=>Object.keys(v.pests).length>0)){ toast('Record at least one pest/disease severity','error'); return; }
+  STATE.pestRecords.push({id:Date.now(),grower,locality,season,controlMeasure:control,visits,recordedBy:CURRENT_USER?.username||''});
+  saveLocal(); renderPestTable(); renderDashboard(); updateAlertBadge();
+  toast('Pest record saved ('+visits.length+' visit'+( visits.length>1?'s':'')+') ✓');
   document.getElementById('pd-grower').value=''; document.getElementById('pd-locality').value='';
   document.querySelectorAll('.pest-select').forEach(s=>s.value=s.options[0].value);
   if(document.getElementById('pd-comments')) document.getElementById('pd-comments').value='';
@@ -1892,12 +1847,12 @@ async function savePestRecord(){
   switchVisitTab(1); calcYieldImpact();
   if(GAS_URL){
     for(const v of visits){
-      for(const [f,pd] of Object.entries(v.pests||{})){
+      for(const[f,pd] of Object.entries(v.pests||{})){
         if(!pd.sev) continue;
         await callGAS('savePestDisease',{Grower_Name:grower,Zone:STATE.growers.find(g=>g.name===grower)?.zone||'',Locality:locality,Date_Observed:v.date,Season:season,Pest_Disease_Name:f,Severity:pd.sev,Severity_Pct:pd.pct,Affected_Area_Ha:v.affectedArea,Control_Measure:control,Officer_Comments:v.comments,Recorded_By:CURRENT_USER?.username||''});
       }
     }
-    toast('Synced to Sheets ✓','success');
+    toast('Synced to Sheets ✓');
   }
 }
 function renderPestTable(){
@@ -1906,17 +1861,16 @@ function renderPestTable(){
   const sf=document.getElementById('pest-filter-season')?.value||'';
   if(gf) rows=rows.filter(r=>r.grower===gf);
   if(sf) rows=rows.filter(r=>r.season===sf);
-  const badge=document.getElementById('pest-count-badge');
-  if(badge) badge.textContent=rows.length;
+  const badge=document.getElementById('pest-count-badge'); if(badge) badge.textContent=rows.length;
   const container=document.getElementById('pest-records-grouped');
   if(!container) return;
-  if(!rows.length){ container.innerHTML=`<div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-title">No pest records yet</div><div class="empty-sub">Record pest & disease incidences from the form</div></div>`; return; }
+  if(!rows.length){ container.innerHTML=`<div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-title">No pest records yet</div></div>`; return; }
   container.innerHTML=rows.map(r=>{
     const g=STATE.growers.find(x=>x.name===r.grower);
     const zc=ZONE_COLORS[g?.zone||'']||'#888';
     const highCount=r.visits?r.visits.reduce((s,v)=>s+Object.values(v.pests||{}).filter(p=>p.sev==='High').length,0):0;
     const visitRows=r.visits?r.visits.map(v=>{
-      const pestEntries=Object.entries(v.pests||{}).filter(([,p])=>p.sev);
+      const pe=Object.entries(v.pests||{}).filter(([,p])=>p.sev);
       return `<div style="background:rgba(255,255,255,.02);border-radius:8px;padding:8px 12px;margin-bottom:6px;border:1px solid var(--border);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
           <span class="badge badge-blue">Visit ${v.visitNo}</span>
@@ -1925,12 +1879,12 @@ function renderPestTable(){
           ${v.affectedArea?`<span style="font-size:11px;color:var(--orange);">Affected: ${v.affectedArea} ha</span>`:''}
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:5px;">
-          ${pestEntries.length?pestEntries.map(([f,p])=>`<span class="badge badge-${p.sev==='High'?'red':p.sev==='Moderate'?'orange':'green'}">${PEST_ICONS[f]||''} ${f} — ${p.sev} (${p.pct}%)</span>`).join(''):'<span style="font-size:11px;color:var(--text3);">No pests recorded</span>'}
+          ${pe.length?pe.map(([f,p])=>`<span class="badge badge-${p.sev==='High'?'red':p.sev==='Moderate'?'orange':'green'}">${PEST_ICONS[f]||''} ${f} — ${p.sev} (${p.pct}%)</span>`).join(''):'<span style="font-size:11px;color:var(--text3);">No pests recorded</span>'}
         </div>
         ${v.comments?`<div style="font-size:11px;color:var(--text2);margin-top:5px;"><i class="fas fa-comment"></i> ${v.comments}</div>`:''}
       </div>`;
     }).join(''):'';
-    return `<div style="background:var(--card2);border:1px solid ${highCount?'rgba(239,68,68,.3)':' var(--border)'};border-radius:10px;padding:12px;margin-bottom:10px;">
+    return `<div style="background:var(--card2);border:1px solid ${highCount?'rgba(239,68,68,.3)':'var(--border)'};border-radius:10px;padding:12px;margin-bottom:10px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
         <strong>${r.grower}</strong>
         <span style="font-size:11px;background:${zc}22;color:${zc};border-radius:5px;padding:2px 8px;font-weight:700;">${g?.zone||''}</span>
@@ -1938,7 +1892,7 @@ function renderPestTable(){
         <span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season||''}</span>
         ${highCount?`<span class="badge badge-red"><i class="fas fa-exclamation-triangle"></i> ${highCount} high alert${highCount>1?'s':''}</span>`:''}
         <span style="font-size:11px;color:var(--text3);margin-left:auto;">${r.visits?r.visits.length:0} visit${r.visits?.length>1?'s':''}</span>
-        <button class="btn btn-ghost btn-icon btn-sm" onclick="editPestRecord(${r.id})" title="Edit"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="editPestRecord(${r.id})"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
         <button class="btn btn-red btn-icon btn-sm" onclick="deletePestRecord(${r.id})"><i class="fas fa-trash-alt"></i></button>
       </div>
       ${visitRows}
@@ -1949,51 +1903,39 @@ function renderPestTable(){
 function editPestRecord(id){
   const rec=STATE.pestRecords.find(r=>r.id==id);
   if(!rec){ toast('Record not found','error'); return; }
-  // Populate form with existing data
   document.getElementById('pd-grower').value=rec.grower||'';
   document.getElementById('pd-locality').value=rec.locality||'';
   if(document.getElementById('pd-season')) document.getElementById('pd-season').value=rec.season||'Season 1';
   if(document.getElementById('pd-control')) document.getElementById('pd-control').value=rec.controlMeasure||'';
-  // Populate visit 1 data
   const v1=rec.visits?.[0]||{};
   if(v1.date&&document.getElementById('pd-date')) document.getElementById('pd-date').value=v1.date;
   if(v1.stage&&document.getElementById('pd-stage')) document.getElementById('pd-stage').value=v1.stage;
   if(v1.affectedArea&&document.getElementById('pd-affected-area')) document.getElementById('pd-affected-area').value=v1.affectedArea;
   if(v1.comments&&document.getElementById('pd-comments')) document.getElementById('pd-comments').value=v1.comments;
-  // Populate pest inputs for visit 1
   Object.entries(v1.pests||{}).forEach(([f,p])=>{
-    const id=f.replace(/[\s\(\)\/]/g,'_');
-    const sevEl=document.getElementById('sev-'+id);
-    const pctEl=document.getElementById('pct-'+id);
-    if(sevEl) sevEl.value=p.sev||'';
-    if(pctEl) pctEl.value=p.pct||0;
+    const id2=f.replace(/[\s\(\)\/]/g,'_');
+    const se=document.getElementById('sev-'+id2), pe=document.getElementById('pct-'+id2);
+    if(se) se.value=p.sev||''; if(pe) pe.value=p.pct||0;
   });
-  // Handle visit 2 and 3 if present
   for(let n=2;n<=3;n++){
     const vn=rec.visits?.[n-1];
     if(vn){
       const panel=document.getElementById('visit-panel-'+n);
       if(panel&&!panel.innerHTML.trim()) panel.innerHTML=buildVisitPanel(n);
-      const badge=document.getElementById('v'+n+'-badge');
-      if(badge) badge.style.display='inline-flex';
+      const b=document.getElementById('v'+n+'-badge'); if(b) b.style.display='inline-flex';
       if(vn.date){ const el=document.getElementById('pd-date-v'+n); if(el) el.value=vn.date; }
       if(vn.stage){ const el=document.getElementById('pd-stage-v'+n); if(el) el.value=vn.stage; }
       if(vn.affectedArea){ const el=document.getElementById('pd-area-v'+n); if(el) el.value=vn.affectedArea; }
       if(vn.comments){ const el=document.getElementById('pd-comments-v'+n); if(el) el.value=vn.comments; }
       Object.entries(vn.pests||{}).forEach(([f,p])=>{
         const sid=f.replace(/[\s\(\)\/]/g,'_')+'_v'+n;
-        const sevEl=document.getElementById('sev-'+sid);
-        const pctEl=document.getElementById('pct-'+sid);
-        if(sevEl) sevEl.value=p.sev||'';
-        if(pctEl) pctEl.value=p.pct||0;
+        const se=document.getElementById('sev-'+sid), pe=document.getElementById('pct-'+sid);
+        if(se) se.value=p.sev||''; if(pe) pe.value=p.pct||0;
       });
     }
   }
-  // Remove original record so save creates updated version
-  STATE.pestRecords=STATE.pestRecords.filter(r=>r.id!=id);
-  saveLocal();
-  showSection('pests');
-  switchVisitTab(1);
+  STATE.pestRecords=STATE.pestRecords.filter(r=>r.id!=id); saveLocal();
+  showSection('pests'); switchVisitTab(1);
   toast('Editing pest record — update and re-save','info');
 }
 function deletePestRecord(id){
@@ -2037,10 +1979,8 @@ async function saveYieldAssessment(){
   const avg=valid.reduce((a,b)=>a+b)/valid.length;
   const yHa=avg*10;
   const rec={id:Date.now(),date,grower,zone,locality,variety,area,season,samples,avg:avg.toFixed(3),yieldHa:yHa.toFixed(2),yieldArpent:(yHa/HA_TO_ARPENT).toFixed(2),yieldAcre:(yHa/HA_TO_ACRE).toFixed(2),comments};
-  STATE.yieldAssessments.push(rec); saveLocal();
-  renderYieldTable(); renderDashboard();
-  toast('Yield assessment saved ✓','success');
-  if(GAS_URL){ const r=await callGAS('saveYieldAssessment',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Assessment_Date:date,Area_Sqm:area,Sample1_Kg_Sqm:samples[0]||0,Sample2_Kg_Sqm:samples[1]||0,Sample3_Kg_Sqm:samples[2]||0,Sample4_Kg_Sqm:samples[3]||0,Sample5_Kg_Sqm:samples[4]||0,Officer_Comments:comments,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓','success'); }
+  STATE.yieldAssessments.push(rec); saveLocal(); renderYieldTable(); renderDashboard(); toast('Yield assessment saved ✓');
+  if(GAS_URL){ const r=await callGAS('saveYieldAssessment',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Assessment_Date:date,Area_Sqm:area,Sample1_Kg_Sqm:samples[0]||0,Sample2_Kg_Sqm:samples[1]||0,Sample3_Kg_Sqm:samples[2]||0,Sample4_Kg_Sqm:samples[3]||0,Sample5_Kg_Sqm:samples[4]||0,Officer_Comments:comments,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓'); }
 }
 function clearYieldForm(){
   ['ya-date','ya-area','ya-comments'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -2049,29 +1989,19 @@ function clearYieldForm(){
   ['ya-avg','ya-arpent','ya-ha','ya-acre'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
 }
 function renderYieldTable(){
-  const badge=document.getElementById('yield-count-badge');
-  if(badge) badge.textContent=STATE.yieldAssessments.length;
+  const badge=document.getElementById('yield-count-badge'); if(badge) badge.textContent=STATE.yieldAssessments.length;
   const tbody=document.getElementById('yield-table');
   if(!STATE.yieldAssessments.length){ tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-title">No yield assessments yet</div></div></td></tr>`; return; }
   tbody.innerHTML=STATE.yieldAssessments.map(r=>`<tr>
-    <td>${r.date||'—'}</td>
-    <td><strong>${r.grower}</strong></td>
-    <td>${r.locality||'—'}</td>
-    <td>${r.variety||'—'}</td>
-    <td>${r.area}</td>
-    <td>${r.avg}</td>
-    <td>${r.yieldArpent}</td>
-    <td style="color:var(--gold);font-weight:700;">${r.yieldHa}</td>
+    <td>${r.date||'—'}</td><td><strong>${r.grower}</strong></td><td>${r.locality||'—'}</td>
+    <td>${r.variety||'—'}</td><td>${r.area}</td><td>${r.avg}</td>
+    <td>${r.yieldArpent}</td><td style="color:var(--gold);font-weight:700;">${r.yieldHa}</td>
     <td>${r.yieldAcre}</td>
     <td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season||'—'}</span></td>
     <td><div class="row-actions"><button class="btn btn-ghost btn-icon btn-sm" onclick="deleteYield(${r.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button></div></td>
   </tr>`).join('');
 }
-function deleteYield(id){
-  if(!confirm('Delete?')) return;
-  STATE.yieldAssessments=STATE.yieldAssessments.filter(r=>r.id!=id);
-  saveLocal(); renderYieldTable(); toast('Deleted','warning');
-}
+function deleteYield(id){ if(!confirm('Delete?')) return; STATE.yieldAssessments=STATE.yieldAssessments.filter(r=>r.id!=id); saveLocal(); renderYieldTable(); toast('Deleted','warning'); }
 
 // ============================================================
 //  MAP
@@ -2082,13 +2012,9 @@ let drawnItems=null;
 function getLocalityCoords(locality, zone){
   const k=zone+':'+locality;
   if(LOCALITY_COORDS[k]) return LOCALITY_COORDS[k];
-  // Zone-centred fallback with small jitter so markers don't stack
-  const zoneCentres={
-    E1:[-20.2300,57.4920], E2:[-20.2350,57.5900],
-    E3:[-20.2200,57.7150], E4:[-20.3400,57.7350]
-  };
+  const zoneCentres={E1:[-20.2300,57.4920],E2:[-20.2350,57.5900],E3:[-20.2200,57.7150],E4:[-20.3400,57.7350]};
   const ctr=zoneCentres[zone]||[-20.2500,57.6300];
-  return [ctr[0]+(Math.random()-.5)*.025, ctr[1]+(Math.random()-.5)*.025];
+  return [ctr[0]+(Math.random()-.5)*.025,ctr[1]+(Math.random()-.5)*.025];
 }
 function getGrowerSeverity(growerName){
   const recs=STATE.pestRecords.filter(r=>r.grower===growerName);
@@ -2107,17 +2033,17 @@ function initMap(){
   drawnItems=new L.FeatureGroup(); map.addLayer(drawnItems);
   const dc=new L.Control.Draw({position:'topright',edit:{featureGroup:drawnItems,remove:true},draw:{polygon:{shapeOptions:{color:'#f0a500',fillColor:'#f0a500',fillOpacity:.15,weight:2},showArea:true},rectangle:{shapeOptions:{color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:.12,weight:2}},circle:{shapeOptions:{color:'#22c55e',fillColor:'#22c55e',fillOpacity:.12,weight:2}},marker:true,polyline:false,circlemarker:false}});
   map.addControl(dc);
-  map.on(L.Draw.Event.CREATED,function(e){ drawnItems.addLayer(e.layer); updateDrawnShapesList(); toast(`${e.layerType} drawn ✓`,'success'); });
+  map.on(L.Draw.Event.CREATED,function(e){ drawnItems.addLayer(e.layer); updateDrawnShapesList(); toast(`${e.layerType} drawn ✓`); });
   map.on(L.Draw.Event.DELETED,function(){ updateDrawnShapesList(); });
   renderMapLayers(); renderZoneStats();
   setTimeout(()=>map.invalidateSize(),200);
 }
 function updateDrawnShapesList(){
   const el=document.getElementById('drawn-shapes-list');
-  const countEl=document.getElementById('shapes-count');
+  const ce=document.getElementById('shapes-count');
   if(!el||!drawnItems) return;
   const layers=drawnItems.getLayers();
-  if(countEl) countEl.textContent=layers.length;
+  if(ce) ce.textContent=layers.length;
   if(!layers.length){ el.innerHTML='<span style="font-size:12px;color:var(--text3);">No shapes drawn yet.</span>'; return; }
   el.innerHTML=layers.map((l,i)=>{
     let type='Shape';
@@ -2128,11 +2054,7 @@ function updateDrawnShapesList(){
     return `<span class="shape-chip">${type} ${i+1}</span>`;
   }).join('');
 }
-function clearDrawnShapes(){
-  if(!drawnItems||!drawnItems.getLayers().length){ toast('No shapes','info'); return; }
-  if(!confirm('Clear all drawn shapes?')) return;
-  drawnItems.clearLayers(); updateDrawnShapesList(); toast('Shapes cleared','warning');
-}
+function clearDrawnShapes(){ if(!drawnItems||!drawnItems.getLayers().length){ toast('No shapes','info'); return; } if(!confirm('Clear all drawn shapes?')) return; drawnItems.clearLayers(); updateDrawnShapesList(); toast('Shapes cleared','warning'); }
 function renderMapLayers(){
   if(!map) return;
   Object.values(mapLayers).forEach(l=>{ if(l) try{ map.removeLayer(l); }catch(e){} });
@@ -2141,8 +2063,8 @@ function renderMapLayers(){
     const zl=L.layerGroup();
     Object.entries(ZONE_POLYGONS).forEach(([zone,coords])=>{
       const color=ZONE_COLORS[zone];
-      const zDistLabel={E1:'Moka District (West)',E2:'Moka-Flacq Border',E3:'Flacq District (Central)',E4:'Flacq District (SE Coast)'};
-      L.polygon(coords,{color,weight:2,fillColor:color,fillOpacity:.1}).bindPopup(`<div class="pop-name" style="color:${color};">Zone ${zone}</div><div style="font-size:11px;color:#aaa;margin-bottom:4px;">${zDistLabel[zone]||''}</div><div class="pop-row">${STATE.growers.filter(g=>g.zone===zone).length} growers · ${STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div>`).addTo(zl);
+      const zDesc={E1:'Moka District (West)',E2:'Moka-Flacq Border',E3:'Flacq District (Central)',E4:'Flacq District (SE Coast)'};
+      L.polygon(coords,{color,weight:2,fillColor:color,fillOpacity:.1}).bindPopup(`<div class="pop-name" style="color:${color};">Zone ${zone}</div><div style="font-size:11px;color:#aaa;margin-bottom:4px;">${zDesc[zone]||''}</div><div class="pop-row">${STATE.growers.filter(g=>g.zone===zone).length} growers · ${STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div>`).addTo(zl);
       const lats=coords.map(c=>c[0]),lngs=coords.map(c=>c[1]);
       L.marker([(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lngs)+Math.max(...lngs))/2],{icon:L.divIcon({className:'',html:`<div style="color:${color};font-weight:800;font-size:14px;text-shadow:0 1px 4px #000;pointer-events:none;">Zone ${zone}</div>`,iconAnchor:[28,10]})}).addTo(zl);
     });
@@ -2151,12 +2073,10 @@ function renderMapLayers(){
   if(layerState.growers&&STATE.growers.length){
     const gl=L.layerGroup();
     STATE.growers.forEach(g=>{
-      const sev=getGrowerSeverity(g.name);
-      const color=sevColor(sev);
+      const sev=getGrowerSeverity(g.name), color=sevColor(sev);
       const coords=getLocalityCoords(g.locality,g.zone);
       const plots=STATE.plantation.filter(p=>p.grower===g.name);
-      const icon=L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.6);"></div>`,iconAnchor:[7,7]});
-      L.marker(coords,{icon}).bindPopup(`<div class="pop-name">👤 ${g.name}</div><div class="pop-row"><i class="fas fa-map-marker-alt"></i> ${g.locality} (Zone ${g.zone})</div><div class="pop-row"><i class="fas fa-seedling"></i> ${plots.length} plots · ${plots.reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div><div><span class="pop-sev" style="background:${color}22;color:${color};">Risk: ${sev}</span></div>`).addTo(gl);
+      L.marker(coords,{icon:L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.6);"></div>`,iconAnchor:[7,7]})}).bindPopup(`<div class="pop-name">👤 ${g.name}</div><div class="pop-row"><i class="fas fa-map-marker-alt"></i> ${g.locality} (Zone ${g.zone})</div><div class="pop-row"><i class="fas fa-seedling"></i> ${plots.length} plots · ${plots.reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div><div><span class="pop-sev" style="background:${color}22;color:${color};">Risk: ${sev}</span></div>`).addTo(gl);
     });
     mapLayers.growers=gl; gl.addTo(map);
   }
@@ -2171,20 +2091,15 @@ function renderMapLayers(){
     mapLayers.plantations=pl; pl.addTo(map);
   }
 }
-function toggleLayer(name){
-  layerState[name]=!layerState[name];
-  const btn=document.getElementById('toggle-'+name);
-  if(btn) btn.classList.toggle('on',layerState[name]);
-  renderMapLayers();
-}
+function toggleLayer(name){ layerState[name]=!layerState[name]; const btn=document.getElementById('toggle-'+name); if(btn) btn.classList.toggle('on',layerState[name]); renderMapLayers(); }
 function renderZoneStats(){
   const el=document.getElementById('zone-stats');
   if(!el) return;
+  const zoneDistrict={E1:'Moka (West)',E2:'Moka/Flacq',E3:'Flacq (Central)',E4:'Flacq (SE Coast)'};
   el.innerHTML=Object.keys(ZONE_LOCALITIES).map(zone=>{
     const gc=STATE.growers.filter(g=>g.zone===zone).length;
     const area=STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0);
     const color=ZONE_COLORS[zone];
-    const zoneDistrict={E1:'Moka (West)',E2:'Moka/Flacq',E3:'Flacq (Central)',E4:'Flacq (SE Coast)'};
     return `<div class="zone-card" onclick="if(map){map.fitBounds(${JSON.stringify(ZONE_POLYGONS[zone])});}" style="border-top:3px solid ${color};">
       <div class="zone-name" style="color:${color};">Zone ${zone}</div>
       <div style="font-size:9px;color:var(--text3);margin-bottom:3px;font-family:var(--font-mono);">${zoneDistrict[zone]||''}</div>
@@ -2239,7 +2154,6 @@ function renderProduction(){
     <td style="color:var(--gold);font-weight:700;">${Math.round(r.estProd)}</td>
     <td>${r.harvestDate}</td>
   </tr>`).join('');
-  // Locality summary
   const lgEl=document.getElementById('locality-yield-grid');
   if(lgEl){
     const locs=[...new Set(STATE.plantation.map(r=>r.locality).filter(Boolean))].sort();
@@ -2259,25 +2173,20 @@ function renderProduction(){
 // ============================================================
 //  CAMPAIGN TABLE
 // ============================================================
-const CAMP_ZONES=['E1','E2','E3','E4'];
-const CAMP_MONTHS=MONTHS;
 function getCampKey(season,zone,grower,month,fortnight){ return `${season}|${zone}|${grower}|${month}|F${fortnight}`; }
 function renderCampaignTable(){
   const season=document.getElementById('camp-season')?.value||'Season 1';
   const container=document.getElementById('campaign-table-container');
   if(!container) return;
-  // Collect all growers with data in current season
   const growerList=[...new Set(STATE.plantation.filter(p=>p.season===season).map(p=>p.grower))].sort();
   if(!growerList.length){ container.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No plantation data for ${season}</div></div>`; return; }
-  // Header
-  let html=`<div class="campaign-table-wrap"><table class="campaign-table"><thead>
-    <tr><th rowspan="2" style="min-width:120px;">Grower</th><th rowspan="2">Zone</th><th rowspan="2">Area (ha)</th>`;
-  CAMP_MONTHS.forEach(m=>{ html+=`<th colspan="2" style="text-align:center;">${m}</th>`; });
+  let html=`<div class="campaign-table-wrap"><table class="campaign-table"><thead><tr><th rowspan="2" style="min-width:120px;">Grower</th><th rowspan="2">Zone</th><th rowspan="2">Area (ha)</th>`;
+  MONTHS.forEach(m=>{ html+=`<th colspan="2" style="text-align:center;">${m}</th>`; });
   html+=`<th rowspan="2">Total Prod (T)</th></tr><tr>`;
-  CAMP_MONTHS.forEach(()=>{ html+=`<th>F1</th><th>F2</th>`; });
+  MONTHS.forEach(()=>{ html+=`<th>F1</th><th>F2</th>`; });
   html+=`</tr></thead><tbody>`;
   let colTotals={};
-  CAMP_MONTHS.forEach((m,mi)=>{ colTotals[mi*2]=0; colTotals[mi*2+1]=0; });
+  MONTHS.forEach((_,mi)=>{ colTotals[mi*2]=0; colTotals[mi*2+1]=0; });
   let grandTotal=0;
   growerList.forEach(grower=>{
     const g=STATE.growers.find(x=>x.name===grower);
@@ -2285,7 +2194,7 @@ function renderCampaignTable(){
     const area=plots.reduce((s,r)=>s+(r.area||0),0);
     let rowTotal=0;
     html+=`<tr><td style="font-weight:600;">${grower}</td><td><span style="color:${ZONE_COLORS[g?.zone||'']||'#888'};font-weight:700;">${g?.zone||'—'}</span></td><td>${area.toFixed(2)}</td>`;
-    CAMP_MONTHS.forEach((m,mi)=>{
+    MONTHS.forEach((m,mi)=>{
       [1,2].forEach(f=>{
         const k=getCampKey(season,g?.zone||'',grower,m,f);
         const val=STATE.campaignData[k]||'';
@@ -2297,28 +2206,21 @@ function renderCampaignTable(){
     grandTotal+=rowTotal;
     html+=`<td style="font-weight:700;color:var(--gold);text-align:right;">${rowTotal.toFixed(1)}</td></tr>`;
   });
-  // Totals row
   html+=`<tr class="total"><td colspan="3">TOTAL</td>`;
-  CAMP_MONTHS.forEach((_,mi)=>{
-    html+=`<td style="text-align:right;">${(colTotals[mi*2]||0).toFixed(1)}</td><td style="text-align:right;">${(colTotals[mi*2+1]||0).toFixed(1)}</td>`;
-  });
-  html+=`<td style="text-align:right;">${grandTotal.toFixed(1)}</td></tr>`;
-  html+=`</tbody></table></div>`;
+  MONTHS.forEach((_,mi)=>{ html+=`<td style="text-align:right;">${(colTotals[mi*2]||0).toFixed(1)}</td><td style="text-align:right;">${(colTotals[mi*2+1]||0).toFixed(1)}</td>`; });
+  html+=`<td style="text-align:right;">${grandTotal.toFixed(1)}</td></tr></tbody></table></div>`;
   container.innerHTML=html;
 }
 function saveCampCell(el){
-  const k=el.dataset.key;
-  const v=el.textContent.trim();
-  if(v&&!isNaN(parseFloat(v))){ STATE.campaignData[k]=v; }
-  else if(!v){ delete STATE.campaignData[k]; }
-  saveLocal();
-  // Re-render to update totals
-  renderCampaignTable();
+  const k=el.dataset.key, v=el.textContent.trim();
+  if(v&&!isNaN(parseFloat(v))) STATE.campaignData[k]=v;
+  else if(!v) delete STATE.campaignData[k];
+  saveLocal(); renderCampaignTable();
 }
 function exportCampaignCsv(){
   const season=document.getElementById('camp-season')?.value||'Season 1';
   let csv='Grower,Zone,Area(ha)';
-  CAMP_MONTHS.forEach(m=>{ csv+=`,${m} F1,${m} F2`; });
+  MONTHS.forEach(m=>{ csv+=`,${m} F1,${m} F2`; });
   csv+=',Total\n';
   const growers=[...new Set(STATE.plantation.filter(p=>p.season===season).map(p=>p.grower))].sort();
   growers.forEach(grower=>{
@@ -2326,13 +2228,11 @@ function exportCampaignCsv(){
     const area=STATE.plantation.filter(p=>p.grower===grower&&p.season===season).reduce((s,r)=>s+(r.area||0),0);
     let row=`${grower},${g?.zone||''},${area.toFixed(2)}`;
     let total=0;
-    CAMP_MONTHS.forEach(m=>{
-      [1,2].forEach(f=>{ const v=STATE.campaignData[getCampKey(season,g?.zone||'',grower,m,f)]||'0'; row+=','+v; total+=parseFloat(v)||0; });
-    });
+    MONTHS.forEach(m=>{ [1,2].forEach(f=>{ const v=STATE.campaignData[getCampKey(season,g?.zone||'',grower,m,f)]||'0'; row+=','+v; total+=parseFloat(v)||0; }); });
     csv+=row+','+total.toFixed(1)+'\n';
   });
   const a=document.createElement('a'); a.href='data:text/csv,'+encodeURIComponent(csv); a.download=`campaign-${season.replace(' ','-')}.csv`; a.click();
-  toast('Campaign CSV exported','success');
+  toast('Campaign CSV exported');
 }
 async function saveCampaignToSheets(){
   if(!GAS_URL){ toast('Set GAS URL first','error'); return; }
@@ -2341,15 +2241,9 @@ async function saveCampaignToSheets(){
   const growers=[...new Set(STATE.plantation.filter(p=>p.season===season).map(p=>p.grower))];
   for(const grower of growers){
     const g=STATE.growers.find(x=>x.name===grower);
-    for(const m of CAMP_MONTHS){
-      for(const f of [1,2]){
-        const k=getCampKey(season,g?.zone||'',grower,m,f);
-        const v=STATE.campaignData[k];
-        if(v){
-          const r=await callGAS('saveCampaign',{Season:season,Zone:g?.zone||'',Grower_Name:grower,Fortnightly_Period:`${m} F${f}`,Yield_T_Ha:v,Production_Area_Ha:STATE.plantation.filter(p=>p.grower===grower&&p.season===season).reduce((s,r)=>s+(r.area||0),0),Recorded_By:CURRENT_USER?.username||''});
-          r.success?ok++:fail++;
-        }
-      }
+    for(const m of MONTHS) for(const f of [1,2]){
+      const k=getCampKey(season,g?.zone||'',grower,m,f), v=STATE.campaignData[k];
+      if(v){ const r=await callGAS('saveCampaign',{Season:season,Zone:g?.zone||'',Grower_Name:grower,Fortnightly_Period:`${m} F${f}`,Yield_T_Ha:v,Production_Area_Ha:STATE.plantation.filter(p=>p.grower===grower&&p.season===season).reduce((s,r)=>s+(r.area||0),0),Recorded_By:CURRENT_USER?.username||''}); r.success?ok++:fail++; }
     }
   }
   toast(fail?`Sync: ${ok} ok, ${fail} failed`:`Synced ${ok} records ✓`,fail?'warning':'success');
@@ -2366,10 +2260,10 @@ function generateReport(){
   const comments=document.getElementById('rpt-comments').value;
   if(!week){ toast('Select a week start date','error'); return; }
   const weekEnd=new Date(week); weekEnd.setDate(weekEnd.getDate()+6);
-  const weekPlants=STATE.plantation.filter(r=>{ if(!r.datePlanted) return false; const d=new Date(r.datePlanted); return d>=new Date(week)&&d<=weekEnd&&(!zone||r.zone===zone); });
-  const weekPests=STATE.pestRecords.filter(r=>{ if(!r.visits||!r.visits[0]?.date) return false; const d=new Date(r.visits[0].date); return d>=new Date(week)&&d<=weekEnd&&(!zone||STATE.growers.find(g=>g.name===r.grower)?.zone===zone); });
-  const totalArea=weekPlants.reduce((s,r)=>s+(r.area||0),0);
-  const highAlerts=weekPests.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
+  const wP=STATE.plantation.filter(r=>{ if(!r.datePlanted) return false; const d=new Date(r.datePlanted); return d>=new Date(week)&&d<=weekEnd&&(!zone||r.zone===zone); });
+  const wPe=STATE.pestRecords.filter(r=>{ if(!r.visits||!r.visits[0]?.date) return false; const d=new Date(r.visits[0].date); return d>=new Date(week)&&d<=weekEnd&&(!zone||STATE.growers.find(g=>g.name===r.grower)?.zone===zone); });
+  const totalArea=wP.reduce((s,r)=>s+(r.area||0),0);
+  const highAlerts=wPe.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
   const preview=document.getElementById('report-preview');
   preview.style.display='block';
   preview.innerHTML=`
@@ -2382,22 +2276,22 @@ function generateReport(){
     </div>
     <h2>📋 Summary</h2>
     <table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
-      <tr><td>Plantations this week</td><td><strong>${weekPlants.length}</strong></td></tr>
+      <tr><td>Plantations this week</td><td><strong>${wP.length}</strong></td></tr>
       <tr><td>Area planted (ha)</td><td><strong>${totalArea.toFixed(2)}</strong></td></tr>
-      <tr><td>Pest/disease records</td><td><strong>${weekPests.length}</strong></td></tr>
+      <tr><td>Pest/disease records</td><td><strong>${wPe.length}</strong></td></tr>
       <tr><td>High severity alerts</td><td style="color:${highAlerts?'#ef4444':'#22c55e'};"><strong>${highAlerts}</strong></td></tr>
     </tbody></table>
-    ${weekPlants.length?`<h2>🌱 Plantation Activity</h2><table><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Area (ha)</th><th>Season</th><th>Fortnight</th></tr></thead><tbody>${weekPlants.map(r=>`<tr><td>${r.grower}</td><td>${r.locality||'—'}</td><td>${r.variety||'—'}</td><td>${(r.area||0).toFixed(2)}</td><td>${r.season}</td><td>${r.fortnight||'—'}</td></tr>`).join('')}</tbody></table>`:''}
-    ${weekPests.length?`<h2>🐛 Pest & Disease Incidents</h2><table><thead><tr><th>Grower</th><th>Date</th><th>High Alerts</th><th>Control</th></tr></thead><tbody>${weekPests.map(r=>`<tr><td>${r.grower}</td><td>${r.visits?.[0]?.date||'—'}</td><td>${r.visits?.reduce((s,v)=>s+Object.values(v.pests||{}).filter(p=>p.sev==='High').length,0)||0}</td><td>${r.controlMeasure||'None'}</td></tr>`).join('')}</tbody></table>`:''}
+    ${wP.length?`<h2>🌱 Plantation Activity</h2><table><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Area (ha)</th><th>Season</th><th>Fortnight</th></tr></thead><tbody>${wP.map(r=>`<tr><td>${r.grower}</td><td>${r.locality||'—'}</td><td>${r.variety||'—'}</td><td>${(r.area||0).toFixed(2)}</td><td>${r.season}</td><td>${r.fortnight||'—'}</td></tr>`).join('')}</tbody></table>`:''}
+    ${wPe.length?`<h2>🐛 Pest & Disease Incidents</h2><table><thead><tr><th>Grower</th><th>Date</th><th>High Alerts</th><th>Control</th></tr></thead><tbody>${wPe.map(r=>`<tr><td>${r.grower}</td><td>${r.visits?.[0]?.date||'—'}</td><td>${r.visits?.reduce((s,v)=>s+Object.values(v.pests||{}).filter(p=>p.sev==='High').length,0)||0}</td><td>${r.controlMeasure||'None'}</td></tr>`).join('')}</tbody></table>`:''}
     ${comments?`<h2>💬 Officer Notes</h2><p style="font-size:13px;line-height:1.6;">${comments}</p>`:''}
     <div style="margin-top:16px;font-size:11px;color:var(--text3);">PoTa Tracker v3.0 — MAUFP — Generated ${new Date().toLocaleString()}</div>`;
-  toast('Report generated ✓','success');
+  toast('Report generated ✓');
 }
 function printReport(){
   const content=document.getElementById('report-preview').innerHTML;
   if(!content){ toast('Generate report first','warning'); return; }
   const w=window.open('','_blank');
-  w.document.write(`<html><head><title>PoTa Weekly Report</title><style>body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:24px;}table{border-collapse:collapse;width:100%;margin-bottom:16px;}th,td{border:1px solid #ccc;padding:6px 10px;}th{background:#f5f5f5;font-weight:700;}h1{color:#c49040;}h2{border-bottom:1px solid #ddd;padding-bottom:4px;margin:16px 0 8px;}@media print{}</style></head><body>${content}</body></html>`);
+  w.document.write(`<html><head><title>PoTa Weekly Report</title><style>body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:24px;}table{border-collapse:collapse;width:100%;margin-bottom:16px;}th,td{border:1px solid #ccc;padding:6px 10px;}th{background:#f5f5f5;font-weight:700;}h1{color:#c49040;}h2{border-bottom:1px solid #ddd;padding-bottom:4px;margin:16px 0 8px;}</style></head><body>${content}</body></html>`);
   w.document.close(); w.print();
 }
 function exportReportCsv(){
@@ -2409,7 +2303,7 @@ function exportReportCsv(){
   const weekEnd=new Date(week); weekEnd.setDate(weekEnd.getDate()+6);
   STATE.plantation.filter(r=>{ if(!r.datePlanted) return false; const d=new Date(r.datePlanted); return d>=new Date(week)&&d<=weekEnd; }).forEach(r=>{ csv+=`${week},${season},${r.grower},${r.locality||''},${r.variety||''},${r.area||0},${r.fortnight||''}\n`; });
   const a=document.createElement('a'); a.href='data:text/csv,'+encodeURIComponent(csv); a.download=`weekly-report-${week}.csv`; a.click();
-  toast('CSV exported','success');
+  toast('CSV exported');
 }
 async function saveReportToSheets(){
   if(!GAS_URL){ toast('Set GAS URL first','error'); return; }
@@ -2419,7 +2313,7 @@ async function saveReportToSheets(){
   const comments=document.getElementById('rpt-comments').value;
   const weekEnd=new Date(week); weekEnd.setDate(weekEnd.getDate()+6);
   const r=await callGAS('saveWeeklyReport',{Report_Date:week,Week_Start:week,Week_End:weekEnd.toISOString().split('T')[0],Season:season,Zone:document.getElementById('rpt-zone')?.value||'',Report_Text:comments,Generated_By:officer||CURRENT_USER?.username||''});
-  if(r.success) toast('Report saved to Sheets ✓','success');
+  if(r.success) toast('Report saved to Sheets ✓');
   else toast('Sheets error: '+r.error,'error');
 }
 
@@ -2435,34 +2329,32 @@ function saveGasUrl(){
   const url=(document.getElementById('gas-url-input')?.value||'').trim();
   if(!url){ toast('Enter a valid URL','error'); return; }
   GAS_URL=url; localStorage.setItem('pota_gas_url_v3',url);
-  updateSyncStatus('saved'); toast('GAS URL saved ✓','success');
+  updateSyncStatus('saved'); toast('GAS URL saved ✓');
 }
 async function testGasConnection(){
   if(!GAS_URL){ toast('Save GAS URL first','error'); return; }
   toast('Testing connection…','info');
   const r=await callGAS('ping',{});
-  r.success?toast('Connection OK ✓ — '+r.message,'success'):toast('Connection failed: '+(r.error||'unknown'),'error');
+  r.success?toast('Connection OK ✓ — '+r.message):toast('Connection failed: '+(r.error||'unknown'),'error');
 }
 async function initSheetsRemote(){
   if(!GAS_URL){ toast('Set GAS URL first','error'); return; }
   const r=await callGAS('initSheets',{});
-  r.success?toast('Sheets initialised ✓','success'):toast('Error: '+r.error,'error');
+  r.success?toast('Sheets initialised ✓'):toast('Error: '+r.error,'error');
 }
 async function pullFromSheets(){
   if(!GAS_URL){ toast('Set GAS URL first','error'); return; }
   toast('Pulling data from Sheets…','info');
   try{
-    // Pull Users first so login credentials are synced
     const ur=await callGAS('getData',{sheet:'Users'});
     if(ur.success&&ur.rows&&ur.rows.length){
       ur.rows.forEach(row=>{
         if(!row.Username) return;
         const existing=STATE.users.findIndex(u=>u.username.toLowerCase()===row.Username.toLowerCase());
         const userObj={username:row.Username,fullName:row.Full_Name||'',role:row.Role||'Field Officer',zoneAccess:row.Zone_Access||'All',password:row.Password||'',status:row.Status||'Active'};
-        if(existing>-1) STATE.users[existing]=userObj;
-        else STATE.users.push(userObj);
+        if(existing>-1) STATE.users[existing]=userObj; else STATE.users.push(userObj);
       });
-      toast('Users synced from Sheets ✓','success');
+      toast('Users synced from Sheets ✓');
     }
     const sheets=['Growers','Plantations','Pest_Disease','Yield_Assessment'];
     for(const s of sheets){
@@ -2470,21 +2362,16 @@ async function pullFromSheets(){
       if(r.success&&r.rows){
         if(s==='Growers') r.rows.forEach(row=>{
           if(!row.Grower_Name) return;
-          if(!STATE.growers.find(g=>g.name===row.Grower_Name)){
-            STATE.growers.push({id:Date.now()+Math.random(),name:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',contact:row.Contact||'',registrationDate:row.Registration_Date||'',status:row.Status||'Active',totalArea:parseFloat(row.Total_Area_Ha)||0,notes:row.Notes||''});
-          }
+          if(!STATE.growers.find(g=>g.name===row.Grower_Name)) STATE.growers.push({id:Date.now()+Math.random(),name:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',contact:row.Contact||'',registrationDate:row.Registration_Date||'',status:row.Status||'Active',totalArea:parseFloat(row.Total_Area_Ha)||0,notes:row.Notes||''});
         });
         if(s==='Plantations') r.rows.forEach(row=>{
           if(!row.Grower_Name||!row.Date_Planted) return;
-          const exists=STATE.plantation.find(p=>p.grower===row.Grower_Name&&p.datePlanted===row.Date_Planted&&p.variety===row.Variety);
-          if(!exists){
-            STATE.plantation.push({id:Date.now()+Math.random(),grower:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',variety:row.Variety||'',datePlanted:row.Date_Planted,area:parseFloat(row.Production_Area_Ha)||0,estYield:parseFloat(row.Estimated_Yield_T_Ha)||0,season:row.Season||'Season 1',fortnight:row.Fortnightly_Period||'Fortnight 1',comments:row.Officer_Comments||''});
-          }
+          if(!STATE.plantation.find(p=>p.grower===row.Grower_Name&&p.datePlanted===row.Date_Planted&&p.variety===row.Variety)) STATE.plantation.push({id:Date.now()+Math.random(),grower:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',variety:row.Variety||'',datePlanted:row.Date_Planted,area:parseFloat(row.Production_Area_Ha)||0,estYield:parseFloat(row.Estimated_Yield_T_Ha)||0,season:row.Season||'Season 1',fortnight:row.Fortnightly_Period||'Fortnight 1',comments:row.Officer_Comments||''});
         });
       }
     }
     saveLocal(); renderDashboard(); renderUsersList(); populateSelects();
-    toast('Data pulled from Sheets ✓','success');
+    toast('Data pulled from Sheets ✓');
   }catch(e){ toast('Pull failed: '+e.message,'error'); }
 }
 function addVariety(){
@@ -2493,7 +2380,7 @@ function addVariety(){
   if(STATE.varieties.includes(v)){ toast('Already exists','warning'); return; }
   STATE.varieties.push(v); saveLocal();
   document.getElementById('new-variety').value=''; renderVarietyList(); populateSelects();
-  toast('Variety "'+v+'" added','success');
+  toast('Variety "'+v+'" added');
 }
 function renderVarietyList(){
   const el=document.getElementById('variety-list');
@@ -2511,9 +2398,9 @@ function createUserLocal(){
   if(password.length<6){ toast('Password must be at least 6 chars','error'); return; }
   if(STATE.users.find(u=>u.username.toLowerCase()===username)){ toast('Username already exists','warning'); return; }
   STATE.users.push({username,fullName,role,zoneAccess,password,status:'Active'});
-  saveLocal(); renderUsersList(); toast('User "'+username+'" created ✓','success');
+  saveLocal(); renderUsersList(); toast('User "'+username+'" created ✓');
   ['nu-username','nu-fullname','nu-password'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  if(GAS_URL) callGAS('createUser',{username,fullName,role,zoneAccess,password}).then(r=>{ if(r.success) toast('User synced to Sheets ✓','success'); });
+  if(GAS_URL) callGAS('createUser',{username,fullName,role,zoneAccess,password}).then(r=>{ if(r.success) toast('User synced to Sheets ✓'); });
 }
 function renderUsersList(){
   const el=document.getElementById('users-list');
@@ -2524,7 +2411,7 @@ function exportAllData(){
   const a=document.createElement('a');
   a.href='data:application/json,'+encodeURIComponent(JSON.stringify({...STATE,_meta:{version:'3.0',exported:new Date().toISOString()}},null,2));
   a.download=`pota-backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
-  toast('Backup downloaded','success');
+  toast('Backup downloaded');
 }
 function importData(){ document.getElementById('import-file').click(); }
 function handleImport(input){
@@ -2533,9 +2420,9 @@ function handleImport(input){
   reader.onload=e=>{
     try{
       const data=JSON.parse(e.target.result);
-      if(data.growers&&data.plantation){ STATE={...DEFAULT_STATE,...data}; saveLocal(); renderDashboard(); toast('Data imported ✓','success'); }
+      if(data.growers&&data.plantation){ STATE={...DEFAULT_STATE,...data}; saveLocal(); renderDashboard(); toast('Data imported ✓'); }
       else toast('Invalid backup file','error');
-    } catch(err){ toast('Failed to parse backup: '+err.message,'error'); }
+    }catch(err){ toast('Failed to parse backup: '+err.message,'error'); }
   };
   reader.readAsText(file);
 }
@@ -2545,12 +2432,12 @@ function clearAllData(){
 }
 
 // ============================================================
-//  SYNC
+//  SYNC TO SHEETS
 // ============================================================
 async function syncToSheets(){
   if(!GAS_URL){ toast('Set GAS URL in Settings first','error'); return; }
   updateSyncStatus('syncing');
-  const totalRecs = STATE.growers.length + STATE.plantation.length + STATE.yieldAssessments.length;
+  const totalRecs=STATE.growers.length+STATE.plantation.length+STATE.yieldAssessments.length;
   toast(`Syncing ${totalRecs} records to Google Sheets…`,'info');
   let ok=0,fail=0;
   for(const g of STATE.growers){
@@ -2564,7 +2451,7 @@ async function syncToSheets(){
   for(const rec of STATE.pestRecords){
     const growerZone=STATE.growers.find(g=>g.name===rec.grower)?.zone||'';
     for(const v of (rec.visits||[])){
-      for(const [f,pd] of Object.entries(v.pests||{})){
+      for(const[f,pd] of Object.entries(v.pests||{})){
         if(!pd.sev) continue;
         const r=await callGAS('savePestDisease',{Grower_Name:rec.grower,Zone:growerZone,Locality:rec.locality||'',Date_Observed:v.date,Season:rec.season,Pest_Disease_Name:f,Severity:pd.sev,Severity_Pct:pd.pct||0,Affected_Area_Ha:v.affectedArea||0,Control_Measure:rec.controlMeasure||'',Officer_Comments:v.comments||'',Recorded_By:CURRENT_USER?.username||''});
         r.success?ok++:fail++;
@@ -2601,13 +2488,20 @@ document.addEventListener('click',e=>{
 // ============================================================
 window.addEventListener('DOMContentLoaded',()=>{
   loadLocal();
-  // Check if already logged in this session
   try{
     const saved=localStorage.getItem('pota_current_user');
-    if(saved){ CURRENT_USER=JSON.parse(saved); document.getElementById('login-screen').style.display='none'; initApp(); }
-    else{
-      // Show hint if no GAS URL
-      if(!GAS_URL){ document.getElementById('login-offline-indicator').style.display='inline-flex'; const hint=document.getElementById('login-hint-box'); hint.style.display='block'; hint.innerHTML='Local credentials:<br><b>admin</b> / pota2024 &nbsp;·&nbsp; <b>officer1</b> / officer123<br><b>EOSEOKG</b> / GAN@3522 &nbsp;·&nbsp; <b>ESOKR</b> / MHEE@9315'; }
+    if(saved){
+      CURRENT_USER=JSON.parse(saved);
+      document.getElementById('login-screen').style.display='none';
+      initApp();
+    } else {
+      // Show local credential hint when no GAS URL set
+      if(!GAS_URL){
+        document.getElementById('login-offline-indicator').style.display='inline-flex';
+        const hint=document.getElementById('login-hint-box');
+        hint.style.display='block';
+        hint.innerHTML='Local credentials:<br><b>admin</b> / pota2024 &nbsp;&middot;&nbsp; <b>officer1</b> / officer123<br><b>eoseokg</b> / GAN@3522 &nbsp;&middot;&nbsp; <b>esokr</b> / MHEE@9315';
+      }
     }
   }catch(e){ localStorage.removeItem('pota_current_user'); }
 });
