@@ -1068,27 +1068,68 @@ const ZONE_LOCALITIES = {
   E4:['Balance John','Beau Champ','Beau Vallon','Bel Air Rivière Sèche','Belle Rive','Belle Rose','Bois Marchand','Camp Beau Bois','Camp de Masque Pavé','Camp Jackerie','Caroline','Cent Gaulettes','Clavet','Clémencia','Deep River','Deux Frères','Ecroignard','Ernest Florent','Grand River South East','Ilot','Kewal Nagar','La Laura','La Lucie Roy','La Nourrice','Laventure','Lesur','L\'Etoile','Mare aux Goyaves','Mare Carrée','Mare Triton','Marie Jeanne','Morc Roy','Morc Sohawon','Olivia','Pellegrin','Petit Bois','Petite Cabane','Plaine Bananes','Pointe aux Feuilles','Pont Lardier','Quatre Soeurs','Sebastopol','Trois Ilots']
 };
 const ZONE_POLYGONS = {
-  E1:[[-20.10,57.42],[-20.10,57.56],[-20.28,57.56],[-20.28,57.42]],
-  E2:[[-20.10,57.56],[-20.10,57.66],[-20.28,57.66],[-20.28,57.56]],
-  E3:[[-20.10,57.66],[-20.10,57.78],[-20.28,57.78],[-20.28,57.66]],
-  E4:[[-20.28,57.54],[-20.28,57.82],[-20.45,57.82],[-20.45,57.54]]
+  // E1: Moka District (west-central)
+  // Adjusted east bound from 57.56 → 57.62 to include Quartier Militaire, Alma, Providence, etc.
+  E1: [[-20.10, 57.42], [-20.10, 57.62], [-20.28, 57.62], [-20.28, 57.42]],
+
+  // E2: Flacq District (western part)
+  // East bound extended 57.66 → 57.67, south bound extended -20.28 → -20.29 to include Montagne Blanche and Camp de Masque
+  E2: [[-20.10, 57.62], [-20.10, 57.67], [-20.29, 57.67], [-20.29, 57.62]],
+
+  // E3: Flacq District (coastal)
+  // East bound extended 57.78 → 57.79 to include Trou d’Eau Douce; south bound set to -20.238 (boundary with E4)
+  E3: [[-20.10, 57.67], [-20.10, 57.79], [-20.238, 57.79], [-20.238, 57.67]],
+
+  // E4: Grand Port District (south‑east)
+  // North bound raised from -20.28 → -20.238 to include Mare Carrée and Bel Air; west bound kept at 57.54
+  E4: [[-20.238, 57.54], [-20.238, 57.82], [-20.45, 57.82], [-20.45, 57.54]]
 };
 const LOCALITY_COORDS = {
-  'E1:Moka':[-20.1730,57.4890],'E1:Quartier Militaire':[-20.2040,57.4630],'E1:St Pierre':[-20.2670,57.4620],
-  'E1:Alma':[-20.2250,57.4900],'E1:Reduit':[-20.1980,57.4920],'E1:Helvetia':[-20.2150,57.4800],
-  'E1:Providence':[-20.2080,57.4840],'E1:Dagotiere':[-20.2350,57.4700],'E1:Verdun':[-20.2450,57.4820],
-  'E1:Soreze':[-20.2550,57.4950],'E1:Valetta':[-20.2100,57.4960],'E1:Guibies':[-20.2000,57.5100],
-  'E1:Hermitage':[-20.2300,57.5050],'E1:Gentilly':[-20.2180,57.4750],'E1:Minissy':[-20.2280,57.5020],
-  'E1:Malinga':[-20.2400,57.5100],'E1:Ripailles':[-20.2480,57.5030],'E1:Nouvelle Decouverte':[-20.2550,57.5150],
-  'E2:Camp de Masque':[-20.2300,57.5880],'E2:Lallmatie':[-20.2050,57.5950],'E2:Bon Accueil':[-20.2150,57.5750],
-  'E2:Montagne Blanche':[-20.2000,57.5800],'E2:Brisée Verdière':[-20.1900,57.5850],
-  'E2:Melrose':[-20.2350,57.5700],'E2:Quatre Bords':[-20.2100,57.5820],
-  'E3:Centre de Flacq':[-20.2080,57.7050],'E3:Poste de Flacq':[-20.2300,57.7150],'E3:Belle Mare':[-20.1880,57.7750],
-  'E3:Trou d\'Eau Douce':[-20.1950,57.7880],'E3:Quatre Cocos':[-20.1820,57.7650],'E3:Palmar':[-20.1700,57.7800],
-  'E3:Victoria':[-20.2200,57.7050],'E3:Riche Mare':[-20.2350,57.7200],'E3:Constance':[-20.2580,57.7000],
-  'E4:Bel Air Rivière Sèche':[-20.3050,57.7350],'E4:Beau Champ':[-20.3400,57.7200],'E4:Olivia':[-20.3200,57.7050],
-  'E4:Grand River South East':[-20.3750,57.7600],'E4:Quatre Soeurs':[-20.3550,57.7400],
-  'E4:Mare Carrée':[-20.3100,57.7200],'E4:Sebastopol':[-20.3650,57.7350]
+  // E1: Moka District
+  'E1:Moka': [-20.219, 57.496],
+  'E1:Quartier Militaire': [-20.2479, 57.59737],
+  'E1:St Pierre': [-20.2175, 57.5208],
+  'E1:Alma': [-20.23972, 57.56639],
+  'E1:Reduit': [-20.2275, 57.4925],
+  'E1:Helvetia': [-20.22139, 57.51667],
+  'E1:Providence': [-20.2447, 57.6122],
+  'E1:Dagotiere': [-20.24476, 57.56188],
+  'E1:Verdun': [-20.23417, 57.55476],
+  'E1:Soreze': [-20.20491, 57.48472],
+  'E1:Valetta': [-20.25194, 57.56139],
+  'E1:Guibies': [-20.18694, 57.4875],
+  'E1:Hermitage': [-20.25, 57.55],
+  'E1:Gentilly': [-20.22319, 57.51731],
+  'E1:Minissy': [-20.2375, 57.50667],
+  'E1:Malinga': [-20.19835, 57.55958], 
+  'E1:Ripailles': [-20.19701, 57.57869],
+  'E1:Nouvelle Decouverte': [-20.1872, 57.5819],
+  // E2: Flacq District (West)
+  'E2:Camp de Masque': [-20.2369, 57.6633],
+  'E2:Lallmatie': [-20.18972, 57.66111],
+  'E2:Bon Accueil': [-20.17083, 57.65639],
+  'E2:Montagne Blanche': [-20.28538, 57.65865],
+  'E2:Brisée Verdière': [-20.16389, 57.64667],
+  'E2:Melrose': [-20.26972, 57.63194],
+  'E2:Quatre Bords': [-20.201, 57.585],
+  // E3: Flacq District (Coastal)
+  'E3:Centre de Flacq': [-20.18972, 57.71444],
+  'E3:Poste de Flacq': [-20.16306, 57.73056],
+  'E3:Belle Mare': [-20.195, 57.7683],
+  'E3:Trou d\'Eau Douce': [-20.23806, 57.78667],
+  'E3:Quatre Cocos': [-20.2078, 57.7625],
+  'E3:Palmar': [-20.22009, 57.77552],
+  'E3:Victoria': [-20.16276, 57.49874],  // Near Queen Victoria
+  'E3:Riche Mare': [-20.19915, 57.72754],
+  'E3:Constance': [-20.1778, 57.7086],
+    // E4: Grand Port District (South-East)
+  'E4:Bel Air Rivière Sèche': [-20.25777, 57.74976],
+  'E4:Beau Champ': [-20.27139, 57.76639],
+  'E4:Olivia': [-20.28778, 57.73097],
+  'E4:Grand River South East': [-20.28667, 57.77389],
+  'E4:Quatre Soeurs': [-20.29917, 57.77056],
+  'E4:Mare Carrée': [-20.23861, 57.73444],
+  'E4:Sebastopol': [-20.2907, 57.68779]
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6','#f97316','#ec4899'];
