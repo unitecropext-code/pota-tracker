@@ -468,11 +468,12 @@ tr:hover .row-actions{opacity:1;}
       </svg>
       <div>
         <div class="login-title">PoTa <span>Tracker</span></div>
-        <div class="login-sub">V 3.0 · Mauritius</div>
+      
       </div>
     </div>
     <div id="login-offline-indicator" class="login-offline-badge" style="display:none;">
-      <i class="fas fa-wifi" style="color:var(--orange);"></i> </div>
+      
+    </div>
     <div class="login-field">
       <label class="login-label">Username</label>
       <input class="login-input" id="login-user" placeholder="Enter username" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
@@ -484,6 +485,7 @@ tr:hover .row-actions{opacity:1;}
     <div id="login-error"></div>
     <button class="login-btn" onclick="doLogin()" id="login-btn-el">Sign In</button>
     <div class="login-spinner" id="login-spinner"></div>
+    <div class="login-version">PoTa Tracker v3.0 · </div>
     <div class="login-hint" id="login-hint-box" style="display:none;"></div>
   </div>
 </div>
@@ -1060,29 +1062,82 @@ tr:hover .row-actions{opacity:1;}
 // ============================================================
 //  CONSTANTS
 // ============================================================
-const HA_TO_ARPENT = 1.42857;
-const HA_TO_ACRE   = 2.47105;
+const HA_TO_ARPENT = 2.369;
+const HA_TO_ACRE   = 2.471;
 const DISEASES = ['Late Blight (Phytophthora)','Early Blight (Alternaria)','Soft Rot (Erwinia)','Bacterial Wilt','Common Scab','Blackleg','Rhizoctonia','Powdery Scab'];
 const PESTS    = ['Leaf Miner','Thrips','Whitefly','Aphids','Cutworm','Flea Beetle','Root-knot Nematode','Mite'];
 const PEST_ICONS = {'Late Blight (Phytophthora)':'🍂','Early Blight (Alternaria)':'🌿','Soft Rot (Erwinia)':'💧','Bacterial Wilt':'🦠','Common Scab':'⚫','Blackleg':'⬛','Rhizoctonia':'🔵','Powdery Scab':'⚪','Leaf Miner':'🔀','Thrips':'🦟','Whitefly':'🦋','Aphids':'🐛','Cutworm':'🪱','Flea Beetle':'🪲','Root-knot Nematode':'🔴','Mite':'🕷️'};
 const ZONE_COLORS = {E1:'#f0a500',E2:'#3b82f6',E3:'#22c55e',E4:'#a855f7'};
 const ZONE_LOCALITIES = {
-  E1:['Bel Air Rivière Sèche','La Harmony','Quatre Bornes','Camp de Masque','Olivia','Poste Lafayette'],
-  E2:['Mahebourg','Nouvelle France','Rivière des Anguilles','Saint Hubert','Bois des Amourettes'],
-  E3:['Quartier Militaire','Saint Pierre','Moka','Alma','Montagne Blanche'],
-  E4:['Grand Bois','Plaine Magnien','Souillac','Saint Aubin','Rivière du Poste']
+  E1:['Alma','Bagatelle Dam','Bar Le Duc','Beau Bois','Bell Village','Belle Rive','Bonne Veine','Camp Auguste','Circonstance','Cote D'Or','Dagotiere','Gentilly','Guibies','Helvetia','Hermitage','L'Agrement','L'Assurance','L'Avenir','L'Escalier Br Rd','L'Esperance','La Laura','Le Pouce','Malinga','Minissy','Moka','Nouvelle Decouverte','Petit Verger','Providence','Quartier Militaire','Reduit','Ripailles','Riviere Baptiste','Roselyn Cottage','Soreze','St Pierre','Valetta','Verdun'],
+  E2:['Balance John','Beau Bois','Bel Etang','Belvédère','Bon Accueil','Bonne Mere','Brisée Verdière','Camp de Masque','Camp Thorel','Fuel','Gaulettes Serrées','Gibraltar','Grand Bas Fond','Lallmatie','Latapie','L'Unité','Médine Camp de Masque','Melrose','Mission Cross Rd','Mont Ida','Montagne Blanche','Pellegrin','Petit Paquet','Pont Bon Dieu','Providence','Quatre Bords','Queen Victoria','Riche Fond','Salazie','Salazie Rd','Sans Soucis','St Julien d'Hotman','St Julien Village'],
+  E3:['Argy','Beau Bois','Beau Rivage','Belle Mare','Belle Vue Allendy','Bois d'Oiseaux','Bramsthan','Bras d'Eau','Camp Garreau','Camp Ithier','Camp Marcelin','Camp Poorun','Camp Raffia','Camp Ranoo','Centre de Flacq','Constance','Grande Retraite','Hermitage','Isidore Rose','Kashinath','La Porte Providence','Laventure','Mare Choisy','Mare du Puits','Mare la Chaux','Mare Providence','Mare Tapsy','Morc Constance','Nehru Nagar','Palmar','Petite Retraite','Plaine de Gersigny','Pont Blanc','Poste de Flacq','Quatre Cocos','Riche Mare','Sept Croisées','St Rémy','Trou d'Eau Douce','Victoria'],
+  E4:['Balance John','Beau Champ','Beau Vallon','Bel Air Rivière Sèche','Belle Rive','Belle Rose','Bois Marchand','Camp Beau Bois','Camp de Masque Pavé','Camp Jackerie','Caroline','Cent Gaulettes','Clavet','Clémencia','Deep River','Deux Frères','Ecroignard','Ernest Florent','Grand River South East','Ilot','Kewal Nagar','La Laura','La Lucie Roy','La Nourrice','Laventure','Lesur','L'Etoile','Mare aux Goyaves','Mare Carrée','Mare Triton','Marie Jeanne','Morc Roy','Morc Sohawon','Olivia','Pellegrin','Petit Bois','Petite Cabane','Plaine Bananes','Pointe aux Feuilles','Pont Lardier','Quatre Soeurs','Sebastopol','Trois Ilots']
 };
 const ZONE_POLYGONS = {
-  E1:[[-20.18,57.50],[-20.18,57.63],[-20.28,57.63],[-20.28,57.50]],
-  E2:[[-20.28,57.63],[-20.28,57.74],[-20.40,57.74],[-20.40,57.63]],
-  E3:[[-20.18,57.38],[-20.18,57.50],[-20.30,57.50],[-20.30,57.38]],
-  E4:[[-20.38,57.44],[-20.38,57.60],[-20.50,57.60],[-20.50,57.44]]
+  E1:[[-20.10,57.42],[-20.10,57.56],[-20.28,57.56],[-20.28,57.42]],
+  E2:[[-20.10,57.56],[-20.10,57.66],[-20.28,57.66],[-20.28,57.56]],
+  E3:[[-20.10,57.66],[-20.10,57.78],[-20.28,57.78],[-20.28,57.66]],
+  E4:[[-20.28,57.54],[-20.28,57.82],[-20.45,57.82],[-20.45,57.54]]
 };
 const LOCALITY_COORDS = {
-  'E1:Bel Air Rivière Sèche':[-20.20,57.55],'E1:La Harmony':[-20.23,57.57],'E1:Quatre Bornes':[-20.26,57.49],'E1:Camp de Masque':[-20.21,57.60],'E1:Olivia':[-20.19,57.53],'E1:Poste Lafayette':[-20.24,57.62],
-  'E2:Mahebourg':[-20.40,57.70],'E2:Nouvelle France':[-20.38,57.67],'E2:Rivière des Anguilles':[-20.36,57.65],'E2:Saint Hubert':[-20.34,57.68],'E2:Bois des Amourettes':[-20.32,57.71],
-  'E3:Quartier Militaire':[-20.22,57.44],'E3:Saint Pierre':[-20.24,57.40],'E3:Moka':[-20.19,57.46],'E3:Alma':[-20.26,57.42],'E3:Montagne Blanche':[-20.21,57.48],
-  'E4:Grand Bois':[-20.43,57.51],'E4:Plaine Magnien':[-20.45,57.54],'E4:Souillac':[-20.48,57.52],'E4:Saint Aubin':[-20.46,57.48],'E4:Rivière du Poste':[-20.41,57.56]
+  // Zone E1 — Moka District (western localities)
+  'E1:Moka':[-20.1730,57.4890],'E1:Quartier Militaire':[-20.2040,57.4630],'E1:St Pierre':[-20.2670,57.4620],
+  'E1:Alma':[-20.2250,57.4900],'E1:Reduit':[-20.1980,57.4920],'E1:Helvetia':[-20.2150,57.4800],
+  'E1:Providence':[-20.2080,57.4840],'E1:Dagotiere':[-20.2350,57.4700],'E1:Verdun':[-20.2450,57.4820],
+  'E1:Soreze':[-20.2550,57.4950],'E1:Valetta':[-20.2100,57.4960],'E1:Guibies':[-20.2000,57.5100],
+  'E1:Hermitage':[-20.2300,57.5050],'E1:Gentilly':[-20.2180,57.4750],'E1:Minissy':[-20.2280,57.5020],
+  'E1:Malinga':[-20.2400,57.5100],'E1:Ripailles':[-20.2480,57.5030],'E1:Nouvelle Decouverte':[-20.2550,57.5150],
+  'E1:L'Agrement':[-20.1900,57.5050],'E1:L'Assurance':[-20.2050,57.5180],'E1:L'Avenir':[-20.2150,57.5250],
+  'E1:L'Esperance':[-20.2600,57.5000],'E1:La Laura':[-20.2700,57.5100],'E1:Le Pouce':[-20.1850,57.5020],
+  'E1:Bagatelle Dam':[-20.1950,57.4850],'E1:Bar Le Duc':[-20.2050,57.4780],'E1:Beau Bois':[-20.2250,57.5180],
+  'E1:Bell Village':[-20.2400,57.4920],'E1:Belle Rive':[-20.2620,57.5200],'E1:Bonne Veine':[-20.2380,57.5080],
+  'E1:Camp Auguste':[-20.2500,57.4850],'E1:Circonstance':[-20.2200,57.4900],'E1:Cote D'Or':[-20.2300,57.4780],
+  'E1:L'Escalier Br Rd':[-20.2700,57.5050],'E1:Petit Verger':[-20.2650,57.4900],'E1:Riviere Baptiste':[-20.2350,57.5150],
+  'E1:Roselyn Cottage':[-20.2480,57.5200],
+  // Zone E2 — East Moka / West Flacq border
+  'E2:Camp de Masque':[-20.2300,57.5880],'E2:Lallmatie':[-20.2050,57.5950],'E2:Bon Accueil':[-20.2150,57.5750],
+  'E2:Montagne Blanche':[-20.2000,57.5800],'E2:Brisée Verdière':[-20.1900,57.5850],'E2:Médine Camp de Masque':[-20.2420,57.5950],
+  'E2:Melrose':[-20.2350,57.5700],'E2:Quatre Bords':[-20.2100,57.5820],'E2:Providence':[-20.2250,57.5780],
+  'E2:Bel Etang':[-20.1950,57.6050],'E2:Belvédère':[-20.2080,57.6100],'E2:Balance John':[-20.2450,57.6000],
+  'E2:Beau Bois':[-20.2200,57.5900],'E2:Bonne Mere':[-20.2300,57.5820],'E2:Camp Thorel':[-20.1880,57.5950],
+  'E2:Fuel':[-20.2550,57.5850],'E2:Gaulettes Serrées':[-20.2150,57.6050],'E2:Gibraltar':[-20.2480,57.5780],
+  'E2:Grand Bas Fond':[-20.2000,57.5900],'E2:Latapie':[-20.2380,57.5900],'E2:L'Unité':[-20.2620,57.5950],
+  'E2:Mission Cross Rd':[-20.2280,57.5850],'E2:Mont Ida':[-20.2500,57.5900],'E2:Pellegrin':[-20.2700,57.5950],
+  'E2:Petit Paquet':[-20.1820,57.6050],'E2:Pont Bon Dieu':[-20.2750,57.6000],'E2:Queen Victoria':[-20.2050,57.5700],
+  'E2:Riche Fond':[-20.2600,57.5800],'E2:Salazie':[-20.1780,57.6100],'E2:Salazie Rd':[-20.1850,57.6080],
+  'E2:Sans Soucis':[-20.2650,57.5700],'E2:St Julien d'Hotman':[-20.2800,57.6050],'E2:St Julien Village':[-20.2850,57.6000],
+  // Zone E3 — Central Flacq District
+  'E3:Centre de Flacq':[-20.2080,57.7050],'E3:Poste de Flacq':[-20.2300,57.7150],'E3:Belle Mare':[-20.1880,57.7750],
+  'E3:Trou d'Eau Douce':[-20.1950,57.7880],'E3:Quatre Cocos':[-20.1820,57.7650],'E3:Palmar':[-20.1700,57.7800],
+  'E3:Victoria':[-20.2200,57.7050],'E3:Riche Mare':[-20.2350,57.7200],'E3:Constance':[-20.2580,57.7000],
+  'E3:Camp Ithier':[-20.2450,57.6900],'E3:Laventure':[-20.2100,57.7350],'E3:Mare Choisy':[-20.1950,57.7400],
+  'E3:Bras d'Eau':[-20.1750,57.7700],'E3:Argy':[-20.2650,57.6850],'E3:Beau Bois':[-20.2280,57.6800],
+  'E3:Beau Rivage':[-20.2420,57.7300],'E3:Belle Vue Allendy':[-20.2000,57.7200],'E3:Bois d'Oiseaux':[-20.2150,57.7550],
+  'E3:Bramsthan':[-20.2350,57.6750],'E3:Camp Garreau':[-20.2500,57.7100],'E3:Camp Marcelin':[-20.2050,57.7150],
+  'E3:Camp Poorun':[-20.2180,57.6950],'E3:Camp Raffia':[-20.2280,57.7250],'E3:Camp Ranoo':[-20.2380,57.7050],
+  'E3:Grande Retraite':[-20.1950,57.7350],'E3:Hermitage':[-20.2050,57.6850],'E3:Isidore Rose':[-20.2480,57.7350],
+  'E3:Kashinath':[-20.2550,57.7150],'E3:La Porte Providence':[-20.2150,57.7050],'E3:Mare du Puits':[-20.2300,57.7450],
+  'E3:Mare la Chaux':[-20.2250,57.7600],'E3:Mare Providence':[-20.2050,57.7450],'E3:Mare Tapsy':[-20.2400,57.7400],
+  'E3:Morc Constance':[-20.2620,57.7050],'E3:Nehru Nagar':[-20.2150,57.7200],'E3:Petite Retraite':[-20.1880,57.7300],
+  'E3:Plaine de Gersigny':[-20.2680,57.7200],'E3:Pont Blanc':[-20.2550,57.7300],'E3:Riche Mare':[-20.2350,57.7200],
+  'E3:Sept Croisées':[-20.2450,57.7250],'E3:St Rémy':[-20.2480,57.6950],
+  // Zone E4 — South-East Flacq (coastal SE)
+  'E4:Bel Air Rivière Sèche':[-20.3050,57.7350],'E4:Beau Champ':[-20.3400,57.7200],'E4:Olivia':[-20.3200,57.7050],
+  'E4:Grand River South East':[-20.3750,57.7600],'E4:Quatre Soeurs':[-20.3550,57.7400],'E4:Pointe aux Feuilles':[-20.3900,57.7800],
+  'E4:Mare Carrée':[-20.3100,57.7200],'E4:Sebastopol':[-20.3650,57.7350],'E4:Trois Ilots':[-20.4050,57.7650],
+  'E4:Beau Vallon':[-20.2950,57.7450],'E4:Belle Rive':[-20.3250,57.7150],'E4:Belle Rose':[-20.3350,57.7050],
+  'E4:Bois Marchand':[-20.3450,57.7000],'E4:Camp Beau Bois':[-20.3550,57.7100],'E4:Camp de Masque Pavé':[-20.3000,57.7050],
+  'E4:Camp Jackerie':[-20.2880,57.6950],'E4:Caroline':[-20.3150,57.7350],'E4:Cent Gaulettes':[-20.3250,57.7600],
+  'E4:Clavet':[-20.3450,57.7350],'E4:Clémencia':[-20.3580,57.7550],'E4:Deep River':[-20.3800,57.7700],
+  'E4:Deux Frères':[-20.3700,57.7450],'E4:Ecroignard':[-20.2800,57.7050],'E4:Ernest Florent':[-20.3100,57.7500],
+  'E4:Ilot':[-20.3950,57.7800],'E4:Kewal Nagar':[-20.3050,57.6950],'E4:La Laura':[-20.3300,57.6900],
+  'E4:La Lucie Roy':[-20.3200,57.7400],'E4:La Nourrice':[-20.3400,57.7450],'E4:Laventure':[-20.3500,57.7200],
+  'E4:Lesur':[-20.3650,57.7250],'E4:L'Etoile':[-20.3750,57.7350],'E4:Mare aux Goyaves':[-20.3850,57.7500],
+  'E4:Mare Triton':[-20.4000,57.7600],'E4:Marie Jeanne':[-20.3150,57.7600],'E4:Morc Roy':[-20.2950,57.7200],
+  'E4:Morc Sohawon':[-20.3050,57.7150],'E4:Pellegrin':[-20.3250,57.7050],'E4:Petit Bois':[-20.3450,57.7500],
+  'E4:Petite Cabane':[-20.3600,57.7600],'E4:Plaine Bananes':[-20.3700,57.7500],'E4:Pont Lardier':[-20.3850,57.7650],
+  'E4:Balance John':[-20.2850,57.7100]
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6','#f97316','#ec4899'];
@@ -1091,7 +1146,7 @@ const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6
 //  STATE & PERSISTENCE
 // ============================================================
 const DEFAULT_STATE = {
-  growers:[],plantation:[],pestRecords:[],yieldAssessments:[],varieties:['Mondial','Spunta','Désirée','Hermes','Red Norland'],
+  growers:[],plantation:[],pestRecords:[],yieldAssessments:[],varieties:['Delaware','Jelly','Mondial','Panamera','Spunta Imported','Spunta Local'],
   campaignData:{},weeklyReports:[],users:[
     {username:'superadmin',fullName:'Super Administrator',role:'Administrator',zoneAccess:'All',password:'KOPS@1353',status:'Active'},
     {username:'admin',fullName:'Administrator',role:'Administrator',zoneAccess:'All',password:'pota2024',status:'Active'},
@@ -1110,8 +1165,12 @@ function loadLocal(){
     const d = localStorage.getItem('pota_state_v3');
     if(d) STATE = {...DEFAULT_STATE,...JSON.parse(d)};
     if(!STATE.users || !STATE.users.length) STATE.users = DEFAULT_STATE.users;
-    if(!STATE.varieties || !STATE.varieties.length) STATE.varieties = DEFAULT_STATE.varieties;
+    // Always ensure correct varieties are available (add new ones if missing)
+    if(!STATE.varieties || !STATE.varieties.length) STATE.varieties = [...DEFAULT_STATE.varieties];
+    DEFAULT_STATE.varieties.forEach(v=>{ if(!STATE.varieties.includes(v)) STATE.varieties.push(v); });
+    STATE.varieties.sort();
     if(!STATE.campaignData) STATE.campaignData = {};
+    if(!STATE.weeklyReports) STATE.weeklyReports = [];
     GAS_URL = localStorage.getItem('pota_gas_url_v3') || '';
   } catch(e){ STATE = {...DEFAULT_STATE}; }
 }
@@ -1130,6 +1189,8 @@ async function doLogin(){
   const spinner = document.getElementById('login-spinner');
   errEl.textContent = '';
   if(!user || !pass){ errEl.textContent = 'Please enter username and password.'; return; }
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
   btn.style.display = 'none';
   spinner.style.display = 'block';
   let result = null;
@@ -1138,25 +1199,30 @@ async function doLogin(){
   if(GAS_URL){
     try{
       const r = await callGAS('login', {username:user, password:pass});
-      if(r.success){
+      if(r.success && r.user){
         result = r.user;
-      } else if(r.error === 'USER_NOT_FOUND' || r.error === 'INVALID_CREDENTIALS' || r.error === 'ACCOUNT_INACTIVE'){
+      } else if(r.error === 'INVALID_CREDENTIALS' || r.error === 'ACCOUNT_INACTIVE'){
+        // Definitive fail from GAS - still try local
         result = null;
-        // Fall through to local
       }
-    } catch(e){}
+      // USER_NOT_FOUND or network error: fall through to local
+    } catch(e){
+      // Network error: fall through to local auth
+    }
   }
 
   // Local fallback
   if(!result){
-    const localUser = STATE.users.find(u => u.username.toLowerCase() === user);
-    if(localUser && localUser.status === 'Active' && localUser.password === pass){
+    const localUser = STATE.users.find(u => u.username.toLowerCase() === user.toLowerCase());
+    if(localUser && localUser.status === 'Active' && localUser.password.trim() === pass){
       result = {username:localUser.username, fullName:localUser.fullName, role:localUser.role, zoneAccess:localUser.zoneAccess};
     }
   }
 
   spinner.style.display = 'none';
   btn.style.display = 'block';
+  btn.disabled = false;
+  btn.style.opacity = '1';
 
   if(result){
     CURRENT_USER = result;
@@ -1208,9 +1274,21 @@ async function callGAS(action, data = {}){
   if(!GAS_URL) return {success:false, error:'No GAS URL configured'};
   const params = new URLSearchParams({action, ...Object.fromEntries(Object.entries(data).map(([k,v])=>[k,v===null||v===undefined?'':String(v)]))});
   try{
-    const resp = await fetch(GAS_URL, {method:'POST', body:params});
-    const json = await resp.json();
-    return json;
+    const resp = await fetch(GAS_URL, {
+      method:'POST',
+      body:params,
+      redirect:'follow'
+    });
+    const text = await resp.text();
+    // Handle GAS redirect or HTML error response
+    try{
+      const json = JSON.parse(text);
+      return json;
+    } catch(e){
+      // GAS sometimes returns HTML on auth error
+      if(text.includes('Signin') || text.includes('sign in')) return {success:false, error:'GAS authentication required. Check deployment settings.'};
+      return {success:false, error:'Invalid response from GAS: '+text.slice(0,100)};
+    }
   } catch(e){
     return {success:false, error:e.message};
   }
@@ -1534,7 +1612,9 @@ function deleteGrower(id){
 function getFortnight(d){ return new Date(d).getDate()<=15?'Fortnight 1':'Fortnight 2'; }
 function getMonthAbbr(d){ return new Date(d).toLocaleString('default',{month:'short'}); }
 async function savePlantation(){
-  const grower=document.getElementById('pl-grower').value;
+  const growerEl=document.getElementById('pl-grower');
+  const editId=growerEl?.dataset?.editId||'';
+  const grower=growerEl.value;
   const zone=document.getElementById('pl-zone').value;
   const locality=document.getElementById('pl-locality').value;
   const variety=document.getElementById('pl-variety').value;
@@ -1542,16 +1622,31 @@ async function savePlantation(){
   const area=parseFloat(document.getElementById('pl-area').value)||0;
   const estYield=parseFloat(document.getElementById('pl-est-yield').value)||0;
   const season=document.getElementById('pl-season').value;
+  const comments=document.getElementById('pl-comments')?.value.trim()||'';
   if(!grower||!zone||!locality||!planted){ toast('Grower, Zone, Locality and Date required','error'); return; }
-  const rec={id:Date.now(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments:document.getElementById('pl-comments').value.trim()};
-  STATE.plantation.push(rec); saveLocal();
+  if(editId){
+    // Update existing record
+    const idx=STATE.plantation.findIndex(r=>String(r.id)===editId);
+    if(idx>-1){ STATE.plantation[idx]={...STATE.plantation[idx],grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments}; }
+    toast('Plantation record updated ✓','success');
+    delete growerEl.dataset.editId;
+    // Reset button
+    const saveBtn=document.querySelector('#add-plantation-modal .btn-gold');
+    if(saveBtn){ saveBtn.innerHTML='<i class="fas fa-save"></i> Save'; delete saveBtn.dataset.editMode; }
+    const titleEl=document.querySelector('#add-plantation-modal .modal-title');
+    if(titleEl) titleEl.textContent='Add Plantation Record';
+  } else {
+    const rec={id:Date.now(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments};
+    STATE.plantation.push(rec);
+    toast('Plantation record saved ✓','success');
+  }
+  saveLocal();
   closeModal('add-plantation-modal'); renderPlantationTable(); renderDashboard(); updateAlertBadge();
-  toast('Plantation record saved ✓','success');
-  ['pl-comments'].forEach(id=>document.getElementById(id).value='');
+  ['pl-comments'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('pl-grower').value=''; document.getElementById('pl-zone').value='';
   document.getElementById('pl-locality').innerHTML='<option value="">Select Zone first</option>';
   document.getElementById('pl-variety').value=''; document.getElementById('pl-area').value=''; document.getElementById('pl-est-yield').value='';
-  if(GAS_URL){ const r=await callGAS('savePlantation',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Date_Planted:planted,Production_Area_Ha:area,Season:season,Fortnightly_Period:rec.fortnight,Estimated_Yield_T_Ha:estYield,Officer_Comments:rec.comments,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓','success'); }
+  if(GAS_URL){ const r=await callGAS('savePlantation',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Date_Planted:planted,Production_Area_Ha:area,Season:season,Fortnightly_Period:getFortnight(planted),Estimated_Yield_T_Ha:estYield,Officer_Comments:comments,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓','success'); }
 }
 function filteredPlantation(){
   let rows=STATE.plantation;
@@ -1589,7 +1684,9 @@ function renderPlantationTable(){
     <td>${r.estYield||'—'}</td>
     <td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season||'—'}</span></td>
     <td style="font-size:11px;">${r.fortnight||'—'}</td>
-    <td><div class="row-actions"><button class="btn btn-ghost btn-icon btn-sm" onclick="deletePlantation(${r.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button></div></td>
+    <td><div class="row-actions">
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="editPlantation(${r.id})" title="Edit"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
+      <button class="btn btn-ghost btn-icon btn-sm" onclick="deletePlantation(${r.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button></div></td>
   </tr>`).join('');
   // Fortnightly grid
   const fGrid=document.getElementById('fort-grid');
@@ -1602,6 +1699,30 @@ function renderPlantationTable(){
       <div style="font-size:10px;color:var(--text3);">F1:${f1} F2:${f2}</div>
     </div>`;
   }).join(''); }
+}
+function editPlantation(id){
+  const r=STATE.plantation.find(x=>x.id==id);
+  if(!r){ toast('Record not found','error'); return; }
+  // Open modal and populate fields
+  openModal('add-plantation-modal');
+  setTimeout(()=>{
+    document.getElementById('pl-grower').value=r.grower||'';
+    document.getElementById('pl-zone').value=r.zone||'';
+    updateLocalityDropdown('pl-zone','pl-locality');
+    setTimeout(()=>{ document.getElementById('pl-locality').value=r.locality||''; },60);
+    document.getElementById('pl-variety').value=r.variety||'';
+    document.getElementById('pl-date-planted').value=r.datePlanted||'';
+    document.getElementById('pl-area').value=r.area||'';
+    document.getElementById('pl-est-yield').value=r.estYield||'';
+    document.getElementById('pl-season').value=r.season||'Season 1';
+    if(document.getElementById('pl-comments')) document.getElementById('pl-comments').value=r.comments||'';
+    // Mark as edit
+    document.getElementById('pl-grower').dataset.editId=id;
+    const saveBtn=document.querySelector('#add-plantation-modal .btn-gold');
+    if(saveBtn){ saveBtn.innerHTML='<i class="fas fa-save"></i> Update Record'; saveBtn.dataset.editMode='1'; }
+    const titleEl=document.querySelector('#add-plantation-modal .modal-title');
+    if(titleEl) titleEl.textContent='Edit Plantation Record';
+  },80);
 }
 function deletePlantation(id){
   if(!confirm('Delete this plantation record?')) return;
@@ -1817,12 +1938,63 @@ function renderPestTable(){
         <span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season||''}</span>
         ${highCount?`<span class="badge badge-red"><i class="fas fa-exclamation-triangle"></i> ${highCount} high alert${highCount>1?'s':''}</span>`:''}
         <span style="font-size:11px;color:var(--text3);margin-left:auto;">${r.visits?r.visits.length:0} visit${r.visits?.length>1?'s':''}</span>
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="editPestRecord(${r.id})" title="Edit"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
         <button class="btn btn-red btn-icon btn-sm" onclick="deletePestRecord(${r.id})"><i class="fas fa-trash-alt"></i></button>
       </div>
       ${visitRows}
       ${r.controlMeasure?`<div style="font-size:11px;color:var(--text2);margin-top:5px;"><i class="fas fa-shield-alt"></i> Control: ${r.controlMeasure}</div>`:''}
     </div>`;
   }).join('');
+}
+function editPestRecord(id){
+  const rec=STATE.pestRecords.find(r=>r.id==id);
+  if(!rec){ toast('Record not found','error'); return; }
+  // Populate form with existing data
+  document.getElementById('pd-grower').value=rec.grower||'';
+  document.getElementById('pd-locality').value=rec.locality||'';
+  if(document.getElementById('pd-season')) document.getElementById('pd-season').value=rec.season||'Season 1';
+  if(document.getElementById('pd-control')) document.getElementById('pd-control').value=rec.controlMeasure||'';
+  // Populate visit 1 data
+  const v1=rec.visits?.[0]||{};
+  if(v1.date&&document.getElementById('pd-date')) document.getElementById('pd-date').value=v1.date;
+  if(v1.stage&&document.getElementById('pd-stage')) document.getElementById('pd-stage').value=v1.stage;
+  if(v1.affectedArea&&document.getElementById('pd-affected-area')) document.getElementById('pd-affected-area').value=v1.affectedArea;
+  if(v1.comments&&document.getElementById('pd-comments')) document.getElementById('pd-comments').value=v1.comments;
+  // Populate pest inputs for visit 1
+  Object.entries(v1.pests||{}).forEach(([f,p])=>{
+    const id=f.replace(/[\s\(\)\/]/g,'_');
+    const sevEl=document.getElementById('sev-'+id);
+    const pctEl=document.getElementById('pct-'+id);
+    if(sevEl) sevEl.value=p.sev||'';
+    if(pctEl) pctEl.value=p.pct||0;
+  });
+  // Handle visit 2 and 3 if present
+  for(let n=2;n<=3;n++){
+    const vn=rec.visits?.[n-1];
+    if(vn){
+      const panel=document.getElementById('visit-panel-'+n);
+      if(panel&&!panel.innerHTML.trim()) panel.innerHTML=buildVisitPanel(n);
+      const badge=document.getElementById('v'+n+'-badge');
+      if(badge) badge.style.display='inline-flex';
+      if(vn.date){ const el=document.getElementById('pd-date-v'+n); if(el) el.value=vn.date; }
+      if(vn.stage){ const el=document.getElementById('pd-stage-v'+n); if(el) el.value=vn.stage; }
+      if(vn.affectedArea){ const el=document.getElementById('pd-area-v'+n); if(el) el.value=vn.affectedArea; }
+      if(vn.comments){ const el=document.getElementById('pd-comments-v'+n); if(el) el.value=vn.comments; }
+      Object.entries(vn.pests||{}).forEach(([f,p])=>{
+        const sid=f.replace(/[\s\(\)\/]/g,'_')+'_v'+n;
+        const sevEl=document.getElementById('sev-'+sid);
+        const pctEl=document.getElementById('pct-'+sid);
+        if(sevEl) sevEl.value=p.sev||'';
+        if(pctEl) pctEl.value=p.pct||0;
+      });
+    }
+  }
+  // Remove original record so save creates updated version
+  STATE.pestRecords=STATE.pestRecords.filter(r=>r.id!=id);
+  saveLocal();
+  showSection('pests');
+  switchVisitTab(1);
+  toast('Editing pest record — update and re-save','info');
 }
 function deletePestRecord(id){
   if(!confirm('Delete this pest record?')) return;
@@ -1910,8 +2082,13 @@ let drawnItems=null;
 function getLocalityCoords(locality, zone){
   const k=zone+':'+locality;
   if(LOCALITY_COORDS[k]) return LOCALITY_COORDS[k];
-  const ctr=[-20.25,57.58];
-  return [ctr[0]+(Math.random()-.5)*.03,ctr[1]+(Math.random()-.5)*.03];
+  // Zone-centred fallback with small jitter so markers don't stack
+  const zoneCentres={
+    E1:[-20.2300,57.4920], E2:[-20.2350,57.5900],
+    E3:[-20.2200,57.7150], E4:[-20.3400,57.7350]
+  };
+  const ctr=zoneCentres[zone]||[-20.2500,57.6300];
+  return [ctr[0]+(Math.random()-.5)*.025, ctr[1]+(Math.random()-.5)*.025];
 }
 function getGrowerSeverity(growerName){
   const recs=STATE.pestRecords.filter(r=>r.grower===growerName);
@@ -1925,7 +2102,7 @@ function initMap(){
   const container=document.getElementById('map-container');
   if(!container) return;
   if(map){ setTimeout(()=>map.invalidateSize(),100); renderMapLayers(); return; }
-  map=L.map('map-container',{center:[-20.30,57.58],zoom:10});
+  map=L.map('map-container',{center:[-20.25,57.63],zoom:11});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);
   drawnItems=new L.FeatureGroup(); map.addLayer(drawnItems);
   const dc=new L.Control.Draw({position:'topright',edit:{featureGroup:drawnItems,remove:true},draw:{polygon:{shapeOptions:{color:'#f0a500',fillColor:'#f0a500',fillOpacity:.15,weight:2},showArea:true},rectangle:{shapeOptions:{color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:.12,weight:2}},circle:{shapeOptions:{color:'#22c55e',fillColor:'#22c55e',fillOpacity:.12,weight:2}},marker:true,polyline:false,circlemarker:false}});
@@ -1964,7 +2141,8 @@ function renderMapLayers(){
     const zl=L.layerGroup();
     Object.entries(ZONE_POLYGONS).forEach(([zone,coords])=>{
       const color=ZONE_COLORS[zone];
-      L.polygon(coords,{color,weight:2,fillColor:color,fillOpacity:.1}).bindPopup(`<div class="pop-name" style="color:${color};">Zone ${zone}</div><div class="pop-row">${STATE.growers.filter(g=>g.zone===zone).length} growers · ${STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div>`).addTo(zl);
+      const zDistLabel={E1:'Moka District (West)',E2:'Moka-Flacq Border',E3:'Flacq District (Central)',E4:'Flacq District (SE Coast)'};
+      L.polygon(coords,{color,weight:2,fillColor:color,fillOpacity:.1}).bindPopup(`<div class="pop-name" style="color:${color};">Zone ${zone}</div><div style="font-size:11px;color:#aaa;margin-bottom:4px;">${zDistLabel[zone]||''}</div><div class="pop-row">${STATE.growers.filter(g=>g.zone===zone).length} growers · ${STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div>`).addTo(zl);
       const lats=coords.map(c=>c[0]),lngs=coords.map(c=>c[1]);
       L.marker([(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lngs)+Math.max(...lngs))/2],{icon:L.divIcon({className:'',html:`<div style="color:${color};font-weight:800;font-size:14px;text-shadow:0 1px 4px #000;pointer-events:none;">Zone ${zone}</div>`,iconAnchor:[28,10]})}).addTo(zl);
     });
@@ -2006,8 +2184,10 @@ function renderZoneStats(){
     const gc=STATE.growers.filter(g=>g.zone===zone).length;
     const area=STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0);
     const color=ZONE_COLORS[zone];
+    const zoneDistrict={E1:'Moka (West)',E2:'Moka/Flacq',E3:'Flacq (Central)',E4:'Flacq (SE Coast)'};
     return `<div class="zone-card" onclick="if(map){map.fitBounds(${JSON.stringify(ZONE_POLYGONS[zone])});}" style="border-top:3px solid ${color};">
       <div class="zone-name" style="color:${color};">Zone ${zone}</div>
+      <div style="font-size:9px;color:var(--text3);margin-bottom:3px;font-family:var(--font-mono);">${zoneDistrict[zone]||''}</div>
       <div class="zone-val" style="color:${color};">${gc}</div>
       <div class="zone-sub">${gc===1?'grower':'growers'} · ${area.toFixed(1)} ha</div>
     </div>`;
@@ -2272,16 +2452,39 @@ async function pullFromSheets(){
   if(!GAS_URL){ toast('Set GAS URL first','error'); return; }
   toast('Pulling data from Sheets…','info');
   try{
+    // Pull Users first so login credentials are synced
+    const ur=await callGAS('getData',{sheet:'Users'});
+    if(ur.success&&ur.rows&&ur.rows.length){
+      ur.rows.forEach(row=>{
+        if(!row.Username) return;
+        const existing=STATE.users.findIndex(u=>u.username.toLowerCase()===row.Username.toLowerCase());
+        const userObj={username:row.Username,fullName:row.Full_Name||'',role:row.Role||'Field Officer',zoneAccess:row.Zone_Access||'All',password:row.Password||'',status:row.Status||'Active'};
+        if(existing>-1) STATE.users[existing]=userObj;
+        else STATE.users.push(userObj);
+      });
+      toast('Users synced from Sheets ✓','success');
+    }
     const sheets=['Growers','Plantations','Pest_Disease','Yield_Assessment'];
     for(const s of sheets){
       const r=await callGAS('getData',{sheet:s});
       if(r.success&&r.rows){
         if(s==='Growers') r.rows.forEach(row=>{
-          if(!STATE.growers.find(g=>g.name===row.Grower_Name)) STATE.growers.push({id:Date.now()+Math.random(),name:row.Grower_Name,zone:row.Zone,locality:row.Locality,contact:row.Contact,registrationDate:row.Registration_Date,status:row.Status,totalArea:parseFloat(row.Total_Area_Ha)||0,notes:row.Notes||''});
+          if(!row.Grower_Name) return;
+          if(!STATE.growers.find(g=>g.name===row.Grower_Name)){
+            STATE.growers.push({id:Date.now()+Math.random(),name:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',contact:row.Contact||'',registrationDate:row.Registration_Date||'',status:row.Status||'Active',totalArea:parseFloat(row.Total_Area_Ha)||0,notes:row.Notes||''});
+          }
+        });
+        if(s==='Plantations') r.rows.forEach(row=>{
+          if(!row.Grower_Name||!row.Date_Planted) return;
+          const exists=STATE.plantation.find(p=>p.grower===row.Grower_Name&&p.datePlanted===row.Date_Planted&&p.variety===row.Variety);
+          if(!exists){
+            STATE.plantation.push({id:Date.now()+Math.random(),grower:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',variety:row.Variety||'',datePlanted:row.Date_Planted,area:parseFloat(row.Production_Area_Ha)||0,estYield:parseFloat(row.Estimated_Yield_T_Ha)||0,season:row.Season||'Season 1',fortnight:row.Fortnightly_Period||'Fortnight 1',comments:row.Officer_Comments||''});
+          }
         });
       }
     }
-    saveLocal(); renderDashboard(); toast('Data pulled from Sheets ✓','success');
+    saveLocal(); renderDashboard(); renderUsersList(); populateSelects();
+    toast('Data pulled from Sheets ✓','success');
   }catch(e){ toast('Pull failed: '+e.message,'error'); }
 }
 function addVariety(){
@@ -2346,14 +2549,34 @@ function clearAllData(){
 // ============================================================
 async function syncToSheets(){
   if(!GAS_URL){ toast('Set GAS URL in Settings first','error'); return; }
-  updateSyncStatus('syncing'); toast('Syncing to Google Sheets…','info');
+  updateSyncStatus('syncing');
+  const totalRecs = STATE.growers.length + STATE.plantation.length + STATE.yieldAssessments.length;
+  toast(`Syncing ${totalRecs} records to Google Sheets…`,'info');
   let ok=0,fail=0;
-  for(const g of STATE.growers){ const r=await callGAS('saveGrower',{Grower_Name:g.name,Zone:g.zone||'',Locality:g.locality,Contact:g.contact||'',Total_Area_Ha:g.totalArea||0,Registration_Date:g.registrationDate||'',Status:g.status||'Active',Notes:g.notes||''}); r.success?ok++:fail++; }
-  for(const p of STATE.plantation){ const r=await callGAS('savePlantation',{Grower_Name:p.grower,Locality:p.locality,Variety:p.variety||'',Date_Planted:p.datePlanted,Production_Area_Ha:p.area||0,Season:p.season,Fortnightly_Period:p.fortnight,Estimated_Yield_T_Ha:p.estYield||0,Officer_Comments:p.comments||''}); r.success?ok++:fail++; }
-  for(const rec of STATE.pestRecords){ for(const v of (rec.visits||[])){ for(const [f,pd] of Object.entries(v.pests||{})){ if(!pd.sev) continue; const r=await callGAS('savePestDisease',{Grower_Name:rec.grower,Locality:rec.locality,Date_Observed:v.date,Season:rec.season,Pest_Disease_Name:f,Severity:pd.sev,Severity_Pct:pd.pct||0,Affected_Area_Ha:v.affectedArea||0,Control_Measure:rec.controlMeasure||'',Officer_Comments:v.comments||''}); r.success?ok++:fail++; } } }
-  for(const y of STATE.yieldAssessments){ const r=await callGAS('saveYieldAssessment',{Grower_Name:y.grower,Locality:y.locality,Variety:y.variety||'',Assessment_Date:y.date,Area_Sqm:y.area||0,Sample1_Kg_Sqm:y.samples[0]||0,Sample2_Kg_Sqm:y.samples[1]||0,Sample3_Kg_Sqm:y.samples[2]||0,Sample4_Kg_Sqm:y.samples[3]||0,Sample5_Kg_Sqm:y.samples[4]||0,Officer_Comments:y.comments||''}); r.success?ok++:fail++; }
+  for(const g of STATE.growers){
+    const r=await callGAS('saveGrower',{Grower_Name:g.name,Zone:g.zone||'',Locality:g.locality||'',Contact:g.contact||'',Total_Area_Ha:g.totalArea||0,Registration_Date:g.registrationDate||'',Status:g.status||'Active',Notes:g.notes||'',Recorded_By:CURRENT_USER?.username||''});
+    r.success?ok++:fail++;
+  }
+  for(const p of STATE.plantation){
+    const r=await callGAS('savePlantation',{Grower_Name:p.grower,Zone:p.zone||'',Locality:p.locality||'',Variety:p.variety||'',Date_Planted:p.datePlanted,Production_Area_Ha:p.area||0,Season:p.season,Fortnightly_Period:p.fortnight,Estimated_Yield_T_Ha:p.estYield||0,Officer_Comments:p.comments||'',Recorded_By:CURRENT_USER?.username||''});
+    r.success?ok++:fail++;
+  }
+  for(const rec of STATE.pestRecords){
+    const growerZone=STATE.growers.find(g=>g.name===rec.grower)?.zone||'';
+    for(const v of (rec.visits||[])){
+      for(const [f,pd] of Object.entries(v.pests||{})){
+        if(!pd.sev) continue;
+        const r=await callGAS('savePestDisease',{Grower_Name:rec.grower,Zone:growerZone,Locality:rec.locality||'',Date_Observed:v.date,Season:rec.season,Pest_Disease_Name:f,Severity:pd.sev,Severity_Pct:pd.pct||0,Affected_Area_Ha:v.affectedArea||0,Control_Measure:rec.controlMeasure||'',Officer_Comments:v.comments||'',Recorded_By:CURRENT_USER?.username||''});
+        r.success?ok++:fail++;
+      }
+    }
+  }
+  for(const y of STATE.yieldAssessments){
+    const r=await callGAS('saveYieldAssessment',{Grower_Name:y.grower,Zone:y.zone||'',Locality:y.locality||'',Variety:y.variety||'',Assessment_Date:y.date,Season:y.season||'Season 1',Area_Sqm:y.area||0,Sample1_Kg_Sqm:y.samples[0]||0,Sample2_Kg_Sqm:y.samples[1]||0,Sample3_Kg_Sqm:y.samples[2]||0,Sample4_Kg_Sqm:y.samples[3]||0,Sample5_Kg_Sqm:y.samples[4]||0,Officer_Comments:y.comments||'',Recorded_By:CURRENT_USER?.username||''});
+    r.success?ok++:fail++;
+  }
   updateSyncStatus(fail?'error':'ok');
-  toast(fail?`Sync: ${ok} ok, ${fail} failed`:`Synced ${ok} records ✓`,fail?'error':'success');
+  toast(fail?`Sync: ${ok} ok, ${fail} failed`:`Synced ${ok} records ✓ to Google Sheets`,fail?'error':'success');
 }
 
 // ============================================================
@@ -2384,7 +2607,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(saved){ CURRENT_USER=JSON.parse(saved); document.getElementById('login-screen').style.display='none'; initApp(); }
     else{
       // Show hint if no GAS URL
-      if(!GAS_URL){ document.getElementById('login-offline-indicator').style.display='inline-flex'; const hint=document.getElementById('login-hint-box'); hint.style.display='block'; hint.innerHTML='Local credentials:<br><b>admin</b> / pota2024 &nbsp;·&nbsp; <b>officer1</b> / officer123'; }
+      if(!GAS_URL){ document.getElementById('login-offline-indicator').style.display='inline-flex'; const hint=document.getElementById('login-hint-box'); hint.style.display='block'; hint.innerHTML='Local credentials:<br><b>admin</b> / pota2024 &nbsp;·&nbsp; <b>officer1</b> / officer123<br><b>EOSEOKG</b> / GAN@3522 &nbsp;·&nbsp; <b>ESOKR</b> / MHEE@9315'; }
     }
   }catch(e){ localStorage.removeItem('pota_current_user'); }
 });
