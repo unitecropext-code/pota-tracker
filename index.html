@@ -919,7 +919,10 @@ tr:hover .row-actions{opacity:1;}
   <div class="card">
     <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--blue));"></div>
     <div class="card-title"><i class="fas fa-balance-scale" style="color:var(--purple);"></i> Comparative Analysis
-      <div class="card-title-actions">
+      <div class="card-title-actions" style="gap:5px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="openCompInsert('2024')" style="font-size:11px;border-color:rgba(59,130,246,.4);color:var(--blue);"><i class="fas fa-plus"></i> 2024</button>
+        <button class="btn btn-ghost btn-sm" onclick="openCompInsert('2025')" style="font-size:11px;border-color:rgba(168,85,247,.4);color:var(--purple);"><i class="fas fa-plus"></i> 2025</button>
+        <button class="btn btn-gold btn-sm" onclick="openCompInsert('2026')" style="font-size:11px;"><i class="fas fa-plus"></i> 2026</button>
         <select class="form-control btn-sm" id="comp-year" onchange="renderComparative()" style="font-size:11px;min-width:90px;">
           <option value="all">All Years</option>
           <option value="2024">2024</option>
@@ -974,9 +977,120 @@ tr:hover .row-actions{opacity:1;}
   <!-- Detailed comparison table -->
   <div class="card">
     <div class="card-title"><i class="fas fa-table"></i> Detailed Season Comparison Table</div>
-    <div class="table-wrap" id="comp-detail-table"></div>
+    <div id="comp-detail-table"></div>
   </div>
 </section>
+
+<!-- ===== COMP INSERT MODAL ===== -->
+<div class="modal-overlay" id="comp-insert-modal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-seedling" style="color:var(--gold);"></i> <span id="comp-insert-title">Add Plantation Record</span></div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('comp-insert-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ci-edit-id">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Year *</label>
+          <select id="ci-year" class="form-control" onchange="updateCompInsertDate()">
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Season *</label>
+          <select id="ci-season" class="form-control" onchange="updateCompInsertDate()">
+            <option value="Season 1">Season 1</option>
+            <option value="Season 2">Season 2</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Grower *</label>
+        <select id="ci-grower" class="form-control" onchange="compInsertGrowerChanged()">
+          <option value="">— Select Grower —</option>
+        </select>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Zone</label>
+          <select id="ci-zone" class="form-control" onchange="updateLocalityDropdown('ci-zone','ci-locality')">
+            <option value="">Select Zone</option>
+            <option>E1</option><option>E2</option><option>E3</option><option>E4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Locality</label>
+          <select id="ci-locality" class="form-control"><option value="">Select Zone first</option></select>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Variety</label>
+          <select id="ci-variety" class="form-control"><option value="">— Select —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date Planted</label>
+          <input id="ci-date" type="date" class="form-control">
+          <div class="form-hint" id="ci-date-hint">Auto-set from year & season</div>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Area (ha) *</label>
+          <input id="ci-area" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" oninput="compInsertCalcProd()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Est. Yield (T/ha)</label>
+          <input id="ci-yield" type="number" step="0.1" min="0" value="20" class="form-control" oninput="compInsertCalcProd()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fortnightly Period</label>
+        <select id="ci-fortnight" class="form-control">
+          <option value="Fortnight 1">Fortnight 1</option>
+          <option value="Fortnight 2">Fortnight 2</option>
+          <option value="Fortnight 3">Fortnight 3</option>
+          <option value="Fortnight 4">Fortnight 4</option>
+          <option value="Fortnight 5">Fortnight 5</option>
+          <option value="Fortnight 6">Fortnight 6</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Officer Comments</label>
+        <textarea id="ci-comments" class="form-control" rows="2" placeholder="Optional notes…"></textarea>
+      </div>
+      <!-- Est. production preview -->
+      <div id="ci-prod-preview" style="display:none;background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.2);border-radius:9px;padding:10px 14px;margin-bottom:4px;font-size:12px;">
+        <span style="color:var(--text2);">Est. Production:</span>
+        <strong style="color:var(--gold);font-size:16px;margin-left:8px;" id="ci-prod-val">0 T</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('comp-insert-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveCompInsert()"><i class="fas fa-save"></i> <span id="ci-save-label">Save Record</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMP RECORDS MODAL ===== -->
+<div class="modal-overlay" id="comp-records-modal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-list" style="color:var(--blue);"></i> <span id="comp-records-title">Records</span></div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('comp-records-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div id="comp-records-body" style="max-height:460px;overflow-y:auto;padding:14px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('comp-records-modal')">Close</button>
+      <button class="btn btn-gold" id="comp-records-add-btn" onclick="openCompInsertFromRecordsModal()"><i class="fas fa-plus"></i> Add Record</button>
+    </div>
+  </div>
+</div>
 
 <!-- ========== SETTINGS ========== -->
 <section id="sec-settings" class="section">
@@ -2441,6 +2555,9 @@ function renderProduction(){
 // ============================================================
 //  COMPARATIVE ANALYSIS
 // ============================================================
+// Tracks which year+season the Records modal is currently showing
+let _compRecordsCtx = {year:'', season:''};
+
 function renderComparative(){
   const yearFilter=document.getElementById('comp-year')?.value||'all';
   const zoneFilter=document.getElementById('comp-zone')?.value||'';
@@ -2448,7 +2565,6 @@ function renderComparative(){
 
   function getYear(d){ return d?new Date(d).getFullYear().toString():null; }
 
-  // Apply filters to each data set
   const plantFiltered=STATE.plantation.filter(r=>{
     const y=getYear(r.datePlanted);
     if(!y) return false;
@@ -2544,12 +2660,12 @@ function renderComparative(){
     ]}});
   });
 
-  // Detailed comparison table
+  // Detailed comparison table with Edit and Add buttons per row
   const tableEl=document.getElementById('comp-detail-table');
   if(!tableEl) return;
-  const thStyle='padding:9px 12px;background:rgba(255,255,255,.03);color:var(--text2);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-mono);text-align:left;';
+  const thStyle='padding:9px 12px;background:rgba(255,255,255,.03);color:var(--text2);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-mono);text-align:left;white-space:nowrap;';
   const tdStyle='padding:9px 12px;border-top:1px solid var(--border);font-size:12px;vertical-align:middle;';
-  let html=`<div class="table-wrap"><table style="min-width:600px;width:100%;border-collapse:collapse;">
+  let html=`<div class="table-wrap"><table style="min-width:700px;width:100%;border-collapse:collapse;">
     <thead><tr>
       <th style="${thStyle}">Year</th><th style="${thStyle}">Season</th>
       <th style="${thStyle}text-align:center;">Plots</th>
@@ -2557,6 +2673,7 @@ function renderComparative(){
       <th style="${thStyle}text-align:center;">Est. Prod (T)</th>
       <th style="${thStyle}text-align:center;">Avg Yield T/ha</th>
       <th style="${thStyle}text-align:center;">Pest Severity</th>
+      <th style="${thStyle}text-align:center;">Actions</th>
     </tr></thead><tbody>`;
   years.forEach(y=>{
     ['Season 1','Season 2'].forEach((s,si)=>{
@@ -2571,11 +2688,257 @@ function renderComparative(){
         <td style="${tdStyle}text-align:center;font-weight:700;color:var(--gold);">${Math.round(m.prod)||'—'}</td>
         <td style="${tdStyle}text-align:center;color:var(--green);">${m.yieldRecs>0?m.avgYield.toFixed(2):'—'}</td>
         <td style="${tdStyle}text-align:center;">${sevLabel}</td>
+        <td style="${tdStyle}text-align:center;">
+          <div style="display:flex;gap:4px;justify-content:center;">
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompRecords('${y}','${s}')" title="View / Edit records"><i class="fas fa-pencil-alt" style="color:var(--gold);"></i></button>
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompInsert('${y}','${s}')" title="Add record"><i class="fas fa-plus" style="color:var(--green);"></i></button>
+          </div>
+        </td>
       </tr>`;
     });
   });
   html+='</tbody></table></div>';
   tableEl.innerHTML=html;
+}
+
+// ── COMP INSERT MODAL ──────────────────────────────────────────
+function openCompInsert(year, season){
+  // year may be passed from the header buttons (string only) or from table rows (year+season)
+  const yr = year || '2026';
+  const sn = season || 'Season 1';
+
+  // Reset edit state
+  document.getElementById('ci-edit-id').value = '';
+  document.getElementById('comp-insert-title').textContent = 'Add Plantation Record';
+  document.getElementById('ci-save-label').textContent = 'Save Record';
+
+  // Populate year & season
+  const yearSel = document.getElementById('ci-year');
+  const snSel   = document.getElementById('ci-season');
+  if(yearSel) yearSel.value = yr;
+  if(snSel)   snSel.value   = sn;
+
+  // Populate grower dropdown
+  const growerSel = document.getElementById('ci-grower');
+  if(growerSel){
+    growerSel.innerHTML = '<option value="">— Select Grower —</option>' +
+      STATE.growers.map(g=>`<option value="${g.name}">${g.name}</option>`).join('');
+  }
+
+  // Populate variety dropdown
+  const varSel = document.getElementById('ci-variety');
+  if(varSel){
+    varSel.innerHTML = '<option value="">— Select —</option>' +
+      STATE.varieties.map(v=>`<option value="${v}">${v}</option>`).join('');
+  }
+
+  // Clear fields
+  ['ci-grower','ci-zone','ci-area','ci-comments'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const yieldEl=document.getElementById('ci-yield'); if(yieldEl) yieldEl.value='20';
+  document.getElementById('ci-locality').innerHTML='<option value="">Select Zone first</option>';
+  compInsertCalcProd();
+  updateCompInsertDate();
+
+  openModal('comp-insert-modal');
+}
+
+function openCompInsertFromRecordsModal(){
+  closeModal('comp-records-modal');
+  openCompInsert(_compRecordsCtx.year, _compRecordsCtx.season);
+}
+
+function updateCompInsertDate(){
+  const yr   = document.getElementById('ci-year')?.value   || '2026';
+  const sn   = document.getElementById('ci-season')?.value || 'Season 1';
+  const dateEl = document.getElementById('ci-date');
+  // Default mid-season date: Season 1 → March 15, Season 2 → August 15
+  if(dateEl) dateEl.value = sn==='Season 1' ? `${yr}-03-15` : `${yr}-08-15`;
+}
+
+function compInsertGrowerChanged(){
+  const name = document.getElementById('ci-grower')?.value || '';
+  const g    = STATE.growers.find(x=>x.name===name);
+  if(!g) return;
+  const zoneSel = document.getElementById('ci-zone');
+  if(zoneSel && g.zone){
+    zoneSel.value = g.zone;
+    updateLocalityDropdown('ci-zone','ci-locality');
+    // Auto-select grower locality after dropdown population (short delay for DOM update)
+    setTimeout(()=>{
+      const locSel=document.getElementById('ci-locality');
+      if(locSel && g.locality) locSel.value=g.locality;
+    },50);
+  }
+}
+
+function compInsertCalcProd(){
+  const area  = parseFloat(document.getElementById('ci-area')?.value)  || 0;
+  const yield_ = parseFloat(document.getElementById('ci-yield')?.value) || 0;
+  const prod  = area * yield_;
+  const prev  = document.getElementById('ci-prod-preview');
+  const val   = document.getElementById('ci-prod-val');
+  if(prev) prev.style.display = area>0 ? 'block' : 'none';
+  if(val)  val.textContent    = prod.toFixed(1) + ' T';
+}
+
+function saveCompInsert(){
+  const editId  = document.getElementById('ci-edit-id')?.value || '';
+  const year    = document.getElementById('ci-year')?.value    || '2026';
+  const season  = document.getElementById('ci-season')?.value  || 'Season 1';
+  const grower  = document.getElementById('ci-grower')?.value  || '';
+  const zone    = document.getElementById('ci-zone')?.value    || '';
+  const locality= document.getElementById('ci-locality')?.value|| '';
+  const variety = document.getElementById('ci-variety')?.value || '';
+  const date    = document.getElementById('ci-date')?.value    || (season==='Season 1'?`${year}-03-15`:`${year}-08-15`);
+  const area    = parseFloat(document.getElementById('ci-area')?.value)  || 0;
+  const estYield= parseFloat(document.getElementById('ci-yield')?.value) || 20;
+  const fortnight=document.getElementById('ci-fortnight')?.value || 'Fortnight 1';
+  const comments= document.getElementById('ci-comments')?.value || '';
+
+  if(!grower){ toast('Please select a grower','error'); return; }
+  if(area<=0){ toast('Area must be greater than 0','error'); return; }
+
+  if(editId){
+    // Update existing record
+    const idx = STATE.plantation.findIndex(r=>String(r.id)===editId);
+    if(idx>-1){
+      STATE.plantation[idx] = {...STATE.plantation[idx], grower, zone, locality, variety,
+        datePlanted:date, area, estYield, season, fortnight, comments,
+        recordedBy: CURRENT_USER?.username||''};
+      toast('Plantation record updated ✓');
+    } else {
+      toast('Record not found','error'); return;
+    }
+  } else {
+    // New record
+    const newRec = {
+      id: Date.now(),
+      grower, zone, locality, variety,
+      datePlanted: date, area, estYield,
+      season, fortnight, comments,
+      recordedBy: CURRENT_USER?.username||''
+    };
+    STATE.plantation.push(newRec);
+    toast(`Plantation record added for ${grower} (${season} ${year}) ✓`);
+    // Sync to GAS if connected
+    if(GAS_URL) callGAS('savePlantation',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Date_Planted:date,Production_Area_Ha:area,Season:season,Fortnightly_Period:fortnight,Estimated_Yield_T_Ha:estYield,Officer_Comments:comments,Recorded_By:CURRENT_USER?.username||''}).then(r=>{ if(r.success) toast('Synced to Sheets ✓'); });
+  }
+
+  saveLocal();
+  closeModal('comp-insert-modal');
+  renderComparative();
+  renderDashboard();
+}
+
+// ── COMP RECORDS MODAL ────────────────────────────────────────
+function openCompRecords(year, season){
+  _compRecordsCtx = {year, season};
+  document.getElementById('comp-records-title').textContent = `${season} ${year} — Plantation Records`;
+  document.getElementById('comp-records-add-btn').onclick = openCompInsertFromRecordsModal;
+  renderCompRecordsBody(year, season);
+  openModal('comp-records-modal');
+}
+
+function renderCompRecordsBody(year, season){
+  const body = document.getElementById('comp-records-body');
+  if(!body) return;
+  const recs = STATE.plantation.filter(r=>{
+    const y = r.datePlanted ? new Date(r.datePlanted).getFullYear().toString() : null;
+    return y===year && r.season===season;
+  });
+  if(!recs.length){
+    body.innerHTML=`<div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No records for ${season} ${year}</div><div class="empty-sub">Click "+ Add Record" below to add one.</div></div>`;
+    return;
+  }
+  body.innerHTML = recs.map(r=>`
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13px;margin-bottom:3px;">${r.grower}</div>
+          <div style="font-size:11px;color:var(--text2);display:flex;flex-wrap:wrap;gap:8px;">
+            ${r.zone?`<span><i class="fas fa-map-pin" style="color:var(--gold);"></i> Zone ${r.zone}</span>`:''}
+            ${r.locality?`<span>${r.locality}</span>`:''}
+            ${r.variety?`<span><i class="fas fa-leaf" style="color:var(--green);"></i> ${r.variety}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0;">
+          <button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="editCompRecord(${r.id})"><i class="fas fa-pencil-alt" style="color:var(--gold);"></i> Edit</button>
+          <button class="btn btn-red btn-sm" style="font-size:11px;" onclick="deleteCompRecord(${r.id})"><i class="fas fa-trash-alt"></i></button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;">
+        <div style="background:rgba(255,255,255,.03);border-radius:7px;padding:7px 10px;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-family:var(--font-mono);">Date Planted</div>
+          <div style="font-size:12px;font-weight:600;margin-top:2px;">${r.datePlanted||'—'}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border-radius:7px;padding:7px 10px;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-family:var(--font-mono);">Area</div>
+          <div style="font-size:12px;font-weight:700;color:var(--blue);margin-top:2px;">${(r.area||0).toFixed(2)} ha</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border-radius:7px;padding:7px 10px;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-family:var(--font-mono);">Est. Prod</div>
+          <div style="font-size:12px;font-weight:700;color:var(--gold);margin-top:2px;">${Math.round((r.area||0)*(r.estYield||20))} T</div>
+        </div>
+      </div>
+      ${r.comments?`<div style="font-size:11px;color:var(--text2);margin-top:8px;"><i class="fas fa-comment" style="color:var(--text3);margin-right:4px;"></i>${r.comments}</div>`:''}
+    </div>
+  `).join('');
+}
+
+function editCompRecord(id){
+  const rec = STATE.plantation.find(r=>r.id===id);
+  if(!rec){ toast('Record not found','error'); return; }
+
+  // Pre-fill insert modal for editing
+  document.getElementById('ci-edit-id').value = String(id);
+  document.getElementById('comp-insert-title').textContent = 'Edit Plantation Record';
+  document.getElementById('ci-save-label').textContent = 'Save Changes';
+
+  const yr = rec.datePlanted ? new Date(rec.datePlanted).getFullYear().toString() : '2026';
+  document.getElementById('ci-year').value   = yr;
+  document.getElementById('ci-season').value = rec.season || 'Season 1';
+
+  // Growers dropdown
+  const growerSel = document.getElementById('ci-grower');
+  growerSel.innerHTML = '<option value="">— Select Grower —</option>' +
+    STATE.growers.map(g=>`<option value="${g.name}">${g.name}</option>`).join('');
+  growerSel.value = rec.grower || '';
+
+  // Variety dropdown
+  const varSel = document.getElementById('ci-variety');
+  varSel.innerHTML = '<option value="">— Select —</option>' +
+    STATE.varieties.map(v=>`<option value="${v}">${v}</option>`).join('');
+  varSel.value = rec.variety || '';
+
+  // Zone + locality
+  const zoneSel = document.getElementById('ci-zone');
+  if(zoneSel){ zoneSel.value = rec.zone||''; updateLocalityDropdown('ci-zone','ci-locality'); }
+  setTimeout(()=>{
+    const locSel=document.getElementById('ci-locality');
+    if(locSel && rec.locality) locSel.value=rec.locality;
+  },60);
+
+  const dateEl=document.getElementById('ci-date'); if(dateEl) dateEl.value=rec.datePlanted||'';
+  const areaEl=document.getElementById('ci-area'); if(areaEl) areaEl.value=rec.area||'';
+  const yieldEl=document.getElementById('ci-yield'); if(yieldEl) yieldEl.value=rec.estYield||20;
+  const fortEl=document.getElementById('ci-fortnight'); if(fortEl) fortEl.value=rec.fortnight||'Fortnight 1';
+  const commEl=document.getElementById('ci-comments'); if(commEl) commEl.value=rec.comments||'';
+  compInsertCalcProd();
+
+  closeModal('comp-records-modal');
+  openModal('comp-insert-modal');
+}
+
+function deleteCompRecord(id){
+  if(!confirm('Delete this plantation record? This cannot be undone.')) return;
+  STATE.plantation = STATE.plantation.filter(r=>r.id!==id);
+  saveLocal();
+  toast('Record deleted','warning');
+  renderCompRecordsBody(_compRecordsCtx.year, _compRecordsCtx.season);
+  renderComparative();
+  renderDashboard();
 }
 
 // ============================================================
