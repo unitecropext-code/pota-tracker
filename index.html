@@ -533,6 +533,7 @@ tr:hover .row-actions{opacity:1;}
       <div class="nav-label">Analytics</div>
       <div class="nav-item" id="nav-trends" onclick="showSection('trends')"><i class="fas fa-chart-line"></i> Trends</div>
       <div class="nav-item" id="nav-production" onclick="showSection('production')"><i class="fas fa-industry"></i> Production Forecast</div>
+      <div class="nav-item" id="nav-comparative" onclick="showSection('comparative')"><i class="fas fa-balance-scale"></i> Comparative Analysis</div>
       <div class="nav-item" id="nav-campaign" onclick="showSection('campaign')"><i class="fas fa-table"></i> Campaign Table</div>
       <div class="nav-item" id="nav-weekly-report" onclick="showSection('weekly-report')"><i class="fas fa-file-alt"></i> Weekly Report</div>
     </div>
@@ -738,8 +739,10 @@ tr:hover .row-actions{opacity:1;}
         <div class="form-group"><label class="form-label">Control Measure</label><select id="pd-control" class="form-control"><option value="">None / Monitoring</option><option>Chemical — Fungicide</option><option>Chemical — Insecticide</option><option>Chemical — Bactericide</option><option>Chemical — Nematicide</option><option>Biological Control</option><option>Cultural Practice</option><option>Roguing</option><option>Irrigation Management</option><option>Other</option></select></div>
         <label class="form-label" style="margin-bottom:9px;"><i class="fas fa-virus" style="color:var(--red);margin-right:4px;"></i> Diseases</label>
         <div class="pest-grid" id="disease-inputs"></div>
+        <div style="margin-top:6px;margin-bottom:12px;"><button class="btn btn-ghost btn-sm" onclick="openOthersModal('disease')"><i class="fas fa-plus-circle" style="color:var(--purple);"></i> Others (Please Specify)</button><div id="custom-disease-display" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;"></div></div>
         <label class="form-label" style="margin:11px 0 9px;"><i class="fas fa-bug" style="color:var(--orange);margin-right:4px;"></i> Pests</label>
         <div class="pest-grid" id="pest-inputs"></div>
+        <div style="margin-top:6px;margin-bottom:10px;"><button class="btn btn-ghost btn-sm" onclick="openOthersModal('pest')"><i class="fas fa-plus-circle" style="color:var(--orange);"></i> Others (Please Specify)</button><div id="custom-pest-display" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;"></div></div>
         <div class="form-group" style="margin-top:10px;"><label class="form-label">Officer Comments</label><textarea id="pd-comments" class="form-control" rows="2" placeholder="Observations…"></textarea></div>
         <div style="display:flex;gap:8px;margin-top:4px;">
           <button class="btn btn-ghost btn-sm" onclick="addVisit()" style="flex:1;"><i class="fas fa-plus"></i> Add Visit 2/3</button>
@@ -805,6 +808,16 @@ tr:hover .row-actions{opacity:1;}
         </div>
       </div>
       <div class="form-group" style="margin:0;"><label class="form-label">Comments</label><textarea id="ya-comments" class="form-control" rows="5" placeholder="Officer's notes…"></textarea></div>
+      <div class="form-group" style="margin-top:12px;">
+        <label class="form-label"><i class="fas fa-camera" style="color:var(--teal);margin-right:4px;"></i> Field Photos</label>
+        <div class="photo-upload-area" id="ya-photo-area" onclick="document.getElementById('ya-photo-input').click()">
+          <i class="fas fa-cloud-upload-alt" style="font-size:22px;color:var(--text3);margin-bottom:6px;"></i>
+          <div style="font-size:12px;color:var(--text2);">Click to upload photos</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px;">JPG, PNG, HEIC · Max 5 photos</div>
+        </div>
+        <input type="file" id="ya-photo-input" accept="image/*" multiple style="display:none" onchange="handleYaPhotos(this)">
+        <div id="ya-photo-previews" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+      </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="clearYieldForm()"><i class="fas fa-redo"></i> Clear</button>
@@ -898,6 +911,70 @@ tr:hover .row-actions{opacity:1;}
     </div>
   </div>
   <div id="report-preview"></div>
+</section>
+
+<!-- ========== COMPARATIVE ANALYSIS ========== -->
+<section id="sec-comparative" class="section">
+  <div class="card">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--blue));"></div>
+    <div class="card-title"><i class="fas fa-balance-scale" style="color:var(--purple);"></i> Comparative Analysis
+      <div class="card-title-actions">
+        <select class="form-control btn-sm" id="comp-year" onchange="renderComparative()" style="font-size:11px;min-width:90px;">
+          <option value="all">All Years</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+          <option value="2026">2026</option>
+        </select>
+        <select class="form-control btn-sm" id="comp-zone" onchange="renderComparative()" style="font-size:11px;min-width:90px;">
+          <option value="">All Zones</option>
+          <option>E1</option><option>E2</option><option>E3</option><option>E4</option>
+        </select>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:14px;">Season 1 vs Season 2 across 2024, 2025 and 2026 — drawn from recorded plantation, yield assessment, and pest data.</p>
+    <!-- KPI comparison row -->
+    <div id="comp-kpi-row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;"></div>
+  </div>
+
+  <!-- Season 1 vs Season 2 bar charts -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--teal));"></div>
+      <div class="card-title"><i class="fas fa-seedling"></i> Area Planted — Season 1 vs Season 2</div>
+      <div class="chart-wrap chart-h260"><canvas id="comp-area-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--orange));"></div>
+      <div class="card-title"><i class="fas fa-weight"></i> Estimated Production (T) — S1 vs S2</div>
+      <div class="chart-wrap chart-h260"><canvas id="comp-prod-chart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--green),var(--teal));"></div>
+      <div class="card-title"><i class="fas fa-chart-bar"></i> Avg Yield (T/ha) — S1 vs S2 by Year</div>
+      <div class="chart-wrap chart-h260"><canvas id="comp-yield-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--red),var(--orange));"></div>
+      <div class="card-title"><i class="fas fa-bug"></i> Pest & Disease Severity — S1 vs S2</div>
+      <div class="chart-wrap chart-h260"><canvas id="comp-pest-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Year-over-year trend -->
+  <div class="card">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--gold));"></div>
+    <div class="card-title"><i class="fas fa-chart-area"></i> Year-over-Year Production Trend (2024 · 2025 · 2026)</div>
+    <div class="chart-wrap chart-h280"><canvas id="comp-yoy-chart"></canvas></div>
+  </div>
+
+  <!-- Detailed comparison table -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-table"></i> Detailed Season Comparison Table</div>
+    <div class="table-wrap" id="comp-detail-table"></div>
+  </div>
 </section>
 
 <!-- ========== SETTINGS ========== -->
@@ -1031,6 +1108,15 @@ tr:hover .row-actions{opacity:1;}
         <div class="form-group"><label class="form-label">Est. Yield (T/ha)</label><input type="number" id="pl-est-yield" step="0.1" class="form-control" placeholder="e.g. 20"></div>
       </div>
       <div class="form-group"><label class="form-label">Comments</label><textarea id="pl-comments" class="form-control" rows="2" placeholder="Notes…"></textarea></div>
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-camera" style="color:var(--teal);margin-right:4px;"></i> Field Photos</label>
+        <div class="photo-upload-area" onclick="document.getElementById('pl-photo-input').click()" style="padding:12px;">
+          <i class="fas fa-cloud-upload-alt" style="font-size:18px;color:var(--text3);margin-bottom:4px;"></i>
+          <div style="font-size:11px;color:var(--text2);">Click to upload photos · Max 5</div>
+        </div>
+        <input type="file" id="pl-photo-input" accept="image/*" multiple style="display:none" onchange="handlePlPhotos(this)">
+        <div id="pl-photo-previews" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('add-plantation-modal')">Cancel</button>
@@ -1058,8 +1144,11 @@ tr:hover .row-actions{opacity:1;}
 const HA_TO_ARPENT = 2.369;
 const HA_TO_ACRE   = 2.471;
 const DISEASES = ['Late Blight (Phytophthora)','Early Blight (Alternaria)','Soft Rot (Erwinia)','Bacterial Wilt','Common Scab','Blackleg','Rhizoctonia','Powdery Scab'];
-const PESTS    = ['Leaf Miner','Thrips','Whitefly','Aphids','Cutworm','Flea Beetle','Root-knot Nematode','Mite'];
-const PEST_ICONS = {'Late Blight (Phytophthora)':'🍂','Early Blight (Alternaria)':'🌿','Soft Rot (Erwinia)':'💧','Bacterial Wilt':'🦠','Common Scab':'⚫','Blackleg':'⬛','Rhizoctonia':'🔵','Powdery Scab':'⚪','Leaf Miner':'🔀','Thrips':'🦟','Whitefly':'🦋','Aphids':'🐛','Cutworm':'🪱','Flea Beetle':'🪲','Root-knot Nematode':'🔴','Mite':'🕷️'};
+const PESTS    = ['Leaf Miner','Thrips','Whitefly','Aphids','Cutworm','Root-knot Nematode'];
+const PEST_ICONS = {'Late Blight (Phytophthora)':'🍂','Early Blight (Alternaria)':'🌿','Soft Rot (Erwinia)':'💧','Bacterial Wilt':'🦠','Common Scab':'⚫','Blackleg':'⬛','Rhizoctonia':'🔵','Powdery Scab':'⚪','Leaf Miner':'🔀','Thrips':'🦟','Whitefly':'🦋','Aphids':'🐛','Cutworm':'🪱','Root-knot Nematode':'🔴','Others (Please Specify)':'❓'};
+// Custom pests/diseases added via "Others (Please Specify)" button
+let CUSTOM_PESTS = [];
+let CUSTOM_DISEASES = [];
 const ZONE_COLORS = {E1:'#f0a500',E2:'#3b82f6',E3:'#22c55e',E4:'#a855f7'};
 const ZONE_LOCALITIES = {
   E1:['Alma','Bagatelle Dam','Bar Le Duc','Beau Bois','Bell Village','Belle Rive','Bonne Veine','Camp Auguste','Circonstance','Cote D\'Or','Dagotiere','Gentilly','Guibies','Helvetia','Hermitage','L\'Agrement','L\'Assurance','L\'Avenir','L\'Escalier Br Rd','L\'Esperance','La Laura','Le Pouce','Malinga','Minissy','Moka','Nouvelle Decouverte','Petit Verger','Providence','Quartier Militaire','Reduit','Ripailles','Riviere Baptiste','Roselyn Cottage','Soreze','St Pierre','Valetta','Verdun'],
@@ -1876,7 +1965,7 @@ function buildPestCard(name){
       </div>
       <div><div class="pest-input-label">Affected %</div>
         <select class="pest-select" id="pct-${id}">
-          <option value="0">0%</option><option value="10">10%</option><option value="25">25%</option>
+          <option value="0">0%</option><option value="5">5%</option><option value="10">10%</option><option value="25">25%</option>
           <option value="40">40%</option><option value="50">50%</option><option value="60">60%</option>
           <option value="75">75%</option><option value="90">90%</option><option value="100">100%</option>
         </select>
@@ -1961,7 +2050,7 @@ function buildPestCard2(name, prefix){
     <div class="pest-card-name">${PEST_ICONS[name]||''} ${name}</div>
     <div class="pest-row">
       <div><div class="pest-input-label">Severity</div><select class="pest-select" id="sev-${id}"><option value="">—</option><option>Low</option><option>Moderate</option><option>High</option></select></div>
-      <div><div class="pest-input-label">Affected %</div><select class="pest-select" id="pct-${id}"><option value="0">0%</option><option value="10">10%</option><option value="25">25%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="75">75%</option><option value="90">90%</option><option value="100">100%</option></select></div>
+      <div><div class="pest-input-label">Affected %</div><select class="pest-select" id="pct-${id}"><option value="0">0%</option><option value="5">5%</option><option value="10">10%</option><option value="25">25%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="75">75%</option><option value="90">90%</option><option value="100">100%</option></select></div>
     </div>
   </div>`;
 }
