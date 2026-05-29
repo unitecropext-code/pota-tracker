@@ -3636,7 +3636,7 @@ function openChangePasswordModal(targetUsername) {
   const isAdmin = CURRENT_USER?.role === 'Administrator';
 
   // Non-admins can only change their own password
-  if (!isSelf && !isAdmin) { toast('Only administrators can reset other users' passwords', 'error'); return; }
+  if (!isSelf && !isAdmin) { toast("Only administrators can reset other users' passwords", 'error'); return; }
 
   const target = targetUsername || CURRENT_USER?.username;
   document.getElementById('cp-target-username').value = target;
