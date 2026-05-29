@@ -1222,30 +1222,83 @@ tr:hover .row-actions{opacity:1;}
   </div>
 </div>
 
+<style>
+/* ===== MULTI-PLOT ROWS ===== */
+.plot-rows-wrap{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.plot-row{
+  background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:11px;
+  padding:12px 12px 10px;position:relative;transition:border-color .2s;
+}
+.plot-row:hover{border-color:var(--border2);}
+.plot-row-header{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.plot-row-num{
+  width:22px;height:22px;border-radius:50%;background:var(--gold-dim);border:1px solid rgba(240,165,0,.25);
+  color:var(--gold);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);flex-shrink:0;
+}
+.plot-row-label{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.4px;text-transform:uppercase;font-family:var(--font-mono);flex:1;}
+.plot-row-del{
+  width:24px;height:24px;border-radius:6px;border:none;background:transparent;
+  color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:11px;transition:all .15s;
+}
+.plot-row-del:hover{background:var(--red-dim);color:var(--red);}
+.plot-row-grid{display:grid;gap:8px;grid-template-columns:1fr 1fr;}
+@media(min-width:520px){.plot-row-grid{grid-template-columns:1fr 1fr 1fr 1fr;}}
+.add-plot-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;padding:9px;border-radius:9px;border:1.5px dashed var(--border2);
+  background:transparent;color:var(--text2);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .2s;font-family:var(--font-body);
+  margin-top:2px;
+}
+.add-plot-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);}
+.pl-summary-bar{
+  display:flex;flex-wrap:wrap;gap:10px;padding:8px 12px;background:rgba(240,165,0,.05);
+  border:1px solid rgba(240,165,0,.15);border-radius:9px;margin-top:10px;align-items:center;
+}
+.pl-sum-item{font-size:11px;color:var(--text2);font-family:var(--font-mono);}
+.pl-sum-item strong{color:var(--gold);font-weight:700;}
+</style>
+
 <div class="modal-overlay" id="add-plantation-modal">
-  <div class="modal">
+  <div class="modal" style="max-width:640px;">
     <div class="modal-header">
       <div class="modal-title"><i class="fas fa-seedling" style="color:var(--gold);"></i> Add Plantation Record</div>
       <button class="btn btn-ghost btn-icon" onclick="closeModal('add-plantation-modal')"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
+      <!-- Shared header fields -->
       <div class="form-row-2">
-        <div class="form-group"><label class="form-label">Grower *</label><select id="pl-grower" class="form-control" onchange="autofillPlantLocality()"></select></div>
-        <div class="form-group"><label class="form-label">Zone *</label><select id="pl-zone" class="form-control" onchange="updateLocalityDropdown('pl-zone','pl-locality')"><option value="">Select Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select></div>
+        <div class="form-group"><label class="form-label">Grower *</label><select id="pl-grower" class="form-control" onchange="autofillPlantZone()"></select></div>
+        <div class="form-group"><label class="form-label">Zone *</label><select id="pl-zone" class="form-control"><option value="">Select Zone</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select></div>
       </div>
-      <div class="form-row-2">
-        <div class="form-group"><label class="form-label">Locality *</label><select id="pl-locality" class="form-control"><option value="">Select Zone first</option></select></div>
-        <div class="form-group"><label class="form-label">Variety</label><select id="pl-variety" class="form-control"></select></div>
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin:12px 0 10px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);font-family:var(--font-mono);white-space:nowrap;">Plot Details</div>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">Date · Season · Locality · Variety · Area · Yield</div>
       </div>
-      <div class="form-row-2">
-        <div class="form-group"><label class="form-label">Date Planted *</label><input type="date" id="pl-date-planted" class="form-control"></div>
-        <div class="form-group"><label class="form-label">Season</label><select id="pl-season" class="form-control"><option>Season 1</option><option>Season 2</option></select></div>
+
+      <!-- Dynamic plot rows -->
+      <div id="pl-plot-rows" class="plot-rows-wrap"></div>
+      <button class="add-plot-btn" onclick="addPlotRow()"><i class="fas fa-plus-circle"></i> Add Another Plot</button>
+
+      <!-- Live summary -->
+      <div class="pl-summary-bar" id="pl-summary" style="display:none;">
+        <div class="pl-sum-item"><strong id="pl-sum-plots">0</strong> plot(s)</div>
+        <div class="pl-sum-item" style="color:var(--border2);">|</div>
+        <div class="pl-sum-item">Total area: <strong id="pl-sum-area">0.00</strong> ha</div>
+        <div class="pl-sum-item" style="color:var(--border2);">|</div>
+        <div class="pl-sum-item">Avg est. yield: <strong id="pl-sum-yield">—</strong> T/ha</div>
+        <div class="pl-sum-item" style="color:var(--border2);">|</div>
+        <div class="pl-sum-item">Seasons: <strong id="pl-sum-season">—</strong></div>
       </div>
-      <div class="form-row-2">
-        <div class="form-group"><label class="form-label">Area (ha)</label><input type="number" id="pl-area" step="0.01" class="form-control" placeholder="0.00"></div>
-        <div class="form-group"><label class="form-label">Est. Yield (T/ha)</label><input type="number" id="pl-est-yield" step="0.1" class="form-control" placeholder="e.g. 20"></div>
+
+      <div class="form-group" style="margin-top:12px;">
+        <label class="form-label">Comments</label>
+        <textarea id="pl-comments" class="form-control" rows="2" placeholder="Notes…"></textarea>
       </div>
-      <div class="form-group"><label class="form-label">Comments</label><textarea id="pl-comments" class="form-control" rows="2" placeholder="Notes…"></textarea></div>
       <div class="form-group">
         <label class="form-label"><i class="fas fa-camera" style="color:var(--teal);margin-right:4px;"></i> Field Photos</label>
         <div class="photo-upload-area" onclick="document.getElementById('pl-photo-input').click()" style="padding:12px;">
@@ -1824,7 +1877,17 @@ function toast(msg, type='success'){
   stack.appendChild(el);
   setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); },3500);
 }
-function openModal(id){ document.getElementById(id).classList.add('open'); populateSelects(); }
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  populateSelects();
+  if(id==='add-plantation-modal'){
+    // Only reset if not in edit mode (edit mode sets editId before calling openModal)
+    const growerEl=document.getElementById('pl-grower');
+    if(!growerEl?.dataset?.editId){
+      setTimeout(_resetPlotRows,30);
+    }
+  }
+}
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 let fabOpen = false;
 function toggleFab(){
@@ -1843,7 +1906,14 @@ function populateSelects(){
   const gOpts = STATE.growers.map(g=>`<option value="${g.name}">${g.name}</option>`).join('');
   const vOpts = STATE.varieties.map(v=>`<option value="${v}">${v}</option>`).join('');
   ['pl-grower','pd-grower','ya-grower'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select grower…</option>'+gOpts; });
-  ['pl-variety','ya-variety'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select variety…</option>'+vOpts; });
+  // ya-variety is still a single select; pl-variety now lives inside plot rows
+  ['ya-variety'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select variety…</option>'+vOpts; });
+  // Refresh variety dropdowns in any open plot rows
+  document.querySelectorAll('#pl-plot-rows .plot-variety').forEach(sel=>{
+    const cur=sel.value;
+    sel.innerHTML='<option value="">Select variety…</option>'+vOpts;
+    if(cur) sel.value=cur;
+  });
   const allLoc=[...new Set(Object.values(ZONE_LOCALITIES).flat())].sort();
   const lOpts='<option value="">All Localities</option>'+allLoc.map(l=>`<option value="${l}">${l}</option>`).join('');
   ['filter-locality','filter-plant-locality'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=lOpts; });
@@ -1861,6 +1931,128 @@ function autofillPlantLocality(){
   const g=STATE.growers.find(x=>x.name===document.getElementById('pl-grower').value);
   if(g&&g.zone){ document.getElementById('pl-zone').value=g.zone; updateLocalityDropdown('pl-zone','pl-locality'); setTimeout(()=>{ document.getElementById('pl-locality').value=g.locality||''; },50); }
 }
+function autofillPlantZone(){
+  const g=STATE.growers.find(x=>x.name===document.getElementById('pl-grower').value);
+  if(g&&g.zone){ document.getElementById('pl-zone').value=g.zone; }
+  // Re-render plot rows so locality dropdowns refresh for new zone
+  _rebuildPlotRowLocalities();
+}
+
+// ── Multi-plot row helpers ───────────────────────────────────────
+let _plotRowCount=0;
+function _getZone(){ return document.getElementById('pl-zone').value||''; }
+function _localityOptions(zone){
+  const locs=ZONE_LOCALITIES[zone]||[];
+  if(!locs.length) return '<option value="">Select Zone first</option>';
+  return '<option value="">Select locality…</option>'+locs.map(l=>`<option value="${l}">${l}</option>`).join('');
+}
+function _varietyOptions(){
+  return '<option value="">Select variety…</option>'+(STATE.varieties||[]).map(v=>`<option value="${v}">${v}</option>`).join('');
+}
+function addPlotRow(locality='',variety='',area='',yield_='',datePlanted='',season='Season 1'){
+  _plotRowCount++;
+  const idx=_plotRowCount;
+  const zone=_getZone();
+  const rowHtml=`<div class="plot-row" id="plot-row-${idx}">
+    <div class="plot-row-header">
+      <div class="plot-row-num">${idx}</div>
+      <div class="plot-row-label">Plot ${idx}</div>
+      <button class="plot-row-del" onclick="removePlotRow(${idx})" title="Remove this plot"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="plot-row-grid" style="grid-template-columns:1fr 1fr;gap:8px;display:grid;margin-bottom:8px;">
+      <div>
+        <div class="form-label" style="font-size:9px;margin-bottom:4px;">Date Planted *</div>
+        <input type="date" class="form-control plot-date" id="pr-date-${idx}" value="${datePlanted}"
+          style="font-size:12px;padding:7px 9px;" oninput="updatePlotSummary()">
+      </div>
+      <div>
+        <div class="form-label" style="font-size:9px;margin-bottom:4px;">Season</div>
+        <select class="form-control plot-season" id="pr-season-${idx}" style="font-size:12px;padding:7px 9px;">
+          <option${season==='Season 1'?' selected':''}>Season 1</option>
+          <option${season==='Season 2'?' selected':''}>Season 2</option>
+        </select>
+      </div>
+    </div>
+    <div class="plot-row-grid" style="grid-template-columns:1fr 1fr;gap:8px;display:grid;">
+      <div>
+        <div class="form-label" style="font-size:9px;margin-bottom:4px;">Locality *</div>
+        <select class="form-control plot-locality" id="pr-loc-${idx}" style="font-size:12px;padding:7px 9px;">
+          ${_localityOptions(zone)}
+        </select>
+      </div>
+      <div>
+        <div class="form-label" style="font-size:9px;margin-bottom:4px;">Variety</div>
+        <select class="form-control plot-variety" id="pr-var-${idx}" style="font-size:12px;padding:7px 9px;">
+          ${_varietyOptions()}
+        </select>
+      </div>
+      <div>
+        <div class="form-label" style="font-size:9px;margin-bottom:4px;">Area (ha)</div>
+        <input type="number" class="form-control plot-area" id="pr-area-${idx}" step="0.01" placeholder="0.00"
+          value="${area}" oninput="updatePlotSummary()" style="font-size:12px;padding:7px 9px;">
+      </div>
+      <div>
+        <div class="form-label" style="font-size:9px;margin-bottom:4px;">Est. Yield (T/ha)</div>
+        <input type="number" class="form-control plot-yield" id="pr-yield-${idx}" step="0.1" placeholder="e.g. 20"
+          value="${yield_}" oninput="updatePlotSummary()" style="font-size:12px;padding:7px 9px;">
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('pl-plot-rows').insertAdjacentHTML('beforeend',rowHtml);
+  if(locality){ const sel=document.getElementById(`pr-loc-${idx}`); if(sel) sel.value=locality; }
+  if(variety){  const sel=document.getElementById(`pr-var-${idx}`); if(sel) sel.value=variety; }
+  updatePlotSummary();
+}
+function removePlotRow(idx){
+  const el=document.getElementById(`plot-row-${idx}`);
+  if(el){ el.remove(); updatePlotSummary(); }
+}
+function _rebuildPlotRowLocalities(){
+  const zone=_getZone();
+  document.querySelectorAll('#pl-plot-rows .plot-locality').forEach(sel=>{
+    const cur=sel.value;
+    sel.innerHTML=_localityOptions(zone);
+    if(cur) sel.value=cur;
+  });
+}
+function updatePlotSummary(){
+  const rows=document.querySelectorAll('#pl-plot-rows .plot-row');
+  let totalArea=0,yieldSum=0,yieldCount=0,s1=0,s2=0;
+  rows.forEach(r=>{
+    const a=parseFloat(r.querySelector('.plot-area')?.value)||0;
+    const y=parseFloat(r.querySelector('.plot-yield')?.value)||0;
+    const s=r.querySelector('.plot-season')?.value||'';
+    totalArea+=a;
+    if(y>0){yieldSum+=y;yieldCount++;}
+    if(s==='Season 1') s1++; else if(s==='Season 2') s2++;
+  });
+  const sumBar=document.getElementById('pl-summary');
+  if(rows.length>0){
+    sumBar.style.display='flex';
+    document.getElementById('pl-sum-plots').textContent=rows.length;
+    document.getElementById('pl-sum-area').textContent=totalArea.toFixed(2);
+    document.getElementById('pl-sum-yield').textContent=yieldCount?(yieldSum/yieldCount).toFixed(1):'—';
+    const seasEl=document.getElementById('pl-sum-season');
+    if(seasEl){
+      const parts=[];
+      if(s1) parts.push(`S1×${s1}`);
+      if(s2) parts.push(`S2×${s2}`);
+      seasEl.textContent=parts.join(' ');
+    }
+  } else {
+    sumBar.style.display='none';
+  }
+}
+function _resetPlotRows(){
+  _plotRowCount=0;
+  document.getElementById('pl-plot-rows').innerHTML='';
+  document.getElementById('pl-summary').style.display='none';
+  addPlotRow();// always start with one empty row
+}
+// Zone change re-populates locality options in all existing rows
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='pl-zone') _rebuildPlotRowLocalities();
+});
 function autofillYaLocality(){
   const g=STATE.growers.find(x=>x.name===document.getElementById('ya-grower').value);
   if(g&&g.zone){ document.getElementById('ya-zone').value=g.zone; updateLocalityDropdown('ya-zone','ya-locality'); setTimeout(()=>{ document.getElementById('ya-locality').value=g.locality||''; },50); }
@@ -1976,15 +2168,20 @@ async function savePlantation(){
   const editId=growerEl?.dataset?.editId||'';
   const grower=growerEl.value;
   const zone=document.getElementById('pl-zone').value;
-  const locality=document.getElementById('pl-locality').value;
-  const variety=document.getElementById('pl-variety').value;
-  const planted=document.getElementById('pl-date-planted').value;
-  const area=parseFloat(document.getElementById('pl-area').value)||0;
-  const estYield=parseFloat(document.getElementById('pl-est-yield').value)||0;
-  const season=document.getElementById('pl-season').value;
   const comments=document.getElementById('pl-comments')?.value.trim()||'';
-  if(!grower||!zone||!locality||!planted){ toast('Grower, Zone, Locality and Date required','error'); return; }
+  if(!grower||!zone){ toast('Grower and Zone are required','error'); return; }
+
+  // ── Edit mode (single-record edit) ──
   if(editId){
+    const plotRows=document.querySelectorAll('#pl-plot-rows .plot-row');
+    const firstRow=plotRows[0];
+    const locality=firstRow?firstRow.querySelector('.plot-locality')?.value||'':'';
+    const variety=firstRow?firstRow.querySelector('.plot-variety')?.value||'':'';
+    const area=firstRow?parseFloat(firstRow.querySelector('.plot-area')?.value)||0:0;
+    const estYield=firstRow?parseFloat(firstRow.querySelector('.plot-yield')?.value)||0:0;
+    const planted=firstRow?firstRow.querySelector('.plot-date')?.value||'':'';
+    const season=firstRow?firstRow.querySelector('.plot-season')?.value||'Season 1':'Season 1';
+    if(!planted){ toast('Date Planted is required','error'); return; }
     const idx=STATE.plantation.findIndex(r=>String(r.id)===editId);
     if(idx>-1) STATE.plantation[idx]={...STATE.plantation[idx],grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments};
     toast('Record updated ✓');
@@ -1992,17 +2189,56 @@ async function savePlantation(){
     const sb=document.querySelector('#add-plantation-modal .btn-gold');
     if(sb) sb.innerHTML='<i class="fas fa-save"></i> Save';
     const ti=document.querySelector('#add-plantation-modal .modal-title');
-    if(ti) ti.textContent='Add Plantation Record';
-  } else {
-    STATE.plantation.push({id:Date.now(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments});
-    toast('Plantation record saved ✓');
+    if(ti) ti.innerHTML='<i class="fas fa-seedling" style="color:var(--gold);"></i> Add Plantation Record';
+    saveLocal(); closeModal('add-plantation-modal'); renderPlantationTable(); renderDashboard(); updateAlertBadge();
+    _resetPlotRows();
+    document.getElementById('pl-grower').value=''; document.getElementById('pl-zone').value='';
+    return;
   }
+
+  // ── New multi-plot save ──
+  const plotRows=document.querySelectorAll('#pl-plot-rows .plot-row');
+  if(!plotRows.length){ toast('Add at least one plot row','error'); return; }
+
+  // Validate each row
+  let valid=true;
+  plotRows.forEach((row,i)=>{
+    const loc=row.querySelector('.plot-locality')?.value||'';
+    const dt=row.querySelector('.plot-date')?.value||'';
+    if(!loc){ toast(`Plot ${i+1}: locality is required`,'error'); valid=false; }
+    if(!dt){  toast(`Plot ${i+1}: date planted is required`,'error'); valid=false; }
+  });
+  if(!valid) return;
+
+  const saved=[];
+  plotRows.forEach(row=>{
+    const locality=row.querySelector('.plot-locality')?.value||'';
+    const variety=row.querySelector('.plot-variety')?.value||'';
+    const area=parseFloat(row.querySelector('.plot-area')?.value)||0;
+    const estYield=parseFloat(row.querySelector('.plot-yield')?.value)||0;
+    const planted=row.querySelector('.plot-date')?.value||'';
+    const season=row.querySelector('.plot-season')?.value||'Season 1';
+    const rec={id:Date.now()+Math.random(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments};
+    STATE.plantation.push(rec);
+    saved.push(rec);
+  });
+
+  toast(`${saved.length} plantation plot${saved.length>1?'s':''} saved ✓`,'success');
   saveLocal(); closeModal('add-plantation-modal'); renderPlantationTable(); renderDashboard(); updateAlertBadge();
-  ['pl-comments'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('pl-grower').value=''; document.getElementById('pl-zone').value='';
-  document.getElementById('pl-locality').innerHTML='<option value="">Select Zone first</option>';
-  document.getElementById('pl-variety').value=''; document.getElementById('pl-area').value=''; document.getElementById('pl-est-yield').value='';
-  if(GAS_URL){ const r=await callGAS('savePlantation',{Grower_Name:grower,Zone:zone,Locality:locality,Variety:variety,Date_Planted:planted,Production_Area_Ha:area,Season:season,Fortnightly_Period:getFortnight(planted),Estimated_Yield_T_Ha:estYield,Officer_Comments:comments,Recorded_By:CURRENT_USER?.username||''}); if(r.success) toast('Synced to Sheets ✓'); }
+  if(document.getElementById('pl-comments')) document.getElementById('pl-comments').value='';
+  _resetPlotRows();
+
+  // Sync each plot to GAS
+  if(GAS_URL){
+    let synced=0;
+    for(const rec of saved){
+      const r=await callGAS('savePlantation',{Grower_Name:rec.grower,Zone:rec.zone,Locality:rec.locality,Variety:rec.variety,Date_Planted:rec.datePlanted,Production_Area_Ha:rec.area,Season:rec.season,Fortnightly_Period:getFortnight(rec.datePlanted),Estimated_Yield_T_Ha:rec.estYield,Officer_Comments:rec.comments,Recorded_By:CURRENT_USER?.username||''});
+      if(r.success) synced++;
+    }
+    if(synced===saved.length) toast(`${synced} plot${synced>1?'s':''} synced to Sheets ✓`);
+    else toast(`${synced}/${saved.length} plots synced`,'warning');
+  }
 }
 function filteredPlantation(){
   let rows=STATE.plantation;
@@ -2062,19 +2298,16 @@ function editPlantation(id){
   setTimeout(()=>{
     document.getElementById('pl-grower').value=r.grower||'';
     document.getElementById('pl-zone').value=r.zone||'';
-    updateLocalityDropdown('pl-zone','pl-locality');
-    setTimeout(()=>{ document.getElementById('pl-locality').value=r.locality||''; },60);
-    document.getElementById('pl-variety').value=r.variety||'';
-    document.getElementById('pl-date-planted').value=r.datePlanted||'';
-    document.getElementById('pl-area').value=r.area||'';
-    document.getElementById('pl-est-yield').value=r.estYield||'';
-    document.getElementById('pl-season').value=r.season||'Season 1';
     if(document.getElementById('pl-comments')) document.getElementById('pl-comments').value=r.comments||'';
+    // Reset rows and populate with this record's data
+    _plotRowCount=0;
+    document.getElementById('pl-plot-rows').innerHTML='';
+    addPlotRow(r.locality||'',r.variety||'',r.area||'',r.estYield||'',r.datePlanted||'',r.season||'Season 1');
     document.getElementById('pl-grower').dataset.editId=id;
     const sb=document.querySelector('#add-plantation-modal .btn-gold');
     if(sb) sb.innerHTML='<i class="fas fa-save"></i> Update Record';
     const ti=document.querySelector('#add-plantation-modal .modal-title');
-    if(ti) ti.textContent='Edit Plantation Record';
+    if(ti) ti.innerHTML='<i class="fas fa-edit" style="color:var(--gold);"></i> Edit Plantation Record';
   },80);
 }
 function deletePlantation(id){
