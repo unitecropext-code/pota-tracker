@@ -1777,7 +1777,7 @@ function loadLocal(){
     if(!STATE.campaignData) STATE.campaignData = {};
     if(!STATE.weeklyReports) STATE.weeklyReports = [];
     if(!STATE.harvestDays) STATE.harvestDays = 90;
-    if(STATE.defaultYield == null) STATE.defaultYield = 20;
+    if(STATE.defaultYield == null) STATE.defaultYield = 12;
     GAS_URL = localStorage.getItem('pota_gas_url_v3') || '';
   } catch(e){ STATE = {...DEFAULT_STATE}; }
 }
