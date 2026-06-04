@@ -1894,35 +1894,21 @@ async function callGAS(action, data = {}){
   if(!GAS_URL) return {success:false, error:'No GAS URL configured'};
 
   const controller = new AbortController();
-  const timeoutId  = setTimeout(() => controller.abort(), 8000); // 8 s max
-
-  const params = new URLSearchParams({
-    action,
-    ...Object.fromEntries(
-      Object.entries(data).map(([k,v]) => [k, v == null ? '' : String(v)])
-    )
-  });
+  const timeoutId  = setTimeout(() => controller.abort(), 15000);
 
   try{
-    const resp = await fetch(GAS_URL, {
+    const resp = await fetch('/api/gas-proxy', {
       method: 'POST',
-      body: params,
-      redirect: 'follow',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({gasUrl: GAS_URL, action, ...data}),
       signal: controller.signal
     });
     clearTimeout(timeoutId);
-    const text = await resp.text();
-    try{
-      return JSON.parse(text);
-    } catch(e){
-      if(text.includes('Signin') || text.includes('sign in'))
-        return {success:false, error:'GAS authentication required. Check deployment settings.'};
-      return {success:false, error:'Invalid GAS response: ' + text.slice(0,120)};
-    }
+    return await resp.json();
   } catch(e){
     clearTimeout(timeoutId);
     if(e.name === 'AbortError')
-      return {success:false, error:'Request timed out (>8 s). Check GAS URL and network.'};
+      return {success:false, error:'Request timed out (>15 s). Check GAS URL.'};
     return {success:false, error: e.message};
   }
 }
@@ -3860,11 +3846,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       document.getElementById('login-screen').style.display='none';
       initApp();
     } else {
-      // FIX v4: Show offline indicator only — NEVER display credentials on screen
-      if(!GAS_URL){
-        document.getElementById('login-offline-indicator').style.display='inline-flex';
-        document.getElementById('login-offline-indicator').textContent='Offline mode — contact admin for credentials';
-      }
+
     }
   }catch(e){ localStorage.removeItem('pota_current_user'); }
 });
