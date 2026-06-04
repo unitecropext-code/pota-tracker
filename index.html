@@ -1152,7 +1152,7 @@ tr:hover .row-actions{opacity:1;}
       <div class="form-group"><label class="form-label">Password</label><input class="form-control" id="nu-password" type="password" placeholder="Min 6 chars"></div>
     </div>
     <div class="form-row-2">
-      <div class="form-group"><label class="form-label">Role</label><select class="form-control" id="nu-role"><option>Field Officer</option><option>Administrator</option></select></div>
+      <div class="form-group"><label class="form-label">Role</label><select class="form-control" id="nu-role"><option>Field Officer</option><option>Administrator</option><option>Viewer</option></select></div>
       <div class="form-group"><label class="form-label">Zone Access</label><select class="form-control" id="nu-zone"><option>All</option><option>E1</option><option>E2</option><option>E3</option><option>E4</option></select></div>
     </div>
     <button class="btn btn-gold" onclick="createUserLocal()"><i class="fas fa-user-plus"></i> Create User</button>
@@ -1872,6 +1872,34 @@ async function initApp(){
   document.getElementById('user-role-display').textContent = CURRENT_USER.role || 'Field Officer';
   document.getElementById('user-avatar').textContent = (CURRENT_USER.fullName || CURRENT_USER.username).charAt(0).toUpperCase();
   if(GAS_URL) updateSyncStatus('saved');
+
+  // ── VIEWER ROLE: hide all write/admin UI ─────────────────────────────────
+  const isViewer = CURRENT_USER.role === 'Viewer';
+  if(isViewer){
+    // Hide entire Settings nav link
+    const navSettings = document.getElementById('nav-settings');
+    if(navSettings) navSettings.style.display = 'none';
+    // Hide sync pill (no writes for viewer)
+    const syncPill = document.getElementById('sync-pill');
+    if(syncPill) syncPill.style.display = 'none';
+    // Hide topbar action buttons (Add / Report)
+    document.querySelectorAll('#topbar .btn-gold, #topbar .btn-ghost').forEach(b => b.style.display='none');
+    // Hide FAB
+    const fab = document.getElementById('fab');
+    if(fab) fab.style.display = 'none';
+    // Hide non-viewer nav sections (Records + Field Data + Analytics retain read access; only Settings hidden)
+    // Add a viewer banner
+    const main = document.getElementById('main');
+    if(main){
+      const banner = document.createElement('div');
+      banner.id = 'viewer-banner';
+      banner.innerHTML = '<i class="fas fa-eye"></i> <strong>Viewer mode</strong> — read-only access to dashboard & analytics. Contact an Administrator to request edit access.';
+      banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:400;background:rgba(59,130,246,.12);border-top:1px solid rgba(59,130,246,.25);color:#7ab8ff;font-size:11px;padding:7px 18px;text-align:center;backdrop-filter:blur(8px);';
+      document.body.appendChild(banner);
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   renderDashboard();
   updateAlertBadge();
   buildPestInputs();
@@ -1888,7 +1916,13 @@ async function initApp(){
 }
 
 // ============================================================
-//  GAS API  —  FIX: AbortController 8-second timeout
+//  GAS API  —  FIXED: Direct fetch to GAS URL (no proxy)
+//  Root cause of "Unexpected token '<'" was posting to /api/gas-proxy
+//  which doesn't exist in a standalone HTML file → 404 HTML → JSON.parse crash.
+//  Fix: send all calls as GET with URL-encoded params — avoids CORS preflight,
+//  works with GAS "Execute as: Me / Anyone" deployment. Read-only actions
+//  (ping, getData) use doGet; write actions fall through to doGet?action=X&data=…
+//  which doGet passes to doPost-equivalent handlers.
 // ============================================================
 async function callGAS(action, data = {}){
   if(!GAS_URL) return {success:false, error:'No GAS URL configured'};
@@ -1897,14 +1931,25 @@ async function callGAS(action, data = {}){
   const timeoutId  = setTimeout(() => controller.abort(), 15000);
 
   try{
-    const resp = await fetch('/api/gas-proxy', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({gasUrl: GAS_URL, action, ...data}),
+    // Encode payload as a single 'data' param to avoid CORS preflight
+    const params = new URLSearchParams();
+    params.set('action', action);
+    params.set('data', JSON.stringify(data));
+    const url = GAS_URL + (GAS_URL.includes('?') ? '&' : '?') + params.toString();
+
+    const resp = await fetch(url, {
+      method: 'GET',
       signal: controller.signal
     });
     clearTimeout(timeoutId);
-    return await resp.json();
+    const text = await resp.text();
+    try{
+      return JSON.parse(text);
+    } catch(_){
+      // GAS sometimes wraps in a redirect — surface a clear error
+      console.error('GAS non-JSON response:', text.slice(0,200));
+      return {success:false, error:'GAS returned non-JSON. Check deployment: Execute as Me, Anyone can access.'};
+    }
   } catch(e){
     clearTimeout(timeoutId);
     if(e.name === 'AbortError')
@@ -2051,6 +2096,10 @@ const PAGE_META = {
   settings:{title:'Settings',sub:'Configuration & data management'},
 };
 function showSection(id){
+  // Viewer role cannot access Settings
+  if(id==='settings' && CURRENT_USER?.role==='Viewer'){
+    toast('Settings are not available in Viewer mode','warning'); return;
+  }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.mob-nav-item').forEach(n=>n.classList.remove('active'));
