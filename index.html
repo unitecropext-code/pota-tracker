@@ -1905,6 +1905,32 @@ async function initApp(){
     banner.innerHTML='<i class="fas fa-eye" style="margin-right:6px;"></i><strong>Viewer mode</strong> — Dashboard, Map, Trends, Production &amp; Comparative only.';
     banner.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:9000;background:rgba(59,130,246,.13);border-top:1px solid rgba(59,130,246,.3);color:#7ab8ff;font-size:11px;padding:6px 18px;text-align:center;backdrop-filter:blur(10px);pointer-events:none;';
     document.body.appendChild(banner);
+
+    // ── COPY / SAVE PROTECTION for Viewer ────────────────────────────────
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); return false; });
+
+    // Disable text selection via CSS
+    var noSelectStyle = document.createElement('style');
+    noSelectStyle.textContent = 'body{-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important;}';
+    document.head.appendChild(noSelectStyle);
+
+    // Disable keyboard shortcuts: Ctrl+S, Ctrl+A, Ctrl+U, Ctrl+C, Ctrl+P, F12, F5
+    document.addEventListener('keydown', function(e){
+      var blocked = false;
+      if(e.ctrlKey || e.metaKey){
+        var k = e.key ? e.key.toLowerCase() : '';
+        if(['s','a','u','c','p'].indexOf(k) > -1) blocked = true;
+      }
+      if(e.key === 'F12' || e.key === 'F5') blocked = true;
+      if(blocked){ e.preventDefault(); e.stopPropagation(); return false; }
+    }, true);
+
+    // Disable drag
+    document.addEventListener('dragstart', function(e){ e.preventDefault(); return false; });
+
+    // Disable print via Ctrl+P (also caught above) and beforeprint event
+    window.addEventListener('beforeprint', function(e){ e.preventDefault(); window.stop(); });
   }
   // ─────────────────────────────────────────────────────────────────────────
 
