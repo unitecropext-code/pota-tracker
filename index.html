@@ -744,7 +744,35 @@ function openOthersModal(t){}
     </div>
   </div>
 
-  <!-- Fortnight completion tracker -->
+  <!-- 2. Area by Locality + Variety Distribution -->
+  <div class="grid-2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--orange));"></div>
+      <div class="card-title"><i class="fas fa-map-marker-alt"></i> Area by Locality</div>
+      <div class="chart-wrap chart-h240"><canvas id="chart-locality"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--purple));"></div>
+      <div class="card-title"><i class="fas fa-leaf"></i> Variety Distribution</div>
+      <div class="chart-wrap chart-h240"><canvas id="chart-variety"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 3. Fortnightly Plantation + Pest & Disease Severity -->
+  <div class="grid-2" style="margin-bottom:14px;">
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--blue));"></div>
+      <div class="card-title"><i class="fas fa-calendar-alt"></i> Fortnightly Plantation</div>
+      <div class="chart-wrap chart-h240"><canvas id="chart-fortnightly"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--red),var(--orange));"></div>
+      <div class="card-title"><i class="fas fa-bug"></i> Pest &amp; Disease Severity</div>
+      <div id="pest-overview-bars" style="max-height:240px;overflow-y:auto;padding-top:4px;"></div>
+    </div>
+  </div>
+
+  <!-- 4. Fortnight Campaign Tracker -->
   <div class="card" style="margin-bottom:14px;">
     <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--green));"></div>
     <div class="card-title"><i class="fas fa-th" style="color:var(--teal);"></i> Fortnight Campaign Tracker
@@ -753,7 +781,7 @@ function openOthersModal(t){}
     <div id="ft-tracker" style="overflow-x:auto;"></div>
   </div>
 
-  <!-- Harvest Timeline Pin Chart — full-width card -->
+  <!-- 5. Harvest Timeline Pin Chart -->
   <div class="card" style="margin-bottom:14px;overflow:visible;">
     <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--green));"></div>
     <div class="card-title"><i class="fas fa-tractor" style="color:var(--gold);"></i> Harvest Timeline
@@ -781,11 +809,10 @@ function openOthersModal(t){}
       <div id="hc-chart-area" style="min-width:320px;position:relative;overflow:visible;"></div>
     </div>
     <div id="hc-notif-area"></div>
-    <!-- hidden legacy element so old code refs don't throw -->
     <div id="harvest-list" style="display:none;"></div>
   </div>
 
-  <!-- Yield gap -->
+  <!-- 6. Yield Gap -->
   <div class="card" style="margin-bottom:14px;">
     <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--teal));"></div>
     <div class="card-title"><i class="fas fa-chart-bar" style="color:var(--blue);"></i> Yield Gap
@@ -794,33 +821,7 @@ function openOthersModal(t){}
     <div id="yield-gap-list" style="padding:4px 0;"></div>
   </div>
 
-  <!-- Charts row — Area by Locality · Variety Distribution · Fortnightly · Pest Severity -->
-  <div class="grid-2" style="margin-bottom:14px;">
-    <div class="card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--orange));"></div>
-      <div class="card-title"><i class="fas fa-map-marker-alt"></i> Area by Locality</div>
-      <div class="chart-wrap chart-h240"><canvas id="chart-locality"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--purple));"></div>
-      <div class="card-title"><i class="fas fa-leaf"></i> Variety Distribution</div>
-      <div class="chart-wrap chart-h240"><canvas id="chart-variety"></canvas></div>
-    </div>
-  </div>
-  <div class="grid-2" style="margin-bottom:14px;">
-    <div class="card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--blue));"></div>
-      <div class="card-title"><i class="fas fa-calendar-alt"></i> Fortnightly Plantation</div>
-      <div class="chart-wrap chart-h240"><canvas id="chart-fortnightly"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--red),var(--orange));"></div>
-      <div class="card-title"><i class="fas fa-bug"></i> Pest &amp; Disease Severity</div>
-      <div id="pest-overview-bars" style="max-height:240px;overflow-y:auto;padding-top:4px;"></div>
-    </div>
-  </div>
-
-  <!-- Zone heat map + Pest Pressure Index row -->
+  <!-- 7. Zone Pest Heat Map + Pest Pressure Index -->
   <div class="grid-2" style="margin-bottom:14px;">
     <div class="card" style="margin-bottom:0;">
       <div class="card-accent" style="background:linear-gradient(90deg,var(--orange),var(--red));"></div>
@@ -854,6 +855,8 @@ function openOthersModal(t){}
       </div>
     </div>
   </div>
+
+  <!-- 8. Recent Plantation Records -->
   <div class="card" id="recent-plantations-card">
     <div class="card-title"><i class="fas fa-clock"></i> Recent Plantation Records
       <div class="card-title-actions"><button class="btn btn-ghost btn-sm" onclick="showSection('plantation')">View All <i class="fas fa-arrow-right"></i></button></div>
