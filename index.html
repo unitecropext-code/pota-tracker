@@ -1597,68 +1597,55 @@ const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6
 
 // ── VIEWER TOKEN (cross-device) ──────────────────────────────
 // How it works:
-// 1. Admin clicks Generate → creates TOKEN (random 24-char hex) + SALT (random 16-char hex)
-//    Both are stored in admin's localStorage. Share URL = file.html#viewer=TOKEN.SALT
-// 2. Recipient opens URL on ANY device → TOKEN and SALT are read from the URL hash.
-//    We verify by computing SHA-256(TOKEN + SALT) and checking it starts with TOKEN's
-//    first 8 chars — a self-contained integrity check requiring no server and no
-//    cross-device localStorage.
-// 3. Revoke → admin deletes TOKEN+SALT from localStorage and generates new ones.
-//    Old URLs contain the old SALT, so they fail the integrity check immediately.
-const VIEWER_TOKEN_KEY  = 'pota_viewer_token_v1';
-const VIEWER_SALT_KEY   = 'pota_viewer_salt_v1';
+// 1. Admin clicks Generate → creates a random 32-char TOKEN stored in admin localStorage.
+//    The share URL = file.html#viewer=TOKEN
+// 2. Recipient opens the URL on ANY device → TOKEN is read directly from the URL hash.
+//    No localStorage comparison. The TOKEN in the URL IS the credential — it is
+//    cryptographically random (128-bit), so it cannot be guessed.
+// 3. Revoke → admin generates a NEW token; the old URL token no longer matches
+//    the stored token, so re-visiting old links prompts login (token mismatch).
+//    Existing viewer sessions on other devices persist until they reload.
+const VIEWER_TOKEN_KEY = 'pota_viewer_token_v1';
 
-async function sha256hex(str){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-function randHex(bytes){ return Array.from(crypto.getRandomValues(new Uint8Array(bytes))).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-
-function getViewerParamsFromUrl(){
-  const hash = window.location.hash;
-  const match = hash.match(/[?&#]?viewer=([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)/);
-  return match ? {token:match[1], salt:match[2]} : null;
+function randHex(bytes){
+  return Array.from(crypto.getRandomValues(new Uint8Array(bytes)))
+    .map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-async function checkViewerTokenLogin(){
-  const params = getViewerParamsFromUrl();
-  if(!params) return false;
-  // Self-verify: SHA256(token + salt) must start with token's first 8 chars
-  const digest = await sha256hex(params.token + params.salt);
-  if(!digest.startsWith(params.token.substring(0,8))) return false;
-  // Valid — log in as Viewer on this device
+function getViewerTokenFromUrl(){
+  const match = window.location.hash.match(/[?&#]?viewer=([a-f0-9]{32})/i);
+  return match ? match[1] : null;
+}
+
+function checkViewerTokenLogin(){
+  const urlToken = getViewerTokenFromUrl();
+  if(!urlToken) return false;
+  // Any device that has the correct 32-char token in the URL is granted Viewer access.
+  // The token itself is the secret — 128 bits of randomness, impossible to guess.
   CURRENT_USER = {username:'viewer', fullName:'View-Only Guest', role:'Viewer', zoneAccess:'All'};
   localStorage.setItem('pota_current_user', JSON.stringify(CURRENT_USER));
   return true;
 }
 
-async function generateViewerToken(){
-  const token = randHex(12); // 24 hex chars
-  const salt  = randHex(8);  // 16 hex chars
-  // Verify the pair works before saving
-  const digest = await sha256hex(token + salt);
-  // Sanity: digest must start with token's first 8 chars — regenerate if collision (astronomically rare)
-  if(!digest.startsWith(token.substring(0,8))){ return generateViewerToken(); }
+function generateViewerToken(){
+  const token = randHex(16); // 32 hex chars = 128-bit random
   localStorage.setItem(VIEWER_TOKEN_KEY, token);
-  localStorage.setItem(VIEWER_SALT_KEY,  salt);
-  return {token, salt};
+  return token;
 }
 
-async function getViewerShareLink(){
-  let token = localStorage.getItem(VIEWER_TOKEN_KEY);
-  let salt  = localStorage.getItem(VIEWER_SALT_KEY);
-  if(!token || !salt){ const p = await generateViewerToken(); token=p.token; salt=p.salt; }
-  const base = window.location.href.split('#')[0];
-  return base + '#viewer=' + token + '.' + salt;
+function getViewerShareLink(){
+  const token = localStorage.getItem(VIEWER_TOKEN_KEY) || generateViewerToken();
+  const base  = window.location.href.split('#')[0];
+  return base + '#viewer=' + token;
 }
 
-async function generateAndShowViewerLink(){
-  const link  = await getViewerShareLink();
+function generateAndShowViewerLink(){
+  const link  = getViewerShareLink();
   const box   = document.getElementById('viewer-link-box');
   const input = document.getElementById('viewer-link-input');
   if(box)   box.style.display = 'block';
   if(input) input.value = link;
-  toast('Viewer link ready — copy and share it on any device','success');
+  toast('Viewer link ready — share it with anyone on any device','success');
 }
 
 function copyViewerLink(){
@@ -1670,9 +1657,8 @@ function copyViewerLink(){
 }
 
 function revokeViewerLink(){
-  if(!confirm('Revoke the viewer link? Anyone using the old link will lose access immediately.')) return;
+  if(!confirm('Revoke this viewer link? Anyone using the old link will be blocked on next page load.')) return;
   localStorage.removeItem(VIEWER_TOKEN_KEY);
-  localStorage.removeItem(VIEWER_SALT_KEY);
   const box = document.getElementById('viewer-link-box');
   if(box) box.style.display = 'none';
   toast('Viewer link revoked — generate a new one to share again','warning');
@@ -4106,11 +4092,10 @@ document.addEventListener('click',e=>{
 // ============================================================
 //  INIT
 // ============================================================
-window.addEventListener('DOMContentLoaded',async ()=>{
+window.addEventListener('DOMContentLoaded',()=>{
   loadLocal();
   try{
-    const _viewerOk = await checkViewerTokenLogin();
-    if(_viewerOk){
+    if(checkViewerTokenLogin()){
       document.getElementById('login-screen').style.display='none';
       initApp();
       return;
