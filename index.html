@@ -190,12 +190,16 @@ a{color:inherit;text-decoration:none;}
 .stats-grid{display:grid;gap:10px;grid-template-columns:repeat(2,1fr);margin-bottom:14px;}
 @media(min-width:640px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.stat-card.gold::before{background:linear-gradient(90deg,var(--gold),var(--orange));}
-.stat-card.green::before{background:linear-gradient(90deg,var(--green),var(--teal));}
-.stat-card.blue::before{background:linear-gradient(90deg,var(--blue),var(--purple));}
-.stat-card.red::before{background:linear-gradient(90deg,var(--red),var(--orange));}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;transition:box-shadow .3s;}
+.stat-card.gold::before{background:linear-gradient(90deg,var(--gold),var(--orange));box-shadow:0 0 12px rgba(240,165,0,.5);}
+.stat-card.green::before{background:linear-gradient(90deg,var(--green),var(--teal));box-shadow:0 0 12px rgba(34,197,94,.5);}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 0 12px rgba(59,130,246,.5);}
+.stat-card.red::before{background:linear-gradient(90deg,var(--red),var(--orange));box-shadow:0 0 12px rgba(239,68,68,.5);}
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--border2);}
+.stat-card.gold:hover::before{box-shadow:0 0 20px rgba(240,165,0,.8);}
+.stat-card.green:hover::before{box-shadow:0 0 20px rgba(34,197,94,.8);}
+.stat-card.blue:hover::before{box-shadow:0 0 20px rgba(59,130,246,.8);}
+.stat-card.red:hover::before{box-shadow:0 0 20px rgba(239,68,68,.8);}
 .stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:9px;}
 .gold .stat-icon{background:var(--gold-dim);color:var(--gold);}
 .green .stat-icon{background:var(--green-dim);color:var(--green);}
@@ -204,6 +208,62 @@ a{color:inherit;text-decoration:none;}
 .stat-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text2);font-family:var(--font-mono);}
 .stat-val{font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1.1;margin:3px 0 2px;}
 .stat-delta{font-size:11px;color:var(--text2);}
+/* Sparkline inside stat card */
+.stat-sparkline{position:absolute;bottom:0;right:0;width:80px;height:36px;opacity:.35;pointer-events:none;}
+.stat-card:hover .stat-sparkline{opacity:.6;}
+/* Count-up animation */
+@keyframes countUpFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.stat-val.counting{animation:countUpFade .4s var(--ease);}
+/* Pulse ring on sync dot */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;position:relative;}
+.sync-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(34,197,94,.5);animation:syncRing 2s ease-out infinite;}
+@keyframes syncRing{0%{transform:scale(.7);opacity:.8;}100%{transform:scale(1.8);opacity:0;}}
+/* Zone heat map pills */
+.zone-heat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.zone-heat-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--font-mono);border:1px solid;cursor:default;transition:transform .15s;}
+.zone-heat-pill:hover{transform:scale(1.04);}
+.zone-heat-pill.none{background:var(--green-dim);color:var(--green);border-color:rgba(34,197,94,.3);}
+.zone-heat-pill.low{background:var(--teal-dim);color:var(--teal);border-color:rgba(20,184,166,.3);}
+.zone-heat-pill.moderate{background:var(--orange-dim);color:var(--orange);border-color:rgba(249,115,22,.3);}
+.zone-heat-pill.high{background:var(--red-dim);color:var(--red);border-color:rgba(239,68,68,.3);}
+/* Season delta badge */
+.season-delta-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;font-family:var(--font-mono);}
+.season-delta-badge.up{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.25);}
+.season-delta-badge.down{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.season-delta-badge.flat{background:rgba(255,255,255,.05);color:var(--text2);border:1px solid var(--border);}
+/* Fortnight tracker grid */
+.ft-grid{display:grid;grid-template-columns:auto repeat(12,1fr);gap:2px;font-family:var(--font-mono);font-size:9px;}
+.ft-header{color:var(--text3);text-align:center;padding:2px 0;}
+.ft-row-label{color:var(--text2);font-size:9px;padding-right:6px;display:flex;align-items:center;white-space:nowrap;}
+.ft-cell{height:18px;border-radius:3px;border:1px solid rgba(255,255,255,.05);transition:transform .1s;}
+.ft-cell:hover{transform:scale(1.15);z-index:2;position:relative;}
+.ft-cell.filled{background:var(--gold);opacity:.85;}
+.ft-cell.empty{background:rgba(255,255,255,.03);}
+.ft-cell.future{background:rgba(255,255,255,.02);border-style:dashed;}
+/* Harvest countdown widget */
+.harvest-list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;}
+.harvest-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;transition:background .15s;}
+.harvest-item:hover{background:rgba(255,255,255,.04);}
+.harvest-days-badge{min-width:40px;text-align:center;font-family:var(--font-mono);font-size:13px;font-weight:700;padding:3px 8px;border-radius:8px;}
+.harvest-days-badge.urgent{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.3);}
+.harvest-days-badge.soon{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(249,115,22,.3);}
+.harvest-days-badge.ok{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.3);}
+.harvest-days-badge.past{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border);}
+/* Pest pressure index */
+.ppi-ring-wrap{display:flex;align-items:center;gap:16px;}
+.ppi-ring{position:relative;width:80px;height:80px;flex-shrink:0;}
+.ppi-ring svg{transform:rotate(-90deg);}
+.ppi-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ppi-score{font-family:var(--font-display);font-size:20px;font-weight:800;}
+.ppi-sub{font-size:8px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.5px;}
+.ppi-trend-arrow{font-size:13px;font-weight:700;}
+/* Yield gap table */
+.yield-gap-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.yield-gap-row:last-child{border-bottom:none;}
+.yield-gap-name{flex:1;min-width:0;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.yield-gap-bar-wrap{width:90px;height:6px;background:rgba(255,255,255,.06);border-radius:3px;flex-shrink:0;}
+.yield-gap-fill{height:100%;border-radius:3px;transition:width .4s var(--ease);}
+.yield-gap-delta{font-family:var(--font-mono);font-size:10px;font-weight:700;flex-shrink:0;min-width:44px;text-align:right;}
 
 /* ===== GRIDS ===== */
 .grid-2{display:grid;gap:12px;grid-template-columns:1fr;}
@@ -470,56 +530,6 @@ tr:hover .row-actions{opacity:1;}
 .step.active{color:var(--gold);border-color:var(--gold);}
 .step.done{color:var(--green);border-color:var(--green);}
 </style>
-<style>
-/* ===== MOBILE NAV — SLIDING PILL ===== */
-#mobile-nav{position:relative;}
-#mob-nav-pill{
-  position:absolute;top:6px;height:calc(100% - 12px);
-  background:linear-gradient(135deg,rgba(240,165,0,.18),rgba(240,165,0,.08));
-  border:1px solid rgba(240,165,0,.25);
-  border-radius:10px;pointer-events:none;
-  transition:left .28s cubic-bezier(.4,0,.2,1),width .28s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 0 12px rgba(240,165,0,.15);
-}
-.mob-nav-item{transition:color .2s,transform .15s;}
-.mob-nav-item.active{color:var(--gold) !important;}
-.mob-nav-item:active{transform:scale(.92);}
-
-/* ===== COMMAND PALETTE ===== */
-#cmd-overlay{
-  position:fixed;inset:0;z-index:8000;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
-  display:none;align-items:flex-start;justify-content:center;padding-top:80px;
-}
-#cmd-overlay.open{display:flex;}
-#cmd-box{
-  width:min(580px,calc(100vw - 32px));
-  background:linear-gradient(180deg,#0f1824 0%,#0b1220 100%);
-  border:1px solid var(--border2);border-radius:16px;
-  box-shadow:0 32px 80px rgba(0,0,0,.8),0 0 0 1px rgba(240,165,0,.08);
-  overflow:hidden;animation:cmdIn .18s var(--ease);
-}
-@keyframes cmdIn{from{opacity:0;transform:scale(.96) translateY(-10px);}to{opacity:1;transform:none;}}
-#cmd-input-wrap{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--border);}
-#cmd-input-wrap i{color:var(--text2);font-size:15px;flex-shrink:0;}
-#cmd-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:16px;font-family:var(--font-body);}
-#cmd-input::placeholder{color:var(--text3);}
-#cmd-shortcut-hint{font-size:11px;color:var(--text3);font-family:var(--font-mono);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:5px;padding:2px 7px;white-space:nowrap;}
-#cmd-results{max-height:380px;overflow-y:auto;padding:6px;}
-.cmd-section{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--text3);padding:8px 10px 4px;font-family:var(--font-mono);text-transform:uppercase;}
-.cmd-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .12s;}
-.cmd-item:hover,.cmd-item.selected{background:rgba(240,165,0,.08);}
-.cmd-item i{width:16px;text-align:center;color:var(--text2);font-size:13px;flex-shrink:0;}
-.cmd-item-main{flex:1;min-width:0;}
-.cmd-item-label{font-size:13px;font-weight:500;color:var(--text);}
-.cmd-item-sub{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cmd-item-kbd{font-size:10px;color:var(--text3);font-family:var(--font-mono);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:1px 6px;white-space:nowrap;}
-.cmd-match{color:var(--gold);font-weight:700;}
-.cmd-empty{padding:32px 16px;text-align:center;color:var(--text2);font-size:13px;}
-#cmd-footer{border-top:1px solid var(--border);padding:7px 14px;display:flex;gap:16px;align-items:center;}
-.cmd-ft-key{font-size:10px;color:var(--text3);font-family:var(--font-mono);display:flex;align-items:center;gap:5px;}
-.cmd-ft-key kbd{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:var(--font-mono);}
-</style>
 <style>.photo-upload-area{border:2px dashed var(--border2);border-radius:9px;padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,.02);font-size:12px;color:var(--text2);}.photo-upload-area:hover{border-color:var(--gold);background:var(--gold-dim);color:var(--gold);}</style>
 <script>
 (function(){try{localStorage.setItem('pota_state_v3',atob('eyJncm93ZXJzIjpbeyJpZCI6MTc3OTk2MTUxNTYzNywibmFtZSI6Ikpvb2xpYSBhY2t0YXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTU2MDE1OSwibmFtZSI6IlVudXRoIGJoYXJkd2Fqc2luZ2giLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTY2ODE3NywibmFtZSI6Ikhhbm5haCBkaGlyYWoiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTcyNjczNCwibmFtZSI6Ik1vaHVuIFJhbmRoaXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjIxNzAzMzUsIm5hbWUiOiJNb29rb29uZGVlIERldiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiVmVyZHVuIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjIyMjU4NzYsIm5hbWUiOiJwdXJib290ZWVhaCBTdXJla2hhIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMJ0F2ZW5pciIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYyMzUwMTMzLCJuYW1lIjoiQ2hhbmRvbyBWZWRhbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MjQwNDg3OCwibmFtZSI6IlVrbm93biAxIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYyNDc1MjExLCJuYW1lIjoiVWtub3duIDIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjI1MTAwOTAsIm5hbWUiOiJVbmtub3duIDMiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjI2OTQzMTEsIm5hbWUiOiJPb3plZXIgIE1vaGFtbWFkIE5pc2hhYXIgQWxpIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJQZXRpdCBWZXJnZXIiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2Mjc4NDg2NSwibmFtZSI6IkVsYWhlZWJvY2N1cyIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBdmVuaXIiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MjgyMzI5MiwibmFtZSI6Ik5lZXdvb3IgUmF2aW4iLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzAzNTM4NCwibmFtZSI6IkRpZGFyYWxseSBOb29yYW5pIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMwOTczMTUsIm5hbWUiOiJQb29ydW4gVG9vbXVuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMxNDczNzksIm5hbWUiOiJNYXRob29yYWggZGV2ZW5kcmFuYXRoIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJIZXJtaXRhZ2UiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzIzODIwOSwibmFtZSI6IlJhbXBlcnNhZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiSGVybWl0YWdlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMyNjkzMjMsIm5hbWUiOiJKb29saWEgQmVsYWwiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzMwMDgwNSwibmFtZSI6IkJ1Y2hvbyBTYW5kZWVhIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMzMzQ4NzAsIm5hbWUiOiJCdXJrdXRhbGx5IEVzaGFuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMzNzAzOTgsIm5hbWUiOiJCdXJrdXRhbGx5IFR3YWxlYiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYzNDE5NDEzLCJuYW1lIjoiRHVyZ2FoZWUgTmF6aXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzQ1ODQ3OSwibmFtZSI6Ikdvb2R1ciBnaGVlcmphbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBZ3JlbWVudCIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzgwMDQ1MzYwNjY0LCJuYW1lIjoiTW9vcnV0IGJhc3NhbnQiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI5Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9XSwicGxhbnRhdGlvbiI6W3siaWQiOjE3Nzk5NjM2MTYwODksImdyb3dlciI6Ikpvb2xpYSBhY2t0YXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJ2YXJpZXR5IjoiU3B1bnRhIExvY2FsIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA0LTIzIiwiYXJlYSI6Mi41MiwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiQXByIiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTYzNjcwNTQ0LCJncm93ZXIiOiJVbnV0aCBiaGFyZHdhanNpbmdoIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwidmFyaWV0eSI6IlNwdW50YSBMb2NhbCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNC0yMyIsImFyZWEiOjIuNTIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6IkFwciIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzY5MTExMiwiZ3Jvd2VyIjoiSGFubmFoIGRoaXJhaiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDQtMjMiLCJhcmVhIjoxLjA1LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJBcHIiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjM3MTU1NjQsImdyb3dlciI6Ik1vaHVuIFJhbmRoaXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwidmFyaWV0eSI6IlNwdW50YSBMb2NhbCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNC0yMyIsImFyZWEiOjEuMDUsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6IkFwciIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzgyOTI2OCwiZ3Jvd2VyIjoiTW9va29vbmRlZSBEZXYiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlZlcmR1biIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMDQiLCJhcmVhIjowLjA0LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjM4NjM4NjQsImdyb3dlciI6InB1cmJvb3RlZWFoIFN1cmVraGEiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkwnQXZlbmlyIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0wNSIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMSIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzkwMTcxOCwiZ3Jvd2VyIjoiQ2hhbmRvbyBWZWRhbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MC4yNSwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTYzOTkzMjY2LCJncm93ZXIiOiJDaGFuZG9vIFZlZGFuYW5kIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjQyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQzMjkzNDAsImdyb3dlciI6IlVrbm93biAxIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjIxLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQzNTYxMzQsImdyb3dlciI6IlVrbm93biAyIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjIxLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ0Nzc1MDQsImdyb3dlciI6IlVua25vd24gMyIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MC4yMSwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY0NTgyMTg3LCJncm93ZXIiOiJPb3plZXIgIE1vaGFtbWFkIE5pc2hhYXIgQWxpIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJQZXRpdCBWZXJnZXIiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MS4xMywiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY0NjMxOTQxLCJncm93ZXIiOiJFbGFoZWVib2NjdXMiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkwnQXZlbmlyIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0xNCIsImFyZWEiOjAuMzIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMSIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NDcyMTE0NywiZ3Jvd2VyIjoiTmVld29vciBSYXZpbiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTgiLCJhcmVhIjoxLjg5LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ3ODE5NzUsImdyb3dlciI6IkRpZGFyYWxseSBOb29yYW5pIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0xOCIsImFyZWEiOjAuNDIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NDg1NzgyNSwiZ3Jvd2VyIjoiUG9vcnVuIFRvb211biIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiQmFnYXRlbGxlIERhbSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTgiLCJhcmVhIjowLjMyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ5NDU0OTUsImdyb3dlciI6Ik1hdGhvb3JhaCBkZXZlbmRyYW5hdGgiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6Ikhlcm1pdGFnZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjAiLCJhcmVhIjoxLjI2LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjUyMjc4MjYsImdyb3dlciI6IlJhbXBlcnNhZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiSGVybWl0YWdlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMCIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTMwOTkwOSwiZ3Jvd2VyIjoiSm9vbGlhIEJlbGFsIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMCIsImFyZWEiOjMuMzYsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTM1NzYxNCwiZ3Jvd2VyIjoiQnVjaG9vIFNhbmRlZWEiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6Mi45NCwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY1NDMxNDgwLCJncm93ZXIiOiJCdXJrdXRhbGx5IEVzaGFuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMSIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTQ4MTQ1OSwiZ3Jvd2VyIjoiQnVya3V0YWxseSBUd2FsZWIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6MC44NCwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY1NTQwOTQ4LCJncm93ZXIiOiJEaWRhcmFsbHkgTm9vcmFuaSIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjEiLCJhcmVhIjo0LjIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTU5MDc5OCwiZ3Jvd2VyIjoiRHVyZ2FoZWUgTmF6aXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6Mi4xLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjU2MjYwNTksImdyb3dlciI6Ikdvb2R1ciBnaGVlcmphbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBZ3JlbWVudCIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjEiLCJhcmVhIjoyLjUyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9XSwicGVzdFJlY29yZHMiOltdLCJ5aWVsZEFzc2Vzc21lbnRzIjpbXSwidmFyaWV0aWVzIjpbIkRlbGF3YXJlIiwiSmVsbHkiLCJNb25kaWFsIiwiUGFuYW1lcmEiLCJTcHVudGEgSW1wb3J0ZWQiLCJTcHVudGEgTG9jYWwiXSwiY2FtcGFpZ25EYXRhIjp7fSwid2Vla2x5UmVwb3J0cyI6W10sImhhcnZlc3REYXlzIjo5MCwiZGVmYXVsdFlpZWxkIjoxMiwidXNlcnMiOlt7InVzZXJuYW1lIjoic3VwZXJhZG1pbiIsImZ1bGxOYW1lIjoiU3VwZXIgQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBZG1pbmlzdHJhdG9yIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiNjIwZWI4ZTAyOTNlZmMwZmU3Y2Y5MGI0ZTNkMGFkZmZjMGQzYzJjMzU1ZGJhNGUyZWMxYWJhM2NmYTEyYTBkMyIsInN0YXR1cyI6IkFjdGl2ZSJ9LHsidXNlcm5hbWUiOiJhZG1pbiIsImZ1bGxOYW1lIjoiQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBZG1pbmlzdHJhdG9yIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiZTI1Yzg5ZTM4YjI0NWI0YjlkZTE4MWI1NDU5YWNhNTRkMzVmOWE0Nzg0MDNlNThkNWIzMGIyNTE5YzZhODk5OCIsInN0YXR1cyI6IkFjdGl2ZSJ9LHsidXNlcm5hbWUiOiJlb3Nlb2tnIiwiZnVsbE5hbWUiOiJLZXNoYXYgR2FuZ2FkaW4iLCJyb2xlIjoiRmllbGQgT2ZmaWNlciIsInpvbmVBY2Nlc3MiOiJFYXN0IiwicGFzc3dvcmQiOiJiZWUyMzRiNzkxNWE5MWY2ZTdmOWQ5NjcyOWZmYzhhNDFjNzczZGNlOGVjMzYzMDUzNGQzZDU2YjJiNDkyN2RiIiwic3RhdHVzIjoiQWN0aXZlIn0seyJ1c2VybmFtZSI6ImVzb2tyIiwiZnVsbE5hbWUiOiJLZXNoYXYgUmFtaGVldCIsInJvbGUiOiJGaWVsZCBPZmZpY2VyIiwiem9uZUFjY2VzcyI6Ik5vcnRoIiwicGFzc3dvcmQiOiI1MjY5YjFmYzBkYzIwYjkyZTQ4ZWRiZjA5NDdmY2Y2MTZlZTI1ZGQ3MWFiODM4ODliZTc2Nzk5YzA1Mjc5ZDkxIiwic3RhdHVzIjoiQWN0aXZlIn0seyJ1c2VybmFtZSI6Im9mZmljZXIxIiwiZnVsbE5hbWUiOiJGaWVsZCBPZmZpY2VyIDEiLCJyb2xlIjoiRmllbGQgT2ZmaWNlciIsInpvbmVBY2Nlc3MiOiJBbGwiLCJwYXNzd29yZCI6IjExOGI4ZDM1YTE3YmNmMmM3ZDJkNzkwNTA5ZTEyMzA4ZGM2MzMyYzVkMjM0ZjAwOThkMmQ2YmU2NzAwYmViYjEiLCJzdGF0dXMiOiJBY3RpdmUifSx7InVzZXJuYW1lIjoib2ZmaWNlcjIiLCJmdWxsTmFtZSI6IkZpZWxkIE9mZmljZXIgMiIsInJvbGUiOiJGaWVsZCBPZmZpY2VyIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiODQ2MzFkYWI4MDgyMTkxMzRkNjY2MWU2ODVlN2Y3NjdmZjQ2NTM2OTQzMzJlYjY0YjU2ODU5MWM2NWEwZjg3ZiIsInN0YXR1cyI6IkFjdGl2ZSJ9XX0='));}catch(e){}})();
@@ -652,7 +662,6 @@ function openOthersModal(t){}
     <div class="page-sub" id="page-sub">Mauritius Potato Cultivation System</div>
   </div>
   <div class="topbar-right">
-    <button class="btn btn-ghost btn-sm" onclick="openCmdPalette()" title="Search (Ctrl+K)" style="gap:5px;"><i class="fas fa-search"></i><span class="hide-xs" style="font-size:11px;color:var(--text3);font-family:var(--font-mono);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin-left:2px;">⌘K</span></button>
     <span class="topbar-season" id="topbar-season">Season 1</span>
     <button class="btn btn-ghost btn-sm" onclick="showSection('weekly-report')"><i class="fas fa-file-alt"></i><span class="hide-xs"> Report</span></button>
     <button class="btn btn-gold btn-sm" onclick="openModal('add-plantation-modal')"><i class="fas fa-plus"></i><span class="hide-xs"> Add</span></button>
@@ -668,32 +677,101 @@ function openOthersModal(t){}
 
 <!-- ========== DASHBOARD ========== -->
 <section id="sec-dashboard" class="section active">
+  <!-- Stat cards with sparklines -->
   <div class="stats-grid">
     <div class="stat-card gold" onclick="showSection('growers')">
       <div class="stat-icon"><i class="fas fa-users"></i></div>
       <div class="stat-label">Total Growers</div>
       <div class="stat-val" id="sv-growers">0</div>
       <div class="stat-delta">Active registered</div>
+      <canvas class="stat-sparkline" id="spark-growers"></canvas>
     </div>
     <div class="stat-card green" onclick="showSection('plantation')">
       <div class="stat-icon"><i class="fas fa-map"></i></div>
       <div class="stat-label">Total Area (ha)</div>
       <div class="stat-val" id="sv-area">0</div>
       <div class="stat-delta"><span id="sv-plots">0</span> plots recorded</div>
+      <canvas class="stat-sparkline" id="spark-area"></canvas>
     </div>
     <div class="stat-card blue" onclick="showSection('production')">
       <div class="stat-icon"><i class="fas fa-weight"></i></div>
       <div class="stat-label">Est. Production (T)</div>
       <div class="stat-val" id="sv-prod">0</div>
-      <div class="stat-delta">Based on est. yields</div>
+      <div class="stat-delta">Based on est. yields &nbsp;<span id="sv-season-delta"></span></div>
+      <canvas class="stat-sparkline" id="spark-prod"></canvas>
     </div>
     <div class="stat-card red" onclick="showSection('pests')">
       <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
       <div class="stat-label">High Severity Alerts</div>
       <div class="stat-val" id="sv-alerts">0</div>
       <div class="stat-delta" id="sv-alert-label"><span style="color:var(--green);">All clear</span></div>
+      <canvas class="stat-sparkline" id="spark-alerts"></canvas>
     </div>
   </div>
+
+  <!-- Zone heat map + Pest Pressure Index row -->
+  <div class="grid-2" style="margin-bottom:14px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--orange),var(--red));"></div>
+      <div class="card-title"><i class="fas fa-fire-alt" style="color:var(--orange);"></i> Zone Pest Heat Map
+        <span style="margin-left:auto;font-size:10px;color:var(--text3);">by severity</span>
+      </div>
+      <div id="zone-heat-pills" class="zone-heat-row"></div>
+      <div id="zone-heat-detail" style="font-size:11px;color:var(--text3);min-height:18px;"></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--blue));"></div>
+      <div class="card-title"><i class="fas fa-heartbeat" style="color:var(--purple);"></i> Pest Pressure Index
+        <span id="ppi-trend-arrow" class="ppi-trend-arrow" style="margin-left:6px;"></span>
+      </div>
+      <div class="ppi-ring-wrap">
+        <div class="ppi-ring">
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="8"/>
+            <circle id="ppi-arc" cx="40" cy="40" r="32" fill="none" stroke="var(--purple)" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" style="transition:stroke-dashoffset 1s var(--ease),stroke .4s;"/>
+          </svg>
+          <div class="ppi-ring-label">
+            <div class="ppi-score" id="ppi-score">—</div>
+            <div class="ppi-sub">/100</div>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div id="ppi-label" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">No data</div>
+          <div id="ppi-desc" style="font-size:11px;color:var(--text2);line-height:1.5;"></div>
+          <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;" id="ppi-zones"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fortnight completion tracker -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--green));"></div>
+    <div class="card-title"><i class="fas fa-th" style="color:var(--teal);"></i> Fortnight Campaign Tracker
+      <span style="margin-left:auto;font-size:10px;color:var(--text3);">records vs gaps · 2025–2026</span>
+    </div>
+    <div id="ft-tracker" style="overflow-x:auto;"></div>
+  </div>
+
+  <!-- Harvest countdown + Yield gap row -->
+  <div class="grid-2" style="margin-bottom:14px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--green));"></div>
+      <div class="card-title"><i class="fas fa-tractor" style="color:var(--gold);"></i> Harvest Countdown
+        <span style="margin-left:auto;font-size:10px;color:var(--text3);">days to harvest (est.)</span>
+      </div>
+      <div class="harvest-list" id="harvest-list"><span style="font-size:12px;color:var(--text3);">No plantation records yet.</span></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--teal));"></div>
+      <div class="card-title"><i class="fas fa-chart-bar" style="color:var(--blue);"></i> Yield Gap
+        <span style="margin-left:auto;font-size:10px;color:var(--text3);">actual vs estimated T/ha</span>
+      </div>
+      <div id="yield-gap-list" style="padding:4px 0;"></div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
   <div class="grid-2">
     <div class="card">
       <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--orange));"></div>
@@ -1438,7 +1516,6 @@ function openOthersModal(t){}
 
 <!-- MOBILE BOTTOM NAV -->
 <nav id="mobile-nav">
-  <div id="mob-nav-pill"></div>
   <div class="mob-nav-item active" id="mob-nav-dashboard" onclick="showSection('dashboard')"><i class="fas fa-chart-pie"></i>Dash</div>
   <div class="mob-nav-item" id="mob-nav-growers" onclick="showSection('growers')"><i class="fas fa-users"></i>Growers</div>
   <div class="mob-nav-item" id="mob-nav-plantation" onclick="showSection('plantation')"><i class="fas fa-seedling"></i>Plants</div>
@@ -2118,8 +2195,6 @@ async function initApp(){
   if(document.getElementById('gas-url-input')) document.getElementById('gas-url-input').value = GAS_URL;
   const rptOfficer = document.getElementById('rpt-officer');
   if(rptOfficer) rptOfficer.value = CURRENT_USER.fullName || CURRENT_USER.username;
-  // Initialize mobile nav pill position
-  setTimeout(()=>updateMobNavPill('dashboard'), 120);
 }
 
 // ============================================================
@@ -2195,14 +2270,13 @@ function mkChart(id, cfg){
   if(_charts[id]) try{ _charts[id].destroy(); }catch(e){}
   const CHART_OPTS = {
     responsive:true, maintainAspectRatio:false,
-    animation:{duration:700,easing:'easeOutQuart'},
     plugins:{
       legend:{labels:{color:'#7a8daa',font:{size:11}}},
-      tooltip:{backgroundColor:'#131c2d',borderColor:'#223354',borderWidth:1,titleColor:'#e8edf8',bodyColor:'#7a8daa',padding:10,cornerRadius:8}
+      tooltip:{backgroundColor:'#131c2d',borderColor:'#223354',borderWidth:1,titleColor:'#e8edf8',bodyColor:'#7a8daa',padding:10}
     },
     scales:{
       x:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
-      y:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true}
+      y:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}
     }
   };
   cfg.options = deepMerge(CHART_OPTS, cfg.options || {});
@@ -2221,37 +2295,328 @@ function deepMerge(base, override){
 // ============================================================
 //  DASHBOARD
 // ============================================================
-function countUp(el, target, decimals, duration){
+
+// ── Count-up animation helper ──────────────────────────────
+function animateCountUp(el, target, decimals, duration){
   if(!el) return;
-  const start = parseFloat(el.textContent)||0;
-  const end = typeof target === 'number' ? target : parseFloat(target)||0;
-  const startTime = performance.now();
-  function step(now){
-    const p = Math.min((now - startTime) / duration, 1);
-    const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic
-    const val = start + (end - start) * ease;
-    el.textContent = decimals > 0 ? val.toFixed(decimals) : Math.round(val);
-    if(p < 1) requestAnimationFrame(step);
-    else el.textContent = decimals > 0 ? end.toFixed(decimals) : Math.round(end);
+  const start = parseFloat(el.dataset.countTarget)||0;
+  const startTs = performance.now();
+  el.dataset.countTarget = target;
+  el.classList.add('counting');
+  function step(ts){
+    const p = Math.min(1,(ts-startTs)/duration);
+    const ease = 1-Math.pow(1-p,3);
+    const val = start + (target-start)*ease;
+    el.textContent = decimals ? val.toFixed(decimals) : Math.round(val);
+    if(p<1) requestAnimationFrame(step);
+    else { el.textContent = decimals ? target.toFixed(decimals) : Math.round(target); el.classList.remove('counting'); }
   }
   requestAnimationFrame(step);
 }
+
+// ── Sparkline helper (mini SVG path in canvas) ────────────
+function drawSparkline(canvasId, values, color){
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth||80, H = canvas.offsetHeight||36;
+  canvas.width = W*2; canvas.height = H*2; ctx.scale(2,2);
+  ctx.clearRect(0,0,W,H);
+  if(!values||values.length<2){ return; }
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = (max-min)||1;
+  const pts = values.map((v,i)=>({ x: i/(values.length-1)*(W-4)+2, y: H-4-(v-min)/range*(H-8) }));
+  // gradient fill
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, color.replace(')',',0.35)').replace('rgb','rgba'));
+  grad.addColorStop(1, color.replace(')',',0)').replace('rgb','rgba'));
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, H);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x, H);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+  // line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  // dot at end
+  const lp = pts[pts.length-1];
+  ctx.beginPath(); ctx.arc(lp.x,lp.y,2,0,Math.PI*2);
+  ctx.fillStyle = color; ctx.fill();
+}
+
+// ── Fortnight tracker ─────────────────────────────────────
+function renderFortnightTracker(){
+  const el = document.getElementById('ft-tracker'); if(!el) return;
+  const years = [2025, 2026];
+  const seasons = ['S1','S2'];
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const today = new Date();
+
+  // Build lookup: key = "YYYY-season-month-fortnight" → has record?
+  const lookup = new Set();
+  STATE.plantation.forEach(r=>{
+    if(!r.datePlanted) return;
+    const d = new Date(r.datePlanted);
+    const y = d.getFullYear(), m = d.getMonth();
+    const ft = r.fortnight||'Fortnight 1';
+    const sn = r.season||'Season 1';
+    lookup.add(`${y}-${sn}-${m}-${ft}`);
+  });
+
+  let html = `<div class="ft-grid" style="min-width:340px;">`;
+  // header
+  html += `<div class="ft-row-label"></div>`;
+  MONTHS_SHORT.forEach(mo=>html+=`<div class="ft-header">${mo}</div>`);
+
+  years.forEach(y=>{
+    seasons.forEach((s,si)=>{
+      const seasonFull = si===0?'Season 1':'Season 2';
+      ['Fortnight 1','Fortnight 2'].forEach((ft,fi)=>{
+        html += `<div class="ft-row-label" style="padding-right:4px;">${y} ${s}·F${fi+1}</div>`;
+        for(let m=0;m<12;m++){
+          const cellDate = new Date(y, m, fi===0?7:21);
+          const isFuture = cellDate > today;
+          const haRec = lookup.has(`${y}-${seasonFull}-${m}-${ft}`);
+          const cls = isFuture?'future':(haRec?'filled':'empty');
+          const title = `${y} ${seasonFull} ${ft} — ${MONTHS_SHORT[m]}${haRec?' ✓':isFuture?' (future)':' (no record)'}`;
+          const col = haRec?(si===0?'background:var(--gold);opacity:.85;':'background:var(--blue);opacity:.85;'):'';
+          html += `<div class="ft-cell ${cls}" title="${title}" style="${col}"></div>`;
+        }
+      });
+    });
+  });
+  html += `</div>`;
+  // legend
+  html += `<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;font-family:var(--font-mono);color:var(--text3);flex-wrap:wrap;">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:8px;border-radius:2px;background:var(--gold);opacity:.85;display:inline-block;"></span> Season 1 record</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:8px;border-radius:2px;background:var(--blue);opacity:.85;display:inline-block;"></span> Season 2 record</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:8px;border-radius:2px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.12);display:inline-block;"></span> Future</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:8px;border-radius:2px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);display:inline-block;"></span> Gap</span>
+  </div>`;
+  el.innerHTML = html;
+}
+
+// ── Harvest countdown ─────────────────────────────────────
+function renderHarvestCountdown(){
+  const el = document.getElementById('harvest-list'); if(!el) return;
+  const harvestDays = STATE.harvestDays || 90;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const rows = STATE.plantation
+    .filter(r=>r.datePlanted)
+    .map(r=>{
+      const planted = new Date(r.datePlanted);
+      const harvestDate = new Date(planted.getTime() + harvestDays*864e5);
+      const diff = Math.round((harvestDate - today)/864e5);
+      return { ...r, harvestDate, diff };
+    })
+    .sort((a,b)=>a.diff-b.diff)
+    .slice(0,10);
+
+  if(!rows.length){ el.innerHTML=`<span style="font-size:12px;color:var(--text3);">No plantation records yet.</span>`; return; }
+
+  el.innerHTML = rows.map(r=>{
+    const cls = r.diff < 0 ? 'past' : r.diff<=14 ? 'urgent' : r.diff<=30 ? 'soon' : 'ok';
+    const label = r.diff<0 ? `${Math.abs(r.diff)}d ago` : r.diff===0 ? 'Today!' : `${r.diff}d`;
+    const dateStr = r.harvestDate.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    return `<div class="harvest-item">
+      <div class="harvest-days-badge ${cls}">${label}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.grower}</div>
+        <div style="font-size:10px;color:var(--text3);">${r.variety||'—'} · ${r.locality||'—'} · Due ${dateStr}</div>
+      </div>
+      <span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}" style="flex-shrink:0;">${r.season==='Season 1'?'S1':'S2'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Pest Pressure Index ───────────────────────────────────
+function renderPestPressureIndex(){
+  const arc = document.getElementById('ppi-arc');
+  const scoreEl = document.getElementById('ppi-score');
+  const labelEl = document.getElementById('ppi-label');
+  const descEl = document.getElementById('ppi-desc');
+  const arrowEl = document.getElementById('ppi-trend-arrow');
+  const zonesEl = document.getElementById('ppi-zones');
+  if(!arc) return;
+
+  const sevScore = {Low:1, Moderate:2, High:3};
+  const allVisits = STATE.pestRecords.flatMap(r=>(r.visits||[]).map(v=>({...v, grower:r.grower, zone:STATE.growers.find(g=>g.name===r.grower)?.zone||''})));
+  if(!allVisits.length){ scoreEl.textContent='0'; labelEl.textContent='No data'; descEl.textContent='Record some pest visits to see the index.'; return; }
+
+  // Score = weighted average severity across all pest observations
+  const allScores = allVisits.flatMap(v=>Object.values(v.pests||{}).map(p=>sevScore[p.sev]||0).filter(Boolean));
+  const avg = allScores.length ? allScores.reduce((s,v)=>s+v,0)/allScores.length : 0;
+  const score = Math.round((avg/3)*100);
+
+  // Trend: compare last 30 days vs prior 30 days
+  const now = Date.now();
+  const recent30 = allVisits.filter(v=>v.date&&(now-new Date(v.date).getTime())<30*864e5);
+  const prior30  = allVisits.filter(v=>v.date&&(now-new Date(v.date).getTime())>=30*864e5&&(now-new Date(v.date).getTime())<60*864e5);
+  const recentAvg = recent30.length ? recent30.flatMap(v=>Object.values(v.pests||{}).map(p=>sevScore[p.sev]||0).filter(Boolean)).reduce((s,v,_,a)=>s+v/a.length,0):0;
+  const priorAvg  = prior30.length  ? prior30.flatMap(v=>Object.values(v.pests||{}).map(p=>sevScore[p.sev]||0).filter(Boolean)).reduce((s,v,_,a)=>s+v/a.length,0):0;
+  const trend = recentAvg > priorAvg+0.1 ? 'up' : recentAvg < priorAvg-0.1 ? 'down' : 'flat';
+  arrowEl.textContent = trend==='up'?'↑ Worsening':trend==='down'?'↓ Improving':'→ Stable';
+  arrowEl.style.color = trend==='up'?'var(--red)':trend==='down'?'var(--green)':'var(--text2)';
+
+  // Animate arc (circumference = 2π×32 ≈ 201)
+  const offset = 201 - (score/100)*201;
+  arc.style.strokeDashoffset = offset;
+  arc.style.stroke = score>=70?'var(--red)':score>=40?'var(--orange)':'var(--green)';
+
+  scoreEl.textContent = score;
+  scoreEl.style.color = score>=70?'var(--red)':score>=40?'var(--orange)':'var(--green)';
+  labelEl.textContent = score>=70?'High Pressure':score>=40?'Moderate Pressure':'Low / Healthy';
+  labelEl.style.color = score>=70?'var(--red)':score>=40?'var(--orange)':'var(--green)';
+  descEl.textContent = `Based on ${allScores.length} pest observations across ${allVisits.length} field visits.`;
+
+  // Per-zone breakdown pills
+  const zones = ['E1','E2','E3','E4'];
+  zonesEl.innerHTML = zones.map(z=>{
+    const zScores = allVisits.filter(v=>v.zone===z).flatMap(v=>Object.values(v.pests||{}).map(p=>sevScore[p.sev]||0).filter(Boolean));
+    if(!zScores.length) return '';
+    const zAvg = zScores.reduce((s,v)=>s+v,0)/zScores.length;
+    const cls = zAvg>=2.5?'high':zAvg>=1.5?'moderate':zAvg>0?'low':'none';
+    return `<span class="zone-heat-pill ${cls}" style="font-size:10px;padding:2px 8px;">${z} ${cls}</span>`;
+  }).join('');
+}
+
+// ── Zone heat map pills ───────────────────────────────────
+function renderZoneHeatMap(){
+  const el = document.getElementById('zone-heat-pills'); if(!el) return;
+  const detail = document.getElementById('zone-heat-detail');
+  const zones = ['E1','E2','E3','E4'];
+  const sevScore = {Low:1, Moderate:2, High:3};
+
+  const data = zones.map(z=>{
+    const growerNames = STATE.growers.filter(g=>g.zone===z).map(g=>g.name);
+    const pestRecs = STATE.pestRecords.filter(r=>growerNames.includes(r.grower));
+    const scores = pestRecs.flatMap(r=>(r.visits||[]).flatMap(v=>Object.values(v.pests||{}).map(p=>sevScore[p.sev]||0).filter(Boolean)));
+    const avg = scores.length ? scores.reduce((s,v)=>s+v,0)/scores.length : 0;
+    const cls = avg===0?'none':avg<1.5?'low':avg<2.5?'moderate':'high';
+    const plots = STATE.plantation.filter(r=>growerNames.includes(r.grower)).length;
+    const area  = STATE.plantation.filter(r=>growerNames.includes(r.grower)).reduce((s,r)=>s+(r.area||0),0);
+    return { z, cls, avg, plots, area: area.toFixed(1), growers: growerNames.length };
+  });
+
+  el.innerHTML = data.map(d=>`
+    <div class="zone-heat-pill ${d.cls}" onmouseover="document.getElementById('zone-heat-detail').textContent='${d.z}: ${d.growers} grower${d.growers!==1?'s':''}, ${d.plots} plot${d.plots!==1?'s':''}, ${d.area} ha — pest avg ${d.avg.toFixed(1)}/3'"
+      onmouseout="document.getElementById('zone-heat-detail').textContent=''">
+      <i class="fas fa-circle" style="font-size:7px;"></i> ${d.z} <span style="opacity:.7;font-size:9px;">${d.cls.toUpperCase()}</span>
+    </div>`).join('');
+  if(detail) detail.textContent = '';
+}
+
+// ── Season-on-season delta badge ──────────────────────────
+function renderSeasonDeltaBadge(){
+  const el = document.getElementById('sv-season-delta'); if(!el) return;
+  const area2026s1 = STATE.plantation.filter(r=>r.season==='Season 1'&&r.datePlanted&&r.datePlanted.startsWith('2026')).reduce((s,r)=>s+(r.area||0),0);
+  const area2025s1 = STATE.plantation.filter(r=>r.season==='Season 1'&&r.datePlanted&&r.datePlanted.startsWith('2025')).reduce((s,r)=>s+(r.area||0),0);
+  if(!area2025s1||!area2026s1){ el.innerHTML=''; return; }
+  const pct = Math.round(((area2026s1-area2025s1)/area2025s1)*100);
+  const cls = pct>0?'up':pct<0?'down':'flat';
+  el.innerHTML=`<span class="season-delta-badge ${cls}">${pct>0?'↑':'↓'} ${Math.abs(pct)}% vs 2025</span>`;
+}
+
+// ── Yield gap table ───────────────────────────────────────
+function renderYieldGapTable(){
+  const el = document.getElementById('yield-gap-list'); if(!el) return;
+  if(!STATE.yieldAssessments||!STATE.yieldAssessments.length){
+    el.innerHTML=`<div style="font-size:12px;color:var(--text3);padding:8px 0;">No yield assessments yet.</div>`;
+    return;
+  }
+
+  // Group assessments by grower, latest record
+  const byGrower = {};
+  STATE.yieldAssessments.forEach(y=>{
+    if(!byGrower[y.grower]||y.date>byGrower[y.grower].date) byGrower[y.grower]=y;
+  });
+
+  const rows = Object.values(byGrower).map(y=>{
+    const samples = (y.samples||[]).filter(s=>s>0);
+    if(!samples.length) return null;
+    const avgKgSqm = samples.reduce((s,v)=>s+v,0)/samples.length;
+    const actualTha = avgKgSqm * 10000 / 1000;
+    // find plantation record for this grower
+    const pRec = STATE.plantation.filter(r=>r.grower===y.grower).sort((a,b)=>b.id-a.id)[0];
+    const estTha = pRec ? (pRec.estYield||STATE.defaultYield) : STATE.defaultYield;
+    const gap = actualTha - estTha;
+    return { grower: y.grower, actualTha, estTha, gap, locality: y.locality||pRec?.locality||'—' };
+  }).filter(Boolean).sort((a,b)=>a.gap-b.gap);
+
+  if(!rows.length){ el.innerHTML=`<div style="font-size:12px;color:var(--text3);">No assessments with sample data.</div>`; return; }
+
+  const maxAbs = Math.max(...rows.map(r=>Math.abs(r.gap)),1);
+  el.innerHTML = rows.slice(0,8).map(r=>{
+    const pct = Math.round((Math.abs(r.gap)/maxAbs)*100);
+    const pos = r.gap>=0;
+    const col = pos?'var(--green)':'var(--red)';
+    return `<div class="yield-gap-row">
+      <div class="yield-gap-name" title="${r.grower} — ${r.locality}"><strong>${r.grower}</strong> <span style="color:var(--text3);font-size:10px;">${r.locality}</span></div>
+      <div class="yield-gap-bar-wrap"><div class="yield-gap-fill" style="width:${pct}%;background:${col};"></div></div>
+      <div class="yield-gap-delta" style="color:${col};">${pos?'+':''}${r.gap.toFixed(1)} T/ha</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Sparkline data from plantation timeline ───────────────
+function buildSparkData(){
+  const months = [0,1,2,3,4,5,6,7,8,9,10,11];
+  const now = new Date();
+  const curYear = now.getFullYear();
+  // last 6 months sliding window
+  const win = 6;
+  const sparkMonths = Array.from({length:win},(_,i)=>{
+    const d = new Date(curYear, now.getMonth()-win+1+i, 1);
+    return {y:d.getFullYear(),m:d.getMonth()};
+  });
+  const growersByMo = sparkMonths.map(({y,m})=>STATE.growers.filter(g=>g.registrationDate&&new Date(g.registrationDate).getFullYear()===y&&new Date(g.registrationDate).getMonth()===m).length);
+  const areaByMo = sparkMonths.map(({y,m})=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getFullYear()===y&&new Date(r.datePlanted).getMonth()===m).reduce((s,r)=>s+(r.area||0),0));
+  const prodByMo = sparkMonths.map(({y,m})=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getFullYear()===y&&new Date(r.datePlanted).getMonth()===m).reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0));
+  const alertsByMo = sparkMonths.map(({y,m})=>STATE.pestRecords.filter(r=>r.visits&&r.visits.some(v=>v.date&&new Date(v.date).getFullYear()===y&&new Date(v.date).getMonth()===m&&Object.values(v.pests||{}).some(p=>p.sev==='High'))).length);
+  return {growersByMo,areaByMo,prodByMo,alertsByMo};
+}
+
 function renderDashboard(){
   const totalArea = STATE.plantation.reduce((s,r)=>s+(r.area||0),0);
   const estProd   = STATE.plantation.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0);
   const highAlerts= STATE.pestRecords.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
-  countUp(document.getElementById('sv-growers'), STATE.growers.length, 0, 600);
-  countUp(document.getElementById('sv-area'),    totalArea, 1, 700);
-  countUp(document.getElementById('sv-plots'),   STATE.plantation.length, 0, 600);
-  countUp(document.getElementById('sv-prod'),    Math.round(estProd), 0, 800);
-  countUp(document.getElementById('sv-alerts'),  highAlerts, 0, 500);
+
+  // Count-up animations
+  animateCountUp(document.getElementById('sv-growers'), STATE.growers.length, 0, 700);
+  animateCountUp(document.getElementById('sv-area'),    totalArea,            1, 800);
+  animateCountUp(document.getElementById('sv-plots'),   STATE.plantation.length, 0, 600);
+  animateCountUp(document.getElementById('sv-prod'),    Math.round(estProd),  0, 900);
+  animateCountUp(document.getElementById('sv-alerts'),  highAlerts,           0, 500);
+
   document.getElementById('sv-alert-label').innerHTML = highAlerts
     ? `<span style="color:var(--red);">${highAlerts} active alerts</span>`
     : `<span style="color:var(--green);">All clear</span>`;
+
+  // Sparklines (drawn after layout)
   requestAnimationFrame(()=>{
+    const sk = buildSparkData();
+    drawSparkline('spark-growers', sk.growersByMo.map((v,i,a)=>a.slice(0,i+1).reduce((s,x)=>s+x,STATE.growers.length-sk.growersByMo.reduce((s,x)=>s+x,0))), 'rgb(240,165,0)');
+    drawSparkline('spark-area',    sk.areaByMo,    'rgb(34,197,94)');
+    drawSparkline('spark-prod',    sk.prodByMo,    'rgb(59,130,246)');
+    drawSparkline('spark-alerts',  sk.alertsByMo,  'rgb(239,68,68)');
     renderLocalityChart(); renderVarietyChart();
     renderFortnightlyChart(); renderPestOverview();
   });
+
+  renderSeasonDeltaBadge();
+  renderZoneHeatMap();
+  renderPestPressureIndex();
+  renderFortnightTracker();
+  renderHarvestCountdown();
+  renderYieldGapTable();
+
   const tbody  = document.getElementById('recent-table');
   const recent = [...STATE.plantation].sort((a,b)=>b.id-a.id).slice(0,8);
   if(!recent.length){
@@ -4149,8 +4514,6 @@ async function syncToSheets(){
 //  KEYBOARD SHORTCUTS
 // ============================================================
 document.addEventListener('keydown',e=>{
-  // Command palette: Ctrl+K / Cmd+K — works from anywhere
-  if((e.ctrlKey||e.metaKey) && e.key==='k'){ e.preventDefault(); openCmdPalette(); return; }
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT'||e.target.contentEditable==='true') return;
   if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>closeModal(m.id));
   const isViewer = CURRENT_USER?.role==='Viewer';
@@ -4168,188 +4531,10 @@ document.addEventListener('click',e=>{
 });
 
 // ============================================================
-//  MOBILE NAV PILL
-// ============================================================
-function updateMobNavPill(id){
-  const pill = document.getElementById('mob-nav-pill');
-  const activeItem = document.getElementById('mob-nav-'+id);
-  if(!pill || !activeItem) return;
-  const nav = document.getElementById('mobile-nav');
-  const navRect = nav.getBoundingClientRect();
-  const itemRect = activeItem.getBoundingClientRect();
-  pill.style.left = (itemRect.left - navRect.left) + 'px';
-  pill.style.width = itemRect.width + 'px';
-}
-// Patch showSection to also update the pill
-const _origShowSection = showSection;
-// Re-define showSection to include pill update at the end
-(function(){
-  const orig = window.showSection;
-  window.showSection = function(id){
-    orig(id);
-    requestAnimationFrame(()=>updateMobNavPill(id));
-  };
-})();
-
-// ============================================================
-//  COMMAND PALETTE (Ctrl+K / Cmd+K)
-// ============================================================
-let _cmdSelectedIdx = -1;
-
-const CMD_SECTIONS = [
-  {key:'dashboard',icon:'fas fa-chart-pie',label:'Dashboard',sub:'Overview & key metrics',kbd:'D'},
-  {key:'growers',icon:'fas fa-users',label:'Growers',sub:'Grower registry',kbd:'G'},
-  {key:'plantation',icon:'fas fa-seedling',label:'Plantation',sub:'Field planting records'},
-  {key:'pests',icon:'fas fa-bug',label:'Pests & Diseases',sub:'Incidence recording',kbd:'P'},
-  {key:'yield-assess',icon:'fas fa-weight-scale',label:'Yield Assessment',sub:'Field yield exercise'},
-  {key:'trends',icon:'fas fa-chart-line',label:'Trends',sub:'Historical analytics'},
-  {key:'production',icon:'fas fa-industry',label:'Production Forecast',sub:'Monthly estimates'},
-  {key:'comparative',icon:'fas fa-balance-scale',label:'Comparative Analysis',sub:'Season 1 vs Season 2'},
-  {key:'campaign',icon:'fas fa-table',label:'Campaign Table',sub:'Fortnightly tracking'},
-  {key:'weekly-report',icon:'fas fa-file-alt',label:'Weekly Report',sub:'Generate & export'},
-  {key:'map',icon:'fas fa-map-marked-alt',label:'Zone Map',sub:'Interactive map',kbd:'M'},
-  {key:'settings',icon:'fas fa-cog',label:'Settings',sub:'Configuration'},
-];
-
-function openCmdPalette(){
-  const overlay = document.getElementById('cmd-overlay');
-  const input = document.getElementById('cmd-input');
-  overlay.classList.add('open');
-  input.value = '';
-  _cmdSelectedIdx = -1;
-  renderCmdResults('');
-  setTimeout(()=>input.focus(),50);
-}
-function closeCmdPalette(){
-  document.getElementById('cmd-overlay').classList.remove('open');
-}
-
-function highlight(str, q){
-  if(!q) return str;
-  const idx = str.toLowerCase().indexOf(q.toLowerCase());
-  if(idx<0) return str;
-  return str.slice(0,idx)+'<span class="cmd-match">'+str.slice(idx,idx+q.length)+'</span>'+str.slice(idx+q.length);
-}
-
-function renderCmdResults(q){
-  const container = document.getElementById('cmd-results');
-  const items = [];
-
-  // Navigation sections
-  const sectionMatches = CMD_SECTIONS.filter(s=>
-    !q || s.label.toLowerCase().includes(q.toLowerCase()) || s.sub.toLowerCase().includes(q.toLowerCase())
-  );
-  if(sectionMatches.length){
-    items.push({type:'header',label:'Sections'});
-    sectionMatches.forEach(s=>items.push({type:'section',data:s,q}));
-  }
-
-  // Growers
-  if(STATE && STATE.growers){
-    const gMatches = STATE.growers.filter(g=>!q||g.name.toLowerCase().includes(q.toLowerCase())||(g.locality||'').toLowerCase().includes(q.toLowerCase())).slice(0,6);
-    if(gMatches.length){
-      items.push({type:'header',label:'Growers'});
-      gMatches.forEach(g=>items.push({type:'grower',data:g,q}));
-    }
-  }
-
-  // Plantation records
-  if(STATE && STATE.plantation && q && q.length>=2){
-    const pMatches = STATE.plantation.filter(p=>
-      p.grower.toLowerCase().includes(q.toLowerCase()) || (p.variety||'').toLowerCase().includes(q.toLowerCase()) || (p.locality||'').toLowerCase().includes(q.toLowerCase())
-    ).slice(0,5);
-    if(pMatches.length){
-      items.push({type:'header',label:'Plantation Records'});
-      pMatches.forEach(p=>items.push({type:'plantation',data:p,q}));
-    }
-  }
-
-  if(!items.length){
-    container.innerHTML = `<div class="cmd-empty"><i class="fas fa-search" style="font-size:22px;opacity:.3;margin-bottom:10px;display:block;"></i>No results for "<strong>${q}</strong>"</div>`;
-    _cmdSelectedIdx = -1;
-    return;
-  }
-
-  let html = '';
-  let itemIdx = 0;
-  items.forEach(item=>{
-    if(item.type==='header'){
-      html += `<div class="cmd-section">${item.label}</div>`;
-    } else if(item.type==='section'){
-      const s = item.data;
-      html += `<div class="cmd-item" data-idx="${itemIdx}" data-action="nav" data-key="${s.key}">
-        <i class="${s.icon}"></i>
-        <div class="cmd-item-main">
-          <div class="cmd-item-label">${highlight(s.label,q)}</div>
-          <div class="cmd-item-sub">${highlight(s.sub,q)}</div>
-        </div>
-        ${s.kbd?`<span class="cmd-item-kbd">${s.kbd}</span>`:''}
-      </div>`;
-      itemIdx++;
-    } else if(item.type==='grower'){
-      const g = item.data;
-      html += `<div class="cmd-item" data-idx="${itemIdx}" data-action="nav" data-key="growers">
-        <i class="fas fa-user"></i>
-        <div class="cmd-item-main">
-          <div class="cmd-item-label">${highlight(g.name,q)}</div>
-          <div class="cmd-item-sub">${g.zone||''} · ${highlight(g.locality||'—',q)}</div>
-        </div>
-      </div>`;
-      itemIdx++;
-    } else if(item.type==='plantation'){
-      const p = item.data;
-      html += `<div class="cmd-item" data-idx="${itemIdx}" data-action="nav" data-key="plantation">
-        <i class="fas fa-seedling" style="color:var(--green);"></i>
-        <div class="cmd-item-main">
-          <div class="cmd-item-label">${highlight(p.grower,q)} — ${highlight(p.variety||'',q)}</div>
-          <div class="cmd-item-sub">${p.datePlanted||''} · ${highlight(p.locality||'',q)} · ${(p.area||0).toFixed(2)} ha</div>
-        </div>
-      </div>`;
-      itemIdx++;
-    }
-  });
-
-  container.innerHTML = html;
-  _cmdSelectedIdx = -1;
-
-  // Click handlers
-  container.querySelectorAll('.cmd-item').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const key = el.dataset.key;
-      closeCmdPalette();
-      showSection(key);
-    });
-  });
-}
-
-function moveCmdSelection(dir){
-  const items = document.querySelectorAll('#cmd-results .cmd-item');
-  if(!items.length) return;
-  items.forEach(i=>i.classList.remove('selected'));
-  _cmdSelectedIdx = (_cmdSelectedIdx + dir + items.length) % items.length;
-  items[_cmdSelectedIdx].classList.add('selected');
-  items[_cmdSelectedIdx].scrollIntoView({block:'nearest'});
-}
-
-// ============================================================
 //  INIT
 // ============================================================
 window.addEventListener('DOMContentLoaded',()=>{
   loadLocal();
-  // Command palette input listeners — attached here so #cmd-input exists
-  const _cmdInput = document.getElementById('cmd-input');
-  if(_cmdInput){
-    _cmdInput.addEventListener('input', e=>{ renderCmdResults(e.target.value.trim()); });
-    _cmdInput.addEventListener('keydown', e=>{
-      if(e.key==='ArrowDown'){e.preventDefault();moveCmdSelection(1);}
-      else if(e.key==='ArrowUp'){e.preventDefault();moveCmdSelection(-1);}
-      else if(e.key==='Enter'){
-        const selected = document.querySelector('#cmd-results .cmd-item.selected') || document.querySelector('#cmd-results .cmd-item');
-        if(selected){ closeCmdPalette(); showSection(selected.dataset.key); }
-      }
-      else if(e.key==='Escape'){ closeCmdPalette(); }
-    });
-  }
   try{
     if(checkViewerTokenLogin()){
       document.getElementById('login-screen').style.display='none';
@@ -4405,23 +4590,6 @@ window.addEventListener('DOMContentLoaded',()=>{
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('change-password-modal')">Cancel</button>
       <button class="btn btn-gold" id="cp-submit-btn" onclick="changePassword()"><i class="fas fa-key"></i> Update Password</button>
-    </div>
-  </div>
-</div>
-
-<!-- COMMAND PALETTE -->
-<div id="cmd-overlay" role="dialog" aria-modal="true" aria-label="Command palette" onclick="if(event.target===this)closeCmdPalette()">
-  <div id="cmd-box">
-    <div id="cmd-input-wrap">
-      <i class="fas fa-search"></i>
-      <input id="cmd-input" placeholder="Search growers, plantations, sections…" autocomplete="off" autocorrect="off" spellcheck="false">
-      <span id="cmd-shortcut-hint">ESC</span>
-    </div>
-    <div id="cmd-results"></div>
-    <div id="cmd-footer">
-      <div class="cmd-ft-key"><kbd>↑↓</kbd> navigate</div>
-      <div class="cmd-ft-key"><kbd>↵</kbd> select</div>
-      <div class="cmd-ft-key"><kbd>ESC</kbd> close</div>
     </div>
   </div>
 </div>
