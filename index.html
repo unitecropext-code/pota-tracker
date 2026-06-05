@@ -1993,6 +1993,7 @@ function _removeFocusTrap(id) {
 // ============================================================
 const DEFAULT_STATE = {
   growers:[],plantation:[],pestRecords:[],yieldAssessments:[],
+  labSubmissions:[],
   varieties:['Delaware','Jelly','Mondial','Panamera','Spunta Imported','Spunta Local'],
   campaignData:{},weeklyReports:[],
   harvestDays:90,
@@ -2025,6 +2026,7 @@ function loadLocal(){
     if(!STATE.weeklyReports) STATE.weeklyReports = [];
     if(!STATE.harvestDays) STATE.harvestDays = 90;
     if(STATE.defaultYield == null) STATE.defaultYield = 12;
+    if(!STATE.labSubmissions) STATE.labSubmissions = [];
     GAS_URL = localStorage.getItem('pota_gas_url_v3') || '';
   } catch(e){ STATE = {...DEFAULT_STATE}; }
 }
@@ -3411,6 +3413,11 @@ function renderPestTable(){
       </div>
       ${visitRows}
       ${r.controlMeasure?`<div style="font-size:11px;color:var(--text2);margin-top:5px;"><i class="fas fa-shield-alt"></i> Control: ${r.controlMeasure}</div>`:''}
+      <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--border);">
+        <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);font-weight:700;align-self:center;letter-spacing:.5px;"><i class="fas fa-flask" style="color:var(--purple);margin-right:4px;"></i>SUBMIT TO LAB:</span>
+        <button class="btn btn-sm" style="background:rgba(168,85,247,.1);color:var(--purple);border:1px solid rgba(168,85,247,.3);font-size:11px;" onclick="submitLabSample(${r.id},'Plant Pathology')"><i class="fas fa-virus"></i> Plant Pathology${(()=>{const c=(STATE.labSubmissions||[]).filter(s=>s.pestRecordId==r.id&&s.labType==='Plant Pathology').length;return c?` <span style="background:rgba(168,85,247,.3);border-radius:4px;padding:0 5px;font-size:10px;">${c}</span>`:''})()}</button>
+        <button class="btn btn-sm" style="background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.3);font-size:11px;" onclick="submitLabSample(${r.id},'Entomology')"><i class="fas fa-bug"></i> Entomology${(()=>{const c=(STATE.labSubmissions||[]).filter(s=>s.pestRecordId==r.id&&s.labType==='Entomology').length;return c?` <span style="background:rgba(249,115,22,.3);border-radius:4px;padding:0 5px;font-size:10px;">${c}</span>`:''})()}</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -3457,6 +3464,128 @@ function deletePestRecord(id){
   STATE.pestRecords=STATE.pestRecords.filter(x=>x.id!=id);
   saveLocal(); renderPestTable(); renderDashboard(); updateAlertBadge();
   undoDelete('Pest record deleted', ()=>{ STATE.pestRecords.push(_r); saveLocal(); renderPestTable(); renderDashboard(); updateAlertBadge(); });
+}
+
+// ============================================================
+//  LAB SUBMISSIONS  (Plant Pathology & Entomology)
+// ============================================================
+function submitLabSample(pestRecordId, labType){
+  const rec = STATE.pestRecords.find(r=>r.id==pestRecordId);
+  if(!rec){ toast('Pest record not found','error'); return; }
+
+  // Collect all pest/disease names with a recorded severity from this record
+  const allPests = [];
+  (rec.visits||[]).forEach(v=>{
+    Object.entries(v.pests||{}).forEach(([name,pd])=>{
+      if(pd.sev && !allPests.includes(name)) allPests.push(name);
+    });
+  });
+
+  // Separate into pests vs diseases to pre-fill "nature of problem"
+  const pestNames  = allPests.filter(n=>PESTS.includes(n));
+  const diseaseNames = allPests.filter(n=>DISEASES.includes(n));
+  const relevant   = labType==='Entomology' ? (pestNames.length?pestNames:allPests) : (diseaseNames.length?diseaseNames:allPests);
+
+  // Build severity summary  e.g. "Aphids (High 40%), Late Blight (Moderate 25%)"
+  const severitySummary = (rec.visits||[]).flatMap(v=>
+    Object.entries(v.pests||{})
+      .filter(([name])=>relevant.includes(name))
+      .map(([name,pd])=>`${name} (${pd.sev} ${pd.pct}%)`)
+  ).filter((v,i,a)=>a.indexOf(v)===i).join(', ') || relevant.join(', ') || 'Not specified';
+
+  const sub = {
+    id: Date.now() + Math.random(),
+    pestRecordId,
+    grower: rec.grower,
+    locality: rec.locality||'',
+    season: rec.season||'',
+    labType,                   // 'Plant Pathology' | 'Entomology'
+    natureOfProblem: severitySummary,
+    submittedBy: CURRENT_USER?.username||'',
+    submittedAt: new Date().toISOString().split('T')[0],
+    status: 'Submitted'
+  };
+
+  if(!STATE.labSubmissions) STATE.labSubmissions=[];
+  STATE.labSubmissions.push(sub);
+  saveLocal();
+  renderDashboard();
+  toast(`Sample submitted to ${labType} Lab ✓ — ${rec.grower}`, 'success');
+  renderPestTable(); // refresh to update button states
+}
+
+function getLabSubmissionCount(labType, season){
+  if(!STATE.labSubmissions) return 0;
+  return STATE.labSubmissions.filter(s=>
+    s.labType===labType && (!season||s.season===season)
+  ).length;
+}
+
+function renderLabSubmissionsCard(){
+  const el = document.getElementById('lab-submissions-card');
+  if(!el) return;
+  if(!STATE.labSubmissions) STATE.labSubmissions=[];
+
+  const ppS1 = getLabSubmissionCount('Plant Pathology','Season 1');
+  const ppS2 = getLabSubmissionCount('Plant Pathology','Season 2');
+  const enS1 = getLabSubmissionCount('Entomology','Season 1');
+  const enS2 = getLabSubmissionCount('Entomology','Season 2');
+  const ppTotal = ppS1+ppS2, enTotal = enS1+enS2;
+
+  // Recent submissions list (last 5)
+  const recent = [...STATE.labSubmissions].sort((a,b)=>b.id-a.id).slice(0,5);
+  const recentHtml = recent.length ? recent.map(s=>`
+    <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;">
+      <i class="fas fa-${s.labType==='Plant Pathology'?'virus':'bug'}" style="color:${s.labType==='Plant Pathology'?'var(--purple)':'var(--orange)'};width:12px;text-align:center;"></i>
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><strong>${s.grower}</strong> — ${s.natureOfProblem}</span>
+      <span class="badge ${s.season==='Season 1'?'badge-s1':'badge-s2'}" style="flex-shrink:0;">${s.season==='Season 1'?'S1':'S2'}</span>
+      <span style="color:var(--text3);flex-shrink:0;">${s.submittedAt}</span>
+    </div>`).join('') : `<div style="font-size:12px;color:var(--text3);padding:6px 0;">No lab submissions yet.</div>`;
+
+  el.innerHTML = `
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--orange));"></div>
+    <div class="card-title"><i class="fas fa-flask" style="color:var(--purple);"></i> Lab Sample Submissions
+      <span style="margin-left:auto;font-size:10px;color:var(--text3);">Plant Pathology &amp; Entomology</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:12px;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+          <i class="fas fa-virus" style="color:var(--purple);font-size:14px;"></i>
+          <span style="font-size:12px;font-weight:700;color:var(--purple);">Plant Pathology</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px;">
+            <div style="font-size:20px;font-weight:800;color:var(--purple);font-family:var(--font-display);">${ppS1}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">S1 samples</div>
+          </div>
+          <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px;">
+            <div style="font-size:20px;font-weight:800;color:var(--blue);font-family:var(--font-display);">${ppS2}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">S2 samples</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:6px;font-size:11px;color:var(--text2);">Total: <strong style="color:var(--purple);">${ppTotal}</strong> submitted</div>
+      </div>
+      <div style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);border-radius:10px;padding:12px;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+          <i class="fas fa-bug" style="color:var(--orange);font-size:14px;"></i>
+          <span style="font-size:12px;font-weight:700;color:var(--orange);">Entomology</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px;">
+            <div style="font-size:20px;font-weight:800;color:var(--orange);font-family:var(--font-display);">${enS1}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">S1 samples</div>
+          </div>
+          <div style="text-align:center;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 4px;">
+            <div style="font-size:20px;font-weight:800;color:var(--blue);font-family:var(--font-display);">${enS2}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);">S2 samples</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:6px;font-size:11px;color:var(--text2);">Total: <strong style="color:var(--orange);">${enTotal}</strong> submitted</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px;font-family:var(--font-mono);letter-spacing:.5px;">RECENT SUBMISSIONS</div>
+    ${recentHtml}
+  `;
 }
 
 // ============================================================
