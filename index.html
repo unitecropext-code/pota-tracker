@@ -510,11 +510,13 @@ function openOthersModal(t){}
     <div class="login-field">
       <label class="login-label">Username</label>
       <input class="login-input" id="login-user" placeholder="Enter username" autocomplete="username"
+        autocapitalize="none" autocorrect="off" spellcheck="false"
         onkeydown="if(event.key==='Enter'){var p=document.getElementById('login-pass');if(p.value.trim())doLogin();else p.focus();}">
     </div>
     <div class="login-field">
       <label class="login-label">Password</label>
       <input class="login-input" id="login-pass" type="password" placeholder="Enter password" autocomplete="current-password"
+        autocapitalize="none" autocorrect="off" spellcheck="false"
         onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div id="login-error"></div>
@@ -1806,8 +1808,8 @@ function setLoginBusy(busy){
 }
 
 async function doLogin(){
-  const user = document.getElementById('login-user').value.trim().toLowerCase();
-  const pass = document.getElementById('login-pass').value;
+  const user = document.getElementById('login-user').value.trim().toLowerCase().replace(/\s+/g,'');
+  const pass = document.getElementById('login-pass').value.trim();
   const errEl = document.getElementById('login-error');
   errEl.textContent = '';
 
