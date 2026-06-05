@@ -240,10 +240,45 @@ a{color:inherit;text-decoration:none;}
 .ft-cell.filled{background:var(--gold);opacity:.85;}
 .ft-cell.empty{background:rgba(255,255,255,.03);}
 .ft-cell.future{background:rgba(255,255,255,.02);border-style:dashed;}
-/* Harvest countdown widget */
-.harvest-list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;}
-.harvest-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;transition:background .15s;}
-.harvest-item:hover{background:rgba(255,255,255,.04);}
+/* Harvest countdown timeline pin chart */
+.hc-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.hc-controls label{font-size:11px;color:var(--text2);font-family:var(--font-mono);}
+.hc-controls input[type=range]{accent-color:var(--gold);width:110px;}
+.hc-controls select{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:7px;font-size:11px;font-family:var(--font-body);outline:none;}
+.hc-controls select:focus{border-color:var(--gold);}
+.hc-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:10px;color:var(--text2);font-family:var(--font-mono);}
+.hc-legend-item{display:flex;align-items:center;gap:4px;}
+.hc-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.hc-track-wrap{position:relative;height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin:70px 0 80px;}
+.hc-progress{position:absolute;left:0;top:0;height:100%;border-radius:3px;background:var(--green);}
+.hc-today-line{position:absolute;top:-62px;bottom:-76px;width:2px;background:var(--red);z-index:10;pointer-events:none;}
+.hc-today-label{position:absolute;top:-62px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--red);white-space:nowrap;background:var(--card);padding:2px 6px;border-radius:4px;border:1px solid rgba(239,68,68,.4);font-family:var(--font-mono);}
+.hc-today-arrow{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--red);}
+.hc-pin-above{position:absolute;top:-62px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:5;}
+.hc-pin-above:hover .hc-pin-card{opacity:1;pointer-events:auto;transform:translateY(-4px);}
+.hc-pin-above:hover .hc-pin-dot{transform:scale(1.35);}
+.hc-pin-stem{width:2px;height:48px;opacity:.5;}
+.hc-pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--card);margin-top:-1px;flex-shrink:0;transition:transform .15s;}
+.hc-pin-card{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:11px;min-width:160px;max-width:200px;pointer-events:none;opacity:0;transition:opacity .15s,transform .15s;box-shadow:0 4px 24px rgba(0,0,0,.6);z-index:30;}
+.hc-pin-card-name{font-weight:600;font-size:12px;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hc-pin-card-row{display:flex;justify-content:space-between;gap:8px;color:var(--text2);margin-top:2px;font-size:10px;}
+.hc-pin-below{position:absolute;top:6px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:5;}
+.hc-pin-below:hover .hc-pin-card-below{opacity:1;pointer-events:auto;transform:translateY(4px);}
+.hc-pin-below:hover .hc-pin-dot-below{transform:scale(1.35);}
+.hc-pin-stem-below{width:2px;height:44px;opacity:.5;}
+.hc-pin-dot-below{width:13px;height:13px;border-radius:50%;border:2px solid var(--card);flex-shrink:0;transition:transform .15s;}
+.hc-pin-card-below{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-size:11px;min-width:160px;max-width:200px;pointer-events:none;opacity:0;transition:opacity .15s,transform .15s;box-shadow:0 4px 24px rgba(0,0,0,.6);z-index:30;}
+.hc-axis{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:6px;font-family:var(--font-mono);}
+.hc-notif-stack{display:flex;flex-direction:column;gap:6px;margin-top:18px;}
+.hc-section-label{font-size:10px;font-weight:700;color:var(--text2);margin:16px 0 6px;display:flex;align-items:center;gap:6px;font-family:var(--font-mono);letter-spacing:.5px;text-transform:uppercase;}
+.hc-notif{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,.02);cursor:default;transition:background .15s;}
+.hc-notif:hover{background:rgba(255,255,255,.04);}
+.hc-notif-days{font-size:13px;font-weight:700;min-width:52px;text-align:center;border-radius:8px;padding:5px 0;font-family:var(--font-mono);}
+.hc-notif-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);}
+.hc-notif-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+.hc-notif-date{font-size:10px;color:var(--text2);white-space:nowrap;font-family:var(--font-mono);}
+.hc-badge-s1{display:inline-block;padding:1px 6px;border-radius:20px;font-size:9px;font-weight:700;background:#14366b;color:#7eb8f7;}
+.hc-badge-s2{display:inline-block;padding:1px 6px;border-radius:20px;font-size:9px;font-weight:700;background:#2d2566;color:#c4bfff;}
 .harvest-days-badge{min-width:40px;text-align:center;font-family:var(--font-mono);font-size:13px;font-weight:700;padding:3px 8px;border-radius:8px;}
 .harvest-days-badge.urgent{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.3);}
 .harvest-days-badge.soon{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(249,115,22,.3);}
@@ -753,22 +788,45 @@ function openOthersModal(t){}
     <div id="ft-tracker" style="overflow-x:auto;"></div>
   </div>
 
-  <!-- Harvest countdown + Yield gap row -->
-  <div class="grid-2" style="margin-bottom:14px;">
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--green));"></div>
-      <div class="card-title"><i class="fas fa-tractor" style="color:var(--gold);"></i> Harvest Countdown
-        <span style="margin-left:auto;font-size:10px;color:var(--text3);">days to harvest (est.)</span>
-      </div>
-      <div class="harvest-list" id="harvest-list"><span style="font-size:12px;color:var(--text3);">No plantation records yet.</span></div>
+  <!-- Harvest Timeline Pin Chart — full-width card -->
+  <div class="card" style="margin-bottom:14px;overflow:visible;">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--green));"></div>
+    <div class="card-title"><i class="fas fa-tractor" style="color:var(--gold);"></i> Harvest Timeline
+      <span style="margin-left:auto;font-size:10px;color:var(--text3);">pin chart · hover pins for details</span>
     </div>
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--teal));"></div>
-      <div class="card-title"><i class="fas fa-chart-bar" style="color:var(--blue);"></i> Yield Gap
-        <span style="margin-left:auto;font-size:10px;color:var(--text3);">actual vs estimated T/ha</span>
-      </div>
-      <div id="yield-gap-list" style="padding:4px 0;"></div>
+    <div class="hc-controls">
+      <label>Days to harvest:</label>
+      <input type="range" min="60" max="120" value="90" step="1" id="hc-slider" oninput="document.getElementById('hc-val').textContent=this.value+'d';renderHarvestCountdown();">
+      <span id="hc-val" style="font-size:11px;font-weight:700;color:var(--gold);min-width:36px;font-family:var(--font-mono);">90d</span>
+      <label style="margin-left:8px;">View:</label>
+      <select id="hc-view" onchange="renderHarvestCountdown();">
+        <option value="all">All seasons</option>
+        <option value="s1">Season 1 only</option>
+        <option value="s2">Season 2 only</option>
+      </select>
     </div>
+    <div class="hc-legend">
+      <div class="hc-legend-item"><div class="hc-legend-dot" style="background:var(--red);"></div>Today</div>
+      <div class="hc-legend-item"><div class="hc-legend-dot" style="background:var(--green);"></div>&gt;30d growing</div>
+      <div class="hc-legend-item"><div class="hc-legend-dot" style="background:var(--orange);"></div>14–30d soon</div>
+      <div class="hc-legend-item"><div class="hc-legend-dot" style="background:var(--red);opacity:.7;"></div>≤14d urgent</div>
+      <div class="hc-legend-item"><div class="hc-legend-dot" style="background:var(--text3);"></div>Harvested</div>
+    </div>
+    <div style="overflow-x:auto;padding:0 2px;">
+      <div id="hc-chart-area" style="min-width:320px;position:relative;overflow:visible;"></div>
+    </div>
+    <div id="hc-notif-area"></div>
+    <!-- hidden legacy element so old code refs don't throw -->
+    <div id="harvest-list" style="display:none;"></div>
+  </div>
+
+  <!-- Yield gap -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--teal));"></div>
+    <div class="card-title"><i class="fas fa-chart-bar" style="color:var(--blue);"></i> Yield Gap
+      <span style="margin-left:auto;font-size:10px;color:var(--text3);">actual vs estimated T/ha</span>
+    </div>
+    <div id="yield-gap-list" style="padding:4px 0;"></div>
   </div>
 
   <!-- Charts row -->
@@ -2405,37 +2463,168 @@ function renderFortnightTracker(){
   el.innerHTML = html;
 }
 
-// ── Harvest countdown ─────────────────────────────────────
+// ── Harvest countdown (timeline pin chart) ────────────────
 function renderHarvestCountdown(){
-  const el = document.getElementById('harvest-list'); if(!el) return;
-  const harvestDays = STATE.harvestDays || 90;
+  const chartEl = document.getElementById('hc-chart-area');
+  const notifEl = document.getElementById('hc-notif-area');
+  if(!chartEl) return;
+
+  const slider = document.getElementById('hc-slider');
+  const viewSel = document.getElementById('hc-view');
+  const hd = slider ? parseInt(slider.value) : (STATE.harvestDays || 90);
+  const viewFilter = viewSel ? viewSel.value : 'all';
+
+  // Sync legacy slider if it exists (STATE.harvestDays)
+  if(slider) STATE.harvestDays = hd;
+
   const today = new Date(); today.setHours(0,0,0,0);
-  const rows = STATE.plantation
+
+  const pinColors = {ok:'#22c55e', soon:'#f97316', urgent:'#ef4444', past:'#3e5070'};
+  const notifBg   = {ok:'rgba(34,197,94,.08)',  soon:'rgba(249,115,22,.08)',  urgent:'rgba(239,68,68,.08)',  past:'rgba(255,255,255,.03)'};
+  const notifTxt  = {ok:'#22c55e', soon:'#f97316', urgent:'#ef4444', past:'#3e5070'};
+
+  function getStatus(diff){
+    if(diff < 0) return 'past';
+    if(diff <= 14) return 'urgent';
+    if(diff <= 30) return 'soon';
+    return 'ok';
+  }
+
+  let rows = STATE.plantation
     .filter(r=>r.datePlanted)
     .map(r=>{
       const planted = new Date(r.datePlanted);
-      const harvestDate = new Date(planted.getTime() + harvestDays*864e5);
+      const harvestDate = new Date(planted.getTime() + hd*864e5);
       const diff = Math.round((harvestDate - today)/864e5);
-      return { ...r, harvestDate, diff };
+      return {...r, planted, harvestDate, diff, status:getStatus(diff)};
     })
-    .sort((a,b)=>a.diff-b.diff)
-    .slice(0,10);
+    .filter(r=>{
+      if(viewFilter==='s1') return r.season==='Season 1';
+      if(viewFilter==='s2') return r.season==='Season 2';
+      return true;
+    });
 
-  if(!rows.length){ el.innerHTML=`<span style="font-size:12px;color:var(--text3);">No plantation records yet.</span>`; return; }
+  rows.sort((a,b)=>a.diff-b.diff);
 
-  el.innerHTML = rows.map(r=>{
-    const cls = r.diff < 0 ? 'past' : r.diff<=14 ? 'urgent' : r.diff<=30 ? 'soon' : 'ok';
-    const label = r.diff<0 ? `${Math.abs(r.diff)}d ago` : r.diff===0 ? 'Today!' : `${r.diff}d`;
-    const dateStr = r.harvestDate.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    return `<div class="harvest-item">
-      <div class="harvest-days-badge ${cls}">${label}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.grower}</div>
-        <div style="font-size:10px;color:var(--text3);">${r.variety||'—'} · ${r.locality||'—'} · Due ${dateStr}</div>
-      </div>
-      <span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}" style="flex-shrink:0;">${r.season==='Season 1'?'S1':'S2'}</span>
-    </div>`;
-  }).join('');
+  if(!rows.length){
+    chartEl.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0;">No plantation records for this filter.</div>';
+    if(notifEl) notifEl.innerHTML='';
+    return;
+  }
+
+  const allTimes = rows.map(r=>r.harvestDate.getTime());
+  const minTime = Math.min(today.getTime(), ...allTimes);
+  const maxTime = Math.max(today.getTime()+1, ...allTimes);
+  const span = maxTime - minTime || 1;
+
+  const TRACK_W = 600; // logical px for position calc
+  const CLUSTER_PX = 28;
+  const todayPct = Math.max(0, Math.min(1, (today.getTime()-minTime)/span));
+
+  const fmtDate  = d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  const fmtShort = d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+
+  // Assign above/below alternating, avoid collision
+  const posPx = rows.map(r=>Math.round(((r.harvestDate.getTime()-minTime)/span)*TRACK_W));
+  const placement = [];
+  let lastAbovePx=-999, lastBelowPx=-999;
+  rows.forEach((r,i)=>{
+    const px = posPx[i];
+    if(px - lastAbovePx >= CLUSTER_PX){ placement.push('above'); lastAbovePx=px; }
+    else { placement.push('below'); lastBelowPx=px; }
+  });
+
+  // Track wrapper height — account for above (70px) + track (6px) + below (80px)
+  let html = `<div style="position:relative;height:170px;overflow:visible;">
+    <div style="position:relative;height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin:70px 0 80px;">
+      <div style="position:absolute;left:0;top:0;height:100%;width:${(todayPct*100).toFixed(1)}%;border-radius:3px;background:var(--green);"></div>`;
+
+  // Today line
+  html += `<div style="position:absolute;left:${(todayPct*100).toFixed(1)}%;top:-66px;bottom:-76px;width:2px;background:var(--red);z-index:10;pointer-events:none;">
+    <div style="position:absolute;top:-2px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--red);white-space:nowrap;background:var(--card);padding:2px 5px;border-radius:4px;border:1px solid rgba(239,68,68,.4);font-family:var(--font-mono);">TODAY</div>
+    <div style="position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--red);"></div>
+  </div>`;
+
+  // Pins
+  rows.forEach((r,i)=>{
+    const pct = ((r.harvestDate.getTime()-minTime)/span*100).toFixed(1);
+    const col = pinColors[r.status];
+    const side = placement[i];
+    const seaBadge = r.season==='Season 1'?'hc-badge-s1':'hc-badge-s2';
+    const seaLabel = r.season==='Season 1'?'S1':'S2';
+    const dayLabel = r.diff<0?`${Math.abs(r.diff)}d ago`:r.diff===0?'Today!':`${r.diff}d`;
+    const growerShort = r.grower.length>18 ? r.grower.slice(0,17)+'…' : r.grower;
+
+    if(side==='above'){
+      html += `<div class="hc-pin-above" style="left:${pct}%;">
+        <div class="hc-pin-card">
+          <div class="hc-pin-card-name">${r.grower}</div>
+          <div class="hc-pin-card-row"><span>${r.variety||'—'}</span><span class="${seaBadge}">${seaLabel}</span></div>
+          <div class="hc-pin-card-row"><span>${r.locality||'—'}</span><span style="color:${col};font-weight:700;">${dayLabel}</span></div>
+          <div class="hc-pin-card-row"><span style="font-family:var(--font-mono);font-size:9px;">${fmtDate(r.harvestDate)}</span></div>
+        </div>
+        <div class="hc-pin-stem" style="background:${col};"></div>
+        <div class="hc-pin-dot" style="background:${col};"></div>
+      </div>`;
+    } else {
+      html += `<div class="hc-pin-below" style="position:absolute;top:6px;left:${pct}%;transform:translateX(-50%);">
+        <div class="hc-pin-stem-below" style="background:${col};"></div>
+        <div class="hc-pin-dot-below" style="background:${col};border:2px solid var(--card);"></div>
+        <div class="hc-pin-card-below">
+          <div class="hc-pin-card-name">${r.grower}</div>
+          <div class="hc-pin-card-row"><span>${r.variety||'—'}</span><span class="${seaBadge}">${seaLabel}</span></div>
+          <div class="hc-pin-card-row"><span>${r.locality||'—'}</span><span style="color:${col};font-weight:700;">${dayLabel}</span></div>
+          <div class="hc-pin-card-row"><span style="font-family:var(--font-mono);font-size:9px;">${fmtDate(r.harvestDate)}</span></div>
+        </div>
+      </div>`;
+    }
+  });
+
+  html += `</div>`;
+  html += `<div class="hc-axis"><span>${fmtShort(new Date(minTime))}</span><span>${fmtShort(new Date(maxTime))}</span></div>`;
+  html += `</div>`;
+
+  chartEl.innerHTML = html;
+
+  // Hover for below pins
+  chartEl.querySelectorAll('.hc-pin-below').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ const c=el.querySelector('.hc-pin-card-below'); if(c){c.style.opacity='1';c.style.transform='translateX(-50%) translateY(4px)';} });
+    el.addEventListener('mouseleave',()=>{ const c=el.querySelector('.hc-pin-card-below'); if(c){c.style.opacity='0';c.style.transform='translateX(-50%) translateY(0)';} });
+  });
+
+  // Notification list
+  if(!notifEl) return;
+  const urgent = rows.filter(r=>r.status==='urgent');
+  const soon   = rows.filter(r=>r.status==='soon');
+  const ok     = rows.filter(r=>r.status==='ok');
+  const past   = rows.filter(r=>r.status==='past');
+
+  const renderNotifGroup = (label, icon, items, statusKey) => {
+    if(!items.length) return '';
+    let s = `<div class="hc-section-label"><i class="${icon}" style="color:${notifTxt[statusKey]};font-size:13px;"></i>${label}</div>`;
+    items.forEach(r=>{
+      const dayLabel = r.diff<0?`${Math.abs(r.diff)}d ago`:r.diff===0?'Today!':r.diff===1?'Tmrw!':r.diff+'d';
+      const seaBadge = r.season==='Season 1'?'hc-badge-s1':'hc-badge-s2';
+      const seaLabel = r.season==='Season 1'?'S1':'S2';
+      s += `<div class="hc-notif">
+        <div class="hc-notif-days" style="background:${notifBg[r.status]};color:${notifTxt[r.status]};border:1px solid ${notifTxt[r.status]}33;">${dayLabel}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="hc-notif-name">${r.grower}</div>
+          <div class="hc-notif-sub">${r.variety||'—'} · ${r.locality||'—'} · Zone ${r.zone||'—'}</div>
+        </div>
+        <span class="${seaBadge}" style="flex-shrink:0;margin-right:6px;">${seaLabel}</span>
+        <div class="hc-notif-date">${fmtDate(r.harvestDate)}</div>
+      </div>`;
+    });
+    return s;
+  };
+
+  notifEl.innerHTML = `<div class="hc-notif-stack">
+    ${renderNotifGroup('Urgent — harvest within 14 days','fas fa-exclamation-circle',urgent,'urgent')}
+    ${renderNotifGroup('Upcoming — within 30 days','fas fa-clock',soon,'soon')}
+    ${renderNotifGroup('Growing — more than 30 days','fas fa-seedling',ok,'ok')}
+    ${renderNotifGroup('Estimated harvest passed','fas fa-check-circle',past,'past')}
+  </div>`;
 }
 
 // ── Pest Pressure Index ───────────────────────────────────
