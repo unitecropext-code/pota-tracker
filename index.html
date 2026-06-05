@@ -1131,7 +1131,15 @@ function openOthersModal(t){}
 
 <!-- ========== SETTINGS ========== -->
 <section id="sec-settings" class="section">
-  <div class="grid-2">
+  <div class="card" id="fo-settings-card" style="display:none;">
+    <div class="card-title"><i class="fas fa-key"></i> My Account</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7;">
+      As a <strong>Field Officer</strong> you can update your login password below.
+      Contact an Administrator to change your role, zone access, or username.
+    </p>
+    <button class="btn btn-gold" onclick="openChangePasswordModal()"><i class="fas fa-key"></i> Change My Password</button>
+  </div>
+  <div class="grid-2 fo-admin-hidden">
     <div class="card">
       <div class="card-title"><i class="fas fa-leaf"></i> Potato Varieties</div>
       <div style="display:flex;gap:7px;margin-bottom:10px;">
@@ -1155,7 +1163,7 @@ function openOthersModal(t){}
       </div>
     </div>
   </div>
-  <div class="card">
+  <div class="card fo-admin-hidden">
     <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;"><span><i class="fas fa-users-cog"></i> User Management</span><button class="btn btn-ghost" style="font-size:12px;padding:5px 10px;" onclick="openChangePasswordModal()"><i class="fas fa-key"></i> Change My Password</button></div>
     <div class="form-row-3">
       <div class="form-group"><label class="form-label">Username</label><input class="form-control" id="nu-username" placeholder="username"></div>
@@ -1170,7 +1178,7 @@ function openOthersModal(t){}
     <hr class="divider">
     <div id="users-list"></div>
   </div>
-  <div class="card">
+  <div class="card fo-admin-hidden">
     <div class="card-title"><i class="fas fa-database"></i> Data Management</div>
     <div style="display:flex;flex-wrap:wrap;gap:7px;">
       <button class="btn btn-ghost" onclick="exportAllData()"><i class="fas fa-download"></i> Export Backup (JSON)</button>
@@ -1204,6 +1212,30 @@ function openOthersModal(t){}
     <hr class="divider">
     <div style="font-size:12px;color:var(--text2);"><i class="fas fa-info-circle" style="color:var(--blue);margin-right:5px;"></i>All data auto-saved to localStorage. Use Export/Import for backup.</div>
   </div>
+  <div class="card">
+    <div class="card-title"><i class="fas fa-share-alt"></i> Viewer Share Link</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.7;">
+      Generate a read-only link for managers or external reviewers. Anyone with this link
+      can view <strong>Dashboard, Trends, Production Forecast, and Comparative Analysis</strong> only — no editing.
+    </p>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
+      <button class="btn btn-gold" onclick="generateAndShowViewerLink()"><i class="fas fa-link"></i> Generate Link</button>
+      <button class="btn btn-red btn-sm" onclick="revokeViewerLink()"><i class="fas fa-ban"></i> Revoke</button>
+    </div>
+    <div id="viewer-link-box" style="display:none;">
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:8px;">
+        <input id="viewer-link-input" class="form-control" readonly
+          style="flex:1;font-size:11px;font-family:var(--font-mono);background:transparent;border:none;padding:0;min-height:unset;">
+        <button class="btn btn-ghost btn-sm" onclick="copyViewerLink()"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;">
+        <i class="fas fa-info-circle" style="color:var(--blue);"></i>
+        Share this URL on any device. Viewers see Dashboard, Trends, Production &amp; Comparative only.
+        Click <strong>Revoke</strong> to invalidate all existing links immediately.
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title"><i class="fas fa-keyboard"></i> Keyboard Shortcuts</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:12px;">
@@ -1563,6 +1595,16 @@ const LOCALITY_COORDS = {
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6','#f97316','#ec4899'];
 
+// ── VIEWER TOKEN ─────────────────────────────────────────────
+const VIEWER_TOKEN_KEY = 'pota_viewer_token_v1';
+function getViewerTokenFromUrl(){const hash=window.location.hash;const match=hash.match(/[?&#]?viewer=([a-zA-Z0-9_-]+)/);return match?match[1]:null;}
+function checkViewerTokenLogin(){const urlToken=getViewerTokenFromUrl();if(!urlToken)return false;const savedToken=localStorage.getItem(VIEWER_TOKEN_KEY);if(!savedToken||urlToken!==savedToken)return false;CURRENT_USER={username:'viewer',fullName:'View-Only Guest',role:'Viewer',zoneAccess:'All'};localStorage.setItem('pota_current_user',JSON.stringify(CURRENT_USER));return true;}
+function generateViewerToken(){const token=Array.from(crypto.getRandomValues(new Uint8Array(18))).map(b=>b.toString(16).padStart(2,'0')).join('').substring(0,24);localStorage.setItem(VIEWER_TOKEN_KEY,token);return token;}
+function getViewerShareLink(){const token=localStorage.getItem(VIEWER_TOKEN_KEY)||generateViewerToken();const base=window.location.href.split('#')[0];return base+'#viewer='+token;}
+function generateAndShowViewerLink(){const link=getViewerShareLink();const box=document.getElementById('viewer-link-box');const input=document.getElementById('viewer-link-input');if(box)box.style.display='block';if(input)input.value=link;toast('Viewer link ready — copy and share it','success');}
+function copyViewerLink(){const input=document.getElementById('viewer-link-input');if(!input||!input.value){toast('Generate a link first','warning');return;}navigator.clipboard.writeText(input.value).then(()=>toast('Link copied ✓')).catch(()=>{input.select();document.execCommand('copy');toast('Link copied ✓');});}
+function revokeViewerLink(){if(!confirm('Revoke the viewer link? Anyone using the old link will lose access.'))return;localStorage.removeItem(VIEWER_TOKEN_KEY);const box=document.getElementById('viewer-link-box');if(box)box.style.display='none';toast('Viewer link revoked — generate a new one to share again','warning');}
+
 // ============================================================
 //  PASSWORD HASHING  (Web Crypto SHA-256, no external deps)
 // ============================================================
@@ -1893,7 +1935,7 @@ async function initApp(){
     document.head.appendChild(viewerStyle);
     document.querySelectorAll('#topbar .btn-gold,#topbar .btn-ghost').forEach(function(b){b.style.display='none';});
     // Add lock icon to restricted nav items
-    ['growers','plantation','pests','yield-assess','weekly-report','campaign','settings'].forEach(function(id){
+    ['map','growers','plantation','pests','yield-assess','weekly-report','campaign','settings'].forEach(function(id){
       var nav=document.getElementById('nav-'+id);
       if(!nav) return;
       nav.style.opacity='0.55';
@@ -1904,7 +1946,7 @@ async function initApp(){
     });
     // Viewer banner
     var banner=document.createElement('div');
-    banner.innerHTML='<i class="fas fa-eye" style="margin-right:6px;"></i><strong>Viewer mode</strong> — Dashboard, Map, Trends, Production &amp; Comparative only.';
+    banner.innerHTML='<i class="fas fa-eye" style="margin-right:6px;"></i><strong>Viewer mode</strong> — Dashboard, Trends, Production Forecast &amp; Comparative Analysis only.';
     banner.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:9000;background:rgba(59,130,246,.13);border-top:1px solid rgba(59,130,246,.3);color:#7ab8ff;font-size:11px;padding:6px 18px;text-align:center;backdrop-filter:blur(10px);pointer-events:none;';
     document.body.appendChild(banner);
 
@@ -1933,6 +1975,16 @@ async function initApp(){
 
     // Disable print via Ctrl+P (also caught above) and beforeprint event
     window.addEventListener('beforeprint', function(e){ e.preventDefault(); window.stop(); });
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── FIELD OFFICER: restrict Settings to Change Password + Shortcuts only ─
+  if(CURRENT_USER.role === 'Field Officer'){
+    var foStyle = document.createElement('style');
+    foStyle.textContent = '#sec-settings .fo-admin-hidden{display:none!important}';
+    document.head.appendChild(foStyle);
+    var foCard = document.getElementById('fo-settings-card');
+    if(foCard) foCard.style.display = 'block';
   }
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -2138,7 +2190,7 @@ const PAGE_META = {
 };
 function showSection(id){
   // Viewer role: show Access Denied screen for restricted sections
-  var _viewerRestricted=['growers','plantation','pests','yield-assess','weekly-report','campaign','settings'];
+  var _viewerRestricted=['map','growers','plantation','pests','yield-assess','weekly-report','campaign','settings'];
   if(CURRENT_USER && CURRENT_USER.role==='Viewer' && _viewerRestricted.indexOf(id)>-1){
     document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
     document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
@@ -3984,13 +4036,16 @@ document.addEventListener('click',e=>{
 window.addEventListener('DOMContentLoaded',()=>{
   loadLocal();
   try{
+    if(checkViewerTokenLogin()){
+      document.getElementById('login-screen').style.display='none';
+      initApp();
+      return;
+    }
     const saved=localStorage.getItem('pota_current_user');
     if(saved){
       CURRENT_USER=JSON.parse(saved);
       document.getElementById('login-screen').style.display='none';
       initApp();
-    } else {
-
     }
   }catch(e){ localStorage.removeItem('pota_current_user'); }
 });
