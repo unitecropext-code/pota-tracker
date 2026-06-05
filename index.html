@@ -744,41 +744,6 @@ function openOthersModal(t){}
     </div>
   </div>
 
-  <!-- Zone heat map + Pest Pressure Index row -->
-  <div class="grid-2" style="margin-bottom:14px;">
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--orange),var(--red));"></div>
-      <div class="card-title"><i class="fas fa-fire-alt" style="color:var(--orange);"></i> Zone Pest Heat Map
-        <span style="margin-left:auto;font-size:10px;color:var(--text3);">by severity</span>
-      </div>
-      <div id="zone-heat-pills" class="zone-heat-row"></div>
-      <div id="zone-heat-detail" style="font-size:11px;color:var(--text3);min-height:18px;"></div>
-    </div>
-    <div class="card" style="margin-bottom:0;">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--blue));"></div>
-      <div class="card-title"><i class="fas fa-heartbeat" style="color:var(--purple);"></i> Pest Pressure Index
-        <span id="ppi-trend-arrow" class="ppi-trend-arrow" style="margin-left:6px;"></span>
-      </div>
-      <div class="ppi-ring-wrap">
-        <div class="ppi-ring">
-          <svg viewBox="0 0 80 80" width="80" height="80">
-            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="8"/>
-            <circle id="ppi-arc" cx="40" cy="40" r="32" fill="none" stroke="var(--purple)" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" style="transition:stroke-dashoffset 1s var(--ease),stroke .4s;"/>
-          </svg>
-          <div class="ppi-ring-label">
-            <div class="ppi-score" id="ppi-score">—</div>
-            <div class="ppi-sub">/100</div>
-          </div>
-        </div>
-        <div style="flex:1;">
-          <div id="ppi-label" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">No data</div>
-          <div id="ppi-desc" style="font-size:11px;color:var(--text2);line-height:1.5;"></div>
-          <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;" id="ppi-zones"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Fortnight completion tracker -->
   <div class="card" style="margin-bottom:14px;">
     <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--green));"></div>
@@ -829,8 +794,8 @@ function openOthersModal(t){}
     <div id="yield-gap-list" style="padding:4px 0;"></div>
   </div>
 
-  <!-- Charts row -->
-  <div class="grid-2">
+  <!-- Charts row — Area by Locality · Variety Distribution · Fortnightly · Pest Severity -->
+  <div class="grid-2" style="margin-bottom:14px;">
     <div class="card">
       <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--orange));"></div>
       <div class="card-title"><i class="fas fa-map-marker-alt"></i> Area by Locality</div>
@@ -842,7 +807,7 @@ function openOthersModal(t){}
       <div class="chart-wrap chart-h240"><canvas id="chart-variety"></canvas></div>
     </div>
   </div>
-  <div class="grid-2">
+  <div class="grid-2" style="margin-bottom:14px;">
     <div class="card">
       <div class="card-accent" style="background:linear-gradient(90deg,var(--teal),var(--blue));"></div>
       <div class="card-title"><i class="fas fa-calendar-alt"></i> Fortnightly Plantation</div>
@@ -852,6 +817,41 @@ function openOthersModal(t){}
       <div class="card-accent" style="background:linear-gradient(90deg,var(--red),var(--orange));"></div>
       <div class="card-title"><i class="fas fa-bug"></i> Pest &amp; Disease Severity</div>
       <div id="pest-overview-bars" style="max-height:240px;overflow-y:auto;padding-top:4px;"></div>
+    </div>
+  </div>
+
+  <!-- Zone heat map + Pest Pressure Index row -->
+  <div class="grid-2" style="margin-bottom:14px;">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--orange),var(--red));"></div>
+      <div class="card-title"><i class="fas fa-fire-alt" style="color:var(--orange);"></i> Zone Pest Heat Map
+        <span style="margin-left:auto;font-size:10px;color:var(--text3);">by severity</span>
+      </div>
+      <div id="zone-heat-pills" class="zone-heat-row"></div>
+      <div id="zone-heat-detail" style="font-size:11px;color:var(--text3);min-height:18px;"></div>
+    </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--blue));"></div>
+      <div class="card-title"><i class="fas fa-heartbeat" style="color:var(--purple);"></i> Pest Pressure Index
+        <span id="ppi-trend-arrow" class="ppi-trend-arrow" style="margin-left:6px;"></span>
+      </div>
+      <div class="ppi-ring-wrap">
+        <div class="ppi-ring">
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="8"/>
+            <circle id="ppi-arc" cx="40" cy="40" r="32" fill="none" stroke="var(--purple)" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" style="transition:stroke-dashoffset 1s var(--ease),stroke .4s;"/>
+          </svg>
+          <div class="ppi-ring-label">
+            <div class="ppi-score" id="ppi-score">—</div>
+            <div class="ppi-sub">/100</div>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div id="ppi-label" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">No data</div>
+          <div id="ppi-desc" style="font-size:11px;color:var(--text2);line-height:1.5;"></div>
+          <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;" id="ppi-zones"></div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="card" id="recent-plantations-card">
