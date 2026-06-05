@@ -665,7 +665,7 @@ function openOthersModal(t){}
       <div id="pest-overview-bars" style="max-height:240px;overflow-y:auto;padding-top:4px;"></div>
     </div>
   </div>
-  <div class="card">
+  <div class="card" id="recent-plantations-card">
     <div class="card-title"><i class="fas fa-clock"></i> Recent Plantation Records
       <div class="card-title-actions"><button class="btn btn-ghost btn-sm" onclick="showSection('plantation')">View All <i class="fas fa-arrow-right"></i></button></div>
     </div>
@@ -1887,7 +1887,7 @@ async function initApp(){
   if(isViewer){
     // Hide write-only UI
     const viewerStyle = document.createElement('style');
-    viewerStyle.textContent = '#fab,#fab-menu{display:none!important}.sync-pill{display:none!important}#add-grower-modal,#add-plantation-modal{display:none!important}';
+    viewerStyle.textContent = '#fab,#fab-menu{display:none!important}.sync-pill{display:none!important}#add-grower-modal,#add-plantation-modal{display:none!important}#recent-plantations-card{display:none!important}';
     document.head.appendChild(viewerStyle);
     document.querySelectorAll('#topbar .btn-gold,#topbar .btn-ghost').forEach(function(b){b.style.display='none';});
     // Add lock icon to restricted nav items
