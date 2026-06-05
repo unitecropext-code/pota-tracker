@@ -1891,7 +1891,7 @@ async function initApp(){
     document.head.appendChild(viewerStyle);
     document.querySelectorAll('#topbar .btn-gold,#topbar .btn-ghost').forEach(function(b){b.style.display='none';});
     // Add lock icon to restricted nav items
-    ['growers','plantation','pests','yield-assess','weekly-report','settings'].forEach(function(id){
+    ['growers','plantation','pests','yield-assess','weekly-report','campaign','settings'].forEach(function(id){
       var nav=document.getElementById('nav-'+id);
       if(!nav) return;
       nav.style.opacity='0.55';
@@ -2110,7 +2110,7 @@ const PAGE_META = {
 };
 function showSection(id){
   // Viewer role: show Access Denied screen for restricted sections
-  var _viewerRestricted=['growers','plantation','pests','yield-assess','weekly-report','settings'];
+  var _viewerRestricted=['growers','plantation','pests','yield-assess','weekly-report','campaign','settings'];
   if(CURRENT_USER && CURRENT_USER.role==='Viewer' && _viewerRestricted.indexOf(id)>-1){
     document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
     document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
@@ -2158,7 +2158,7 @@ function showSection(id){
       document.getElementById('main').appendChild(_denied);
     }
     _denied.classList.add('active');
-    var _meta={growers:'Growers',plantation:'Plantation',pests:'Pests & Diseases','yield-assess':'Yield Assessment','weekly-report':'Weekly Report',settings:'Settings'};
+    var _meta={growers:'Growers',plantation:'Plantation',pests:'Pests & Diseases','yield-assess':'Yield Assessment','weekly-report':'Weekly Report',campaign:'Campaign Table',settings:'Settings'};
     document.getElementById('page-title').textContent=_meta[id]||id;
     document.getElementById('page-sub').textContent='Access restricted';
     window.scrollTo(0,0);
