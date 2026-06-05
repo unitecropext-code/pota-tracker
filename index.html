@@ -1613,8 +1613,13 @@ function randHex(bytes){
 }
 
 function getViewerTokenFromUrl(){
-  const match = window.location.hash.match(/[?&#]?viewer=([a-f0-9]{32})/i);
-  return match ? match[1] : null;
+  // Use query string (?viewer=TOKEN) — hash fragments are stripped by WhatsApp/SMS/email apps on mobile
+  const params = new URLSearchParams(window.location.search);
+  const qToken = params.get('viewer');
+  if(qToken && /^[a-f0-9]{32}$/i.test(qToken)) return qToken;
+  // Fallback: also check hash in case someone shares a hash-based link
+  const hMatch = window.location.hash.match(/[?&#]?viewer=([a-f0-9]{32})/i);
+  return hMatch ? hMatch[1] : null;
 }
 
 function checkViewerTokenLogin(){
@@ -1635,8 +1640,9 @@ function generateViewerToken(){
 
 function getViewerShareLink(){
   const token = localStorage.getItem(VIEWER_TOKEN_KEY) || generateViewerToken();
-  const base  = window.location.href.split('#')[0];
-  return base + '#viewer=' + token;
+  // Use query string — hash fragments are dropped by WhatsApp, SMS, and email link handlers on mobile
+  const base = window.location.href.split(/[?#]/)[0];
+  return base + '?viewer=' + token;
 }
 
 function generateAndShowViewerLink(){
