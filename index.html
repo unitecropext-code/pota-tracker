@@ -565,7 +565,49 @@ tr:hover .row-actions{opacity:1;}
 .step.active{color:var(--gold);border-color:var(--gold);}
 .step.done{color:var(--green);border-color:var(--green);}
 </style>
-<style>.photo-upload-area{border:2px dashed var(--border2);border-radius:9px;padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,.02);font-size:12px;color:var(--text2);}.photo-upload-area:hover{border-color:var(--gold);background:var(--gold-dim);color:var(--gold);}</style>
+<style>.photo-upload-area{border:2px dashed var(--border2);border-radius:9px;padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,.02);font-size:12px;color:var(--text2);}.photo-upload-area:hover{border-color:var(--gold);background:var(--gold-dim);color:var(--gold);}
+/* ===== GLOBAL SEARCH MODAL ===== */
+#global-search-modal .modal{max-width:700px;max-height:90vh;}
+.gsearch-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center;}
+.gsearch-input{
+  flex:1;background:rgba(255,255,255,.05);border:1.5px solid var(--border2);
+  color:var(--text);padding:11px 14px 11px 40px;border-radius:10px;
+  font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.gsearch-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+.gsearch-input::placeholder{color:var(--text3);}
+.gsearch-input-wrap{position:relative;flex:1;}
+.gsearch-input-wrap .gsearch-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none;}
+.gsearch-filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.gsearch-filter-btn{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;
+  font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--border2);
+  background:transparent;color:var(--text2);font-family:var(--font-body);transition:all .15s;
+}
+.gsearch-filter-btn.active{border-color:var(--blue);color:var(--blue);background:var(--blue-dim);}
+.gsearch-filter-btn:hover{border-color:var(--border2);color:var(--text);}
+.gsearch-filter-selects{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+@media(min-width:560px){.gsearch-filter-selects{grid-template-columns:1fr 1fr 1fr 1fr;}}
+.gsearch-results{max-height:400px;overflow-y:auto;}
+.gsearch-section-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-family:var(--font-mono);padding:8px 0 5px;border-top:1px solid var(--border);margin-top:8px;}
+.gsearch-section-label:first-child{border-top:none;margin-top:0;}
+.gsearch-result-row{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;
+  cursor:pointer;transition:background .12s;margin-bottom:2px;
+}
+.gsearch-result-row:hover{background:rgba(255,255,255,.05);}
+.gsearch-result-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.gsearch-result-main{flex:1;min-width:0;}
+.gsearch-result-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gsearch-result-sub{font-size:11px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gsearch-result-badge{flex-shrink:0;}
+.gsearch-empty{text-align:center;padding:32px 16px;}
+.gsearch-empty-icon{font-size:32px;margin-bottom:8px;}
+.gsearch-empty-text{font-size:13px;color:var(--text2);}
+.gsearch-kbd{display:inline-block;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-size:10px;font-family:var(--font-mono);color:var(--text3);}
+.gsearch-count-badge{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;font-family:var(--font-mono);}
+
+</style>
 <script>
 (function(){try{localStorage.setItem('pota_state_v3',atob('eyJncm93ZXJzIjpbeyJpZCI6MTc3OTk2MTUxNTYzNywibmFtZSI6Ikpvb2xpYSBhY2t0YXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTU2MDE1OSwibmFtZSI6IlVudXRoIGJoYXJkd2Fqc2luZ2giLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTY2ODE3NywibmFtZSI6Ikhhbm5haCBkaGlyYWoiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTcyNjczNCwibmFtZSI6Ik1vaHVuIFJhbmRoaXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjIxNzAzMzUsIm5hbWUiOiJNb29rb29uZGVlIERldiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiVmVyZHVuIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjIyMjU4NzYsIm5hbWUiOiJwdXJib290ZWVhaCBTdXJla2hhIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMJ0F2ZW5pciIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYyMzUwMTMzLCJuYW1lIjoiQ2hhbmRvbyBWZWRhbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MjQwNDg3OCwibmFtZSI6IlVrbm93biAxIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYyNDc1MjExLCJuYW1lIjoiVWtub3duIDIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjI1MTAwOTAsIm5hbWUiOiJVbmtub3duIDMiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjI2OTQzMTEsIm5hbWUiOiJPb3plZXIgIE1vaGFtbWFkIE5pc2hhYXIgQWxpIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJQZXRpdCBWZXJnZXIiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2Mjc4NDg2NSwibmFtZSI6IkVsYWhlZWJvY2N1cyIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBdmVuaXIiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MjgyMzI5MiwibmFtZSI6Ik5lZXdvb3IgUmF2aW4iLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzAzNTM4NCwibmFtZSI6IkRpZGFyYWxseSBOb29yYW5pIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMwOTczMTUsIm5hbWUiOiJQb29ydW4gVG9vbXVuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMxNDczNzksIm5hbWUiOiJNYXRob29yYWggZGV2ZW5kcmFuYXRoIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJIZXJtaXRhZ2UiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzIzODIwOSwibmFtZSI6IlJhbXBlcnNhZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiSGVybWl0YWdlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMyNjkzMjMsIm5hbWUiOiJKb29saWEgQmVsYWwiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzMwMDgwNSwibmFtZSI6IkJ1Y2hvbyBTYW5kZWVhIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMzMzQ4NzAsIm5hbWUiOiJCdXJrdXRhbGx5IEVzaGFuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMzNzAzOTgsIm5hbWUiOiJCdXJrdXRhbGx5IFR3YWxlYiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYzNDE5NDEzLCJuYW1lIjoiRHVyZ2FoZWUgTmF6aXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzQ1ODQ3OSwibmFtZSI6Ikdvb2R1ciBnaGVlcmphbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBZ3JlbWVudCIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzgwMDQ1MzYwNjY0LCJuYW1lIjoiTW9vcnV0IGJhc3NhbnQiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI5Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9XSwicGxhbnRhdGlvbiI6W3siaWQiOjE3Nzk5NjM2MTYwODksImdyb3dlciI6Ikpvb2xpYSBhY2t0YXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJ2YXJpZXR5IjoiU3B1bnRhIExvY2FsIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA0LTIzIiwiYXJlYSI6Mi41MiwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiQXByIiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTYzNjcwNTQ0LCJncm93ZXIiOiJVbnV0aCBiaGFyZHdhanNpbmdoIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwidmFyaWV0eSI6IlNwdW50YSBMb2NhbCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNC0yMyIsImFyZWEiOjIuNTIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6IkFwciIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzY5MTExMiwiZ3Jvd2VyIjoiSGFubmFoIGRoaXJhaiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDQtMjMiLCJhcmVhIjoxLjA1LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJBcHIiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjM3MTU1NjQsImdyb3dlciI6Ik1vaHVuIFJhbmRoaXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwidmFyaWV0eSI6IlNwdW50YSBMb2NhbCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNC0yMyIsImFyZWEiOjEuMDUsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6IkFwciIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzgyOTI2OCwiZ3Jvd2VyIjoiTW9va29vbmRlZSBEZXYiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlZlcmR1biIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMDQiLCJhcmVhIjowLjA0LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjM4NjM4NjQsImdyb3dlciI6InB1cmJvb3RlZWFoIFN1cmVraGEiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkwnQXZlbmlyIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0wNSIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMSIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzkwMTcxOCwiZ3Jvd2VyIjoiQ2hhbmRvbyBWZWRhbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MC4yNSwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTYzOTkzMjY2LCJncm93ZXIiOiJDaGFuZG9vIFZlZGFuYW5kIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjQyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQzMjkzNDAsImdyb3dlciI6IlVrbm93biAxIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjIxLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQzNTYxMzQsImdyb3dlciI6IlVrbm93biAyIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjIxLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ0Nzc1MDQsImdyb3dlciI6IlVua25vd24gMyIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MC4yMSwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY0NTgyMTg3LCJncm93ZXIiOiJPb3plZXIgIE1vaGFtbWFkIE5pc2hhYXIgQWxpIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJQZXRpdCBWZXJnZXIiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MS4xMywiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY0NjMxOTQxLCJncm93ZXIiOiJFbGFoZWVib2NjdXMiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkwnQXZlbmlyIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0xNCIsImFyZWEiOjAuMzIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMSIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NDcyMTE0NywiZ3Jvd2VyIjoiTmVld29vciBSYXZpbiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTgiLCJhcmVhIjoxLjg5LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ3ODE5NzUsImdyb3dlciI6IkRpZGFyYWxseSBOb29yYW5pIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0xOCIsImFyZWEiOjAuNDIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NDg1NzgyNSwiZ3Jvd2VyIjoiUG9vcnVuIFRvb211biIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiQmFnYXRlbGxlIERhbSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTgiLCJhcmVhIjowLjMyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ5NDU0OTUsImdyb3dlciI6Ik1hdGhvb3JhaCBkZXZlbmRyYW5hdGgiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6Ikhlcm1pdGFnZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjAiLCJhcmVhIjoxLjI2LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjUyMjc4MjYsImdyb3dlciI6IlJhbXBlcnNhZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiSGVybWl0YWdlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMCIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTMwOTkwOSwiZ3Jvd2VyIjoiSm9vbGlhIEJlbGFsIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMCIsImFyZWEiOjMuMzYsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTM1NzYxNCwiZ3Jvd2VyIjoiQnVjaG9vIFNhbmRlZWEiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6Mi45NCwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY1NDMxNDgwLCJncm93ZXIiOiJCdXJrdXRhbGx5IEVzaGFuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMSIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTQ4MTQ1OSwiZ3Jvd2VyIjoiQnVya3V0YWxseSBUd2FsZWIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6MC44NCwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY1NTQwOTQ4LCJncm93ZXIiOiJEaWRhcmFsbHkgTm9vcmFuaSIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjEiLCJhcmVhIjo0LjIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTU5MDc5OCwiZ3Jvd2VyIjoiRHVyZ2FoZWUgTmF6aXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6Mi4xLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjU2MjYwNTksImdyb3dlciI6Ikdvb2R1ciBnaGVlcmphbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBZ3JlbWVudCIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjEiLCJhcmVhIjoyLjUyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9XSwicGVzdFJlY29yZHMiOltdLCJ5aWVsZEFzc2Vzc21lbnRzIjpbXSwidmFyaWV0aWVzIjpbIkRlbGF3YXJlIiwiSmVsbHkiLCJNb25kaWFsIiwiUGFuYW1lcmEiLCJTcHVudGEgSW1wb3J0ZWQiLCJTcHVudGEgTG9jYWwiXSwiY2FtcGFpZ25EYXRhIjp7fSwid2Vla2x5UmVwb3J0cyI6W10sImhhcnZlc3REYXlzIjo5MCwiZGVmYXVsdFlpZWxkIjoxMiwidXNlcnMiOlt7InVzZXJuYW1lIjoic3VwZXJhZG1pbiIsImZ1bGxOYW1lIjoiU3VwZXIgQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBZG1pbmlzdHJhdG9yIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiNjIwZWI4ZTAyOTNlZmMwZmU3Y2Y5MGI0ZTNkMGFkZmZjMGQzYzJjMzU1ZGJhNGUyZWMxYWJhM2NmYTEyYTBkMyIsInN0YXR1cyI6IkFjdGl2ZSJ9LHsidXNlcm5hbWUiOiJhZG1pbiIsImZ1bGxOYW1lIjoiQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBZG1pbmlzdHJhdG9yIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiZTI1Yzg5ZTM4YjI0NWI0YjlkZTE4MWI1NDU5YWNhNTRkMzVmOWE0Nzg0MDNlNThkNWIzMGIyNTE5YzZhODk5OCIsInN0YXR1cyI6IkFjdGl2ZSJ9LHsidXNlcm5hbWUiOiJlb3Nlb2tnIiwiZnVsbE5hbWUiOiJLZXNoYXYgR2FuZ2FkaW4iLCJyb2xlIjoiRmllbGQgT2ZmaWNlciIsInpvbmVBY2Nlc3MiOiJFYXN0IiwicGFzc3dvcmQiOiJiZWUyMzRiNzkxNWE5MWY2ZTdmOWQ5NjcyOWZmYzhhNDFjNzczZGNlOGVjMzYzMDUzNGQzZDU2YjJiNDkyN2RiIiwic3RhdHVzIjoiQWN0aXZlIn0seyJ1c2VybmFtZSI6ImVzb2tyIiwiZnVsbE5hbWUiOiJLZXNoYXYgUmFtaGVldCIsInJvbGUiOiJGaWVsZCBPZmZpY2VyIiwiem9uZUFjY2VzcyI6Ik5vcnRoIiwicGFzc3dvcmQiOiI1MjY5YjFmYzBkYzIwYjkyZTQ4ZWRiZjA5NDdmY2Y2MTZlZTI1ZGQ3MWFiODM4ODliZTc2Nzk5YzA1Mjc5ZDkxIiwic3RhdHVzIjoiQWN0aXZlIn0seyJ1c2VybmFtZSI6Im9mZmljZXIxIiwiZnVsbE5hbWUiOiJGaWVsZCBPZmZpY2VyIDEiLCJyb2xlIjoiRmllbGQgT2ZmaWNlciIsInpvbmVBY2Nlc3MiOiJBbGwiLCJwYXNzd29yZCI6IjExOGI4ZDM1YTE3YmNmMmM3ZDJkNzkwNTA5ZTEyMzA4ZGM2MzMyYzVkMjM0ZjAwOThkMmQ2YmU2NzAwYmViYjEiLCJzdGF0dXMiOiJBY3RpdmUifSx7InVzZXJuYW1lIjoib2ZmaWNlcjIiLCJmdWxsTmFtZSI6IkZpZWxkIE9mZmljZXIgMiIsInJvbGUiOiJGaWVsZCBPZmZpY2VyIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiODQ2MzFkYWI4MDgyMTkxMzRkNjY2MWU2ODVlN2Y3NjdmZjQ2NTM2OTQzMzJlYjY0YjU2ODU5MWM2NWEwZjg3ZiIsInN0YXR1cyI6IkFjdGl2ZSJ9XX0='));}catch(e){}})();
 </script>
@@ -860,6 +902,7 @@ function openOthersModal(t){}
   </div>
   <div class="topbar-right">
     <span class="topbar-season" id="topbar-season">Season 1</span>
+    <button class="btn btn-ghost btn-sm" onclick="openGlobalSearch()" title="Global Search (Ctrl+K)" id="global-search-btn" style="border-color:rgba(59,130,246,.4);color:var(--blue);"><i class="fas fa-search"></i><span class="hide-xs"> Search</span></button>
     <button class="btn btn-ghost btn-sm" onclick="showSection('weekly-report')"><i class="fas fa-file-alt"></i><span class="hide-xs"> Report</span></button>
     <button class="btn btn-gold btn-sm" onclick="openModal('add-plantation-modal')"><i class="fas fa-plus"></i><span class="hide-xs"> Add</span></button>
   </div>
@@ -1055,6 +1098,27 @@ function openOthersModal(t){}
     <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div>High severity</div>
     <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div>Season 1 plot</div>
     <div class="legend-item"><div class="legend-dot" style="background:#a855f7;"></div>Season 2 plot</div>
+  </div>
+
+  <!-- Pest/Disease Severity Intensity Bar -->
+  <div class="card" style="margin-top:14px;">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--red),var(--orange),var(--green));"></div>
+    <div class="card-title">
+      <i class="fas fa-virus" style="color:var(--red);"></i> Pest &amp; Disease Severity by Locality
+      <div class="card-title-actions">
+        <select id="map-sev-season" class="form-control btn-sm" onchange="renderMapSeverityBars()" style="font-size:11px;min-width:100px;">
+          <option value="">All Seasons</option>
+          <option value="Season 1">Season 1</option>
+          <option value="Season 2">Season 2</option>
+        </select>
+        <select id="map-sev-disease" class="form-control btn-sm" onchange="renderMapSeverityBars()" style="font-size:11px;min-width:140px;">
+          <option value="">All Pests/Diseases</option>
+        </select>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:12px;">Colour-coded severity intensity across surveyed localities. Hover a bar for details.</p>
+    <div id="map-severity-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;"></div>
+    <div id="map-sev-empty" style="font-size:12px;color:var(--text3);display:none;padding:8px 0;">No pest/disease records found for this filter.</div>
   </div>
 </section>
 
@@ -4158,7 +4222,7 @@ function initMap(){
   map.addControl(dc);
   map.on(L.Draw.Event.CREATED,function(e){ drawnItems.addLayer(e.layer); updateDrawnShapesList(); toast(`${e.layerType} drawn ✓`); });
   map.on(L.Draw.Event.DELETED,function(){ updateDrawnShapesList(); });
-  renderMapLayers(); renderZoneStats();
+  renderMapLayers(); renderZoneStats(); renderMapSeverityBars();
   setTimeout(()=>map.invalidateSize(),200);
 }
 function updateDrawnShapesList(){
@@ -4232,8 +4296,96 @@ function renderZoneStats(){
   }).join('');
 }
 
-// ============================================================
-//  TRENDS
+// ── Map: Pest/Disease Severity Bars ─────────────────────────
+function renderMapSeverityBars(){
+  const grid   = document.getElementById('map-severity-grid');
+  const empty  = document.getElementById('map-sev-empty');
+  const selDis = document.getElementById('map-sev-disease');
+  const selSea = document.getElementById('map-sev-season');
+  if(!grid) return;
+
+  // Populate disease/pest filter once
+  if(selDis && selDis.options.length <= 1){
+    [...DISEASES,...PESTS].forEach(f=>{
+      const o = document.createElement('option');
+      o.value = f; o.textContent = (PEST_ICONS[f]||'') + ' ' + f;
+      selDis.appendChild(o);
+    });
+  }
+
+  const filterDis = selDis?.value || '';
+  const filterSea = selSea?.value || '';
+  const sevScore  = {Low:1, Moderate:2, High:3};
+  const SEV_COLOR = {Low:'var(--green)', Moderate:'var(--orange)', High:'var(--red)'};
+  const SEV_BG    = {Low:'var(--green-dim)', Moderate:'var(--orange-dim)', High:'var(--red-dim)'};
+
+  // Build: { locality -> { diseaseName -> [scores] } }
+  const locData = {};
+  STATE.pestRecords.forEach(r=>{
+    if(filterSea && r.season !== filterSea) return;
+    const loc = r.locality || (STATE.growers.find(g=>g.name===r.grower)?.locality) || 'Unknown';
+    if(!locData[loc]) locData[loc] = {};
+    (r.visits||[]).forEach(v=>{
+      Object.entries(v.pests||{}).forEach(([f,p])=>{
+        if(!p.sev) return;
+        if(filterDis && f !== filterDis) return;
+        if(!locData[loc][f]) locData[loc][f] = [];
+        locData[loc][f].push(sevScore[p.sev]||0);
+      });
+    });
+  });
+
+  const locs = Object.keys(locData).sort();
+  if(!locs.length){
+    grid.innerHTML = '';
+    if(empty) empty.style.display = 'block';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+
+  grid.innerHTML = locs.map(loc=>{
+    const diseases = locData[loc];
+    const allNames = filterDis ? [filterDis] : [...DISEASES,...PESTS].filter(f=>diseases[f]);
+    if(!allNames.length) return '';
+    const rows = allNames.map(f=>{
+      const scores = diseases[f] || [];
+      if(!scores.length) return '';
+      const avg = scores.reduce((s,v)=>s+v,0)/scores.length;
+      const pct = Math.round((avg/3)*100);
+      const cls = avg>=2.5?'High':avg>=1.5?'Moderate':'Low';
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;" title="${f}: avg severity ${avg.toFixed(1)}/3 (${scores.length} record${scores.length!==1?'s':''})">
+        <span style="width:120px;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;">${PEST_ICONS[f]||''} ${f}</span>
+        <div style="flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${SEV_COLOR[cls]};border-radius:4px;transition:width .4s;"></div>
+        </div>
+        <span style="font-size:9px;font-weight:700;color:${SEV_COLOR[cls]};min-width:30px;text-align:right;font-family:var(--font-mono);">${pct}%</span>
+        <span style="font-size:9px;padding:1px 6px;border-radius:8px;background:${SEV_BG[cls]};color:${SEV_COLOR[cls]};border:1px solid ${SEV_COLOR[cls]}33;white-space:nowrap;">${cls}</span>
+      </div>`;
+    }).filter(Boolean).join('');
+    if(!rows) return '';
+    // Overall locality severity
+    const allScores = allNames.flatMap(f=>diseases[f]||[]);
+    const locAvg = allScores.length ? allScores.reduce((s,v)=>s+v,0)/allScores.length : 0;
+    const locCls = locAvg>=2.5?'High':locAvg>=1.5?'Moderate':locAvg>0?'Low':'None';
+    const locColor = locAvg>=2.5?'var(--red)':locAvg>=1.5?'var(--orange)':locAvg>0?'var(--green)':'var(--text3)';
+    const locBg = locAvg>=2.5?'rgba(239,68,68,.12)':locAvg>=1.5?'rgba(249,115,22,.12)':locAvg>0?'rgba(34,197,94,.12)':'rgba(255,255,255,.03)';
+    return `<div style="background:var(--card2);border:1px solid ${locAvg>=2.5?'rgba(239,68,68,.3)':locAvg>=1.5?'rgba(249,115,22,.3)':'var(--border)'};border-radius:10px;padding:12px;border-top:3px solid ${locColor};">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+        <i class="fas fa-map-pin" style="color:${locColor};font-size:11px;"></i>
+        <span style="font-size:12px;font-weight:700;color:var(--text);flex:1;">${loc}</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${locBg};color:${locColor};border:1px solid ${locColor}33;">${locCls}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).filter(Boolean).join('');
+
+  if(!grid.innerHTML.trim()){
+    grid.innerHTML = '';
+    if(empty) empty.style.display = 'block';
+  }
+}
+
+// ── TRENDS
 // ============================================================
 function renderTrends(){
   requestAnimationFrame(()=>{
@@ -4334,15 +4486,37 @@ function renderComparative(){
 
   function computeMetrics(year,season){
     const p=plantFiltered.filter(r=>getYear(r.datePlanted)===year&&r.season===season);
-    const area=p.reduce((s,r)=>s+(r.area||0),0);
-    const prod=p.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0);
+    let area=p.reduce((s,r)=>s+(r.area||0),0);
+    let prod=p.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0);
     const ya=yieldFiltered.filter(r=>getYear(r.date)===year&&r.season===season);
     const avgYield=ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0;
     const pe=pestFiltered.filter(r=>{const v=r.visits?.[0];return v&&getYear(v.date)===year&&r.season===season;});
     const sevScore={High:3,Moderate:2,Low:1};
     let sevSum=0,sevCnt=0;
     pe.forEach(r=>(r.visits||[]).forEach(v=>Object.values(v.pests||{}).forEach(p=>{if(p.sev){sevSum+=sevScore[p.sev]||0;sevCnt++;}})));
-    return{area,prod,avgYield,avgSev:sevCnt?sevSum/sevCnt:0,plots:p.length,yieldRecs:ya.length,pestRecs:pe.length};
+
+    // Merge in season-level summary (for 2024/2025 historical entries)
+    const sumKey=`${year}|${season}`;
+    const sum=(STATE.seasonSummaries||{})[sumKey];
+    let fromSummary=false;
+    let sumPlots=p.length, sumArea=area, sumProd=prod, sumAvgYield=avgYield, sumAvgSev=sevCnt?sevSum/sevCnt:0;
+    if(sum){
+      fromSummary=true;
+      // Use summary values; if live records also exist, prefer live for plots/area if non-zero
+      sumPlots = p.length > 0 ? p.length : (sum.plots||0);
+      sumArea  = area  > 0 ? area  : (sum.area||0);
+      sumProd  = prod  > 0 ? prod  : (sum.prod||0);
+      sumAvgYield = avgYield > 0 ? avgYield : (sum.yield||0);
+      // Pest severity: blend if both present
+      const sumSevScore = sum.pest ? parseFloat(sum.pest) : 0;
+      sumAvgSev = sevCnt ? sevSum/sevCnt : sumSevScore;
+    }
+    return{
+      area:sumArea, prod:sumProd, avgYield:sumAvgYield,
+      avgSev:sumAvgSev, plots:sumPlots,
+      yieldRecs:ya.length, pestRecs:pe.length,
+      fromSummary, summaryNotes:sum?.notes||''
+    };
   }
 
   // KPI row
@@ -4424,19 +4598,21 @@ function renderComparative(){
       html+=`<tr>
         ${si===0?`<td rowspan="2" style="${tdStyle}font-weight:800;font-family:var(--font-display);font-size:16px;">${y}</td>`:''}
         <td style="${tdStyle}"><span style="font-size:11px;font-weight:700;color:${sc};background:${sc}22;padding:2px 9px;border-radius:10px;">${s}</span></td>
-        <td style="${tdStyle}text-align:center;">${m.plots}</td>
-        <td style="${tdStyle}text-align:center;font-weight:700;">${m.area.toFixed(2)}</td>
-        <td style="${tdStyle}text-align:center;font-weight:700;color:var(--gold);">${Math.round(m.prod)||'—'}</td>
-        <td style="${tdStyle}text-align:center;color:var(--green);">${m.yieldRecs>0?m.avgYield.toFixed(2):'—'}</td>
-        <td style="${tdStyle}text-align:center;">${sevLabel}</td>
+        <td style="${tdStyle}text-align:center;">${m.plots||'—'}</td>
+        <td style="${tdStyle}text-align:center;font-weight:700;">${m.area>0?m.area.toFixed(2):'—'}</td>
+        <td style="${tdStyle}text-align:center;font-weight:700;color:var(--gold);">${m.prod>0?Math.round(m.prod):'—'}</td>
+        <td style="${tdStyle}text-align:center;color:var(--green);">${(m.avgYield>0)?m.avgYield.toFixed(2):'—'}</td>
+        <td style="${tdStyle}text-align:center;">${sevLabel}${m.fromSummary&&!m.pestRecs?'<span style="font-size:9px;color:var(--text3);display:block;">summary</span>':''}</td>
         <td style="${tdStyle}text-align:center;">
-          <div style="display:flex;gap:4px;justify-content:center;">
-  <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompRecords('${y}','${s}')" title="View / Edit records"><i class="fas fa-pencil-alt" style="color:var(--gold);"></i></button>
-  ${m.fromSummary || (!m.plots && (y==='2024'||y==='2025'))
-    ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;border-color:rgba(240,165,0,.4);color:var(--gold);" onclick="openSeasonSummary('${y}','${s}')" title="Enter season summary data"><i class="fas fa-table-cells"></i></button>`
-    : `<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompInsert('${y}','${s}')" title="Add individual record"><i class="fas fa-plus" style="color:var(--green);"></i></button>`
+          <div style="display:flex;gap:4px;justify-content:center;align-items:center;">
+  <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompRecords('${y}','${s}')" title="View records"><i class="fas fa-list" style="color:var(--blue);"></i></button>
+  ${y==='2026'
+    ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="open2026AutoSummary('${s}')" title="View live 2026 summary"><i class="fas fa-bolt" style="color:var(--gold);"></i></button>`
+    : `<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;border-color:rgba(240,165,0,.4);color:var(--gold);" onclick="openSeasonSummary('${y}','${s}')" title="Enter/edit season summary"><i class="fas fa-table-cells"></i></button>`
   }
+  ${y!=='2026'?`<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompInsert('${y}','${s}')" title="Add individual record"><i class="fas fa-plus" style="color:var(--green);"></i></button>`:''}
 </div>
+${m.fromSummary&&m.summaryNotes?`<div style="font-size:9px;color:var(--text3);margin-top:3px;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${m.summaryNotes}"><i class="fas fa-sticky-note"></i> ${m.summaryNotes}</div>`:''}
         </td>
       </tr>`;
     });
@@ -4684,61 +4860,6 @@ function deleteCompRecord(id){
   renderDashboard();
   undoDelete('Plantation record deleted', ()=>{ STATE.plantation.push(_r); saveLocal(); renderCompRecordsBody(_compRecordsCtx.year, _compRecordsCtx.season); renderComparative(); renderDashboard(); });
 }
-<!-- ===== SEASON SUMMARY MODAL ===== -->
-<div class="modal-overlay" id="comp-summary-modal" role="dialog" aria-modal="true">
-  <div class="modal" style="max-width:480px;">
-    <div class="modal-header">
-      <div class="modal-title"><i class="fas fa-table" style="color:var(--gold);"></i> <span id="csm-title">Season Summary</span></div>
-      <button class="btn btn-ghost btn-icon" onclick="closeModal('comp-summary-modal')"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="csm-year">
-      <input type="hidden" id="csm-season">
-      <div style="background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.15);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6;">
-        <i class="fas fa-info-circle" style="color:var(--gold);margin-right:5px;"></i>
-        Enter aggregated season-level data directly. These figures will appear in the comparison table and charts for this year/season.
-      </div>
-      <div class="form-row-2">
-        <div class="form-group">
-          <label class="form-label">Number of Plots</label>
-          <input type="number" id="csm-plots" class="form-control" min="0" step="1" placeholder="0" oninput="csmCalc()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Total Area (ha)</label>
-          <input type="number" id="csm-area" class="form-control" step="0.01" placeholder="0.00" oninput="csmCalc()">
-        </div>
-      </div>
-      <div class="form-row-2">
-        <div class="form-group">
-          <label class="form-label">Est. Production (T)</label>
-          <input type="number" id="csm-prod" class="form-control" step="0.1" placeholder="Auto-calculated" oninput="csmCalc()">
-          <div class="form-hint" id="csm-prod-hint"></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Avg Yield (T/ha)</label>
-          <input type="number" id="csm-yield" class="form-control" step="0.1" placeholder="e.g. 20" oninput="csmCalc()">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Pest Severity (avg)</label>
-        <select id="csm-pest" class="form-control">
-          <option value="">— Not recorded —</option>
-          <option value="0.5">Low</option>
-          <option value="1.5">Moderate</option>
-          <option value="2.5">High</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes</label>
-        <textarea id="csm-notes" class="form-control" rows="2" placeholder="Optional notes for this season summary…"></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('comp-summary-modal')">Cancel</button>
-      <button class="btn btn-gold" onclick="saveSeasonSummary()"><i class="fas fa-save"></i> Save Summary</button>
-    </div>
-  </div>
-</div>
 // ============================================================
 //  CAMPAIGN TABLE
 // ============================================================
@@ -5215,8 +5336,105 @@ window.addEventListener('DOMContentLoaded',()=>{
   }catch(e){ localStorage.removeItem('pota_current_user'); }
 });
 
-// ============================================================
-//  SEASON SUMMARY (for 2024/2025 aggregate-level entry)
+// ── 2026 Auto-Populate Summary ────────────────────────────────
+// The "bolt" button in the 2026 row reads live STATE records and shows
+// a read-only summary panel, then offers to add more records.
+function open2026AutoSummary(season){
+  const year = '2026';
+  const recs = STATE.plantation.filter(r=>{
+    if(!r.datePlanted) return false;
+    return new Date(r.datePlanted).getFullYear()===2026 && r.season===season;
+  });
+  const area  = recs.reduce((s,r)=>s+(r.area||0),0);
+  const prod  = recs.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0);
+  const plots = recs.length;
+  const growers = [...new Set(recs.map(r=>r.grower))];
+  const localities = [...new Set(recs.map(r=>r.locality).filter(Boolean))];
+  // Pest severity for 2026
+  const sevScore={High:3,Moderate:2,Low:1};
+  let sevSum=0,sevCnt=0;
+  STATE.pestRecords.forEach(r=>{
+    const v=r.visits?.[0];
+    if(!v||!v.date) return;
+    if(new Date(v.date).getFullYear()!==2026||r.season!==season) return;
+    (r.visits||[]).forEach(vis=>Object.values(vis.pests||{}).forEach(p=>{
+      if(p.sev){sevSum+=sevScore[p.sev]||0;sevCnt++;}
+    }));
+  });
+  const avgSev = sevCnt ? sevSum/sevCnt : 0;
+  const sevLabel = avgSev>=2.5?'High':avgSev>=1.5?'Moderate':avgSev>0?'Low':'No data';
+  const sevColor = avgSev>=2.5?'var(--red)':avgSev>=1.5?'var(--orange)':avgSev>0?'var(--green)':'var(--text3)';
+
+  // Get the modal body
+  const modal = document.getElementById('comp-2026-modal');
+  if(!modal){
+    // Create modal dynamically (once)
+    const el = document.createElement('div');
+    el.className = 'modal-overlay';
+    el.id = 'comp-2026-modal';
+    el.setAttribute('role','dialog');
+    el.setAttribute('aria-modal','true');
+    el.innerHTML = `
+      <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+          <div class="modal-title"><i class="fas fa-bolt" style="color:var(--gold);"></i> <span id="c26-title">2026 Live Summary</span></div>
+          <button class="btn btn-ghost btn-icon" onclick="closeModal('comp-2026-modal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="c26-body"></div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('comp-2026-modal')">Close</button>
+          <button class="btn btn-gold" id="c26-add-btn"><i class="fas fa-plus"></i> Add More Records</button>
+        </div>
+      </div>`;
+    document.body.appendChild(el);
+  }
+
+  const titleEl = document.getElementById('c26-title');
+  const bodyEl  = document.getElementById('c26-body');
+  const addBtn  = document.getElementById('c26-add-btn');
+  if(titleEl) titleEl.textContent = `2026 ${season} — Live Summary`;
+  if(addBtn){
+    addBtn.onclick = ()=>{ closeModal('comp-2026-modal'); openCompInsert('2026',season); };
+  }
+  if(bodyEl){
+    if(!plots){
+      bodyEl.innerHTML=`<div class="empty-state" style="padding:24px;"><div class="empty-icon">🌱</div>
+        <div class="empty-title">No 2026 ${season} records yet</div>
+        <div class="empty-sub">Click "Add More Records" below to begin entering plantation data.</div>
+      </div>`;
+    } else {
+      bodyEl.innerHTML=`
+        <div style="background:rgba(240,165,0,.05);border:1px solid rgba(240,165,0,.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);">
+          <i class="fas fa-info-circle" style="color:var(--gold);margin-right:5px;"></i>
+          Auto-populated from <strong>${plots}</strong> plantation record${plots!==1?'s':''} in STATE. Read-only — data updates live as records are added.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--font-mono);margin-bottom:4px;"><i class="fas fa-seedling" style="color:var(--blue);margin-right:4px;"></i>Plots</div>
+            <div style="font-size:24px;font-weight:800;color:var(--blue);font-family:var(--font-display);">${plots}</div>
+          </div>
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--font-mono);margin-bottom:4px;"><i class="fas fa-map" style="color:var(--green);margin-right:4px;"></i>Total Area</div>
+            <div style="font-size:24px;font-weight:800;color:var(--green);font-family:var(--font-display);">${area.toFixed(2)} ha</div>
+          </div>
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--font-mono);margin-bottom:4px;"><i class="fas fa-weight" style="color:var(--gold);margin-right:4px;"></i>Est. Production</div>
+            <div style="font-size:24px;font-weight:800;color:var(--gold);font-family:var(--font-display);">${Math.round(prod)} T</div>
+          </div>
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-family:var(--font-mono);margin-bottom:4px;"><i class="fas fa-bug" style="color:${sevColor};margin-right:4px;"></i>Pest Severity</div>
+            <div style="font-size:20px;font-weight:800;color:${sevColor};font-family:var(--font-display);">${sevLabel}</div>
+          </div>
+        </div>
+        ${growers.length?`<div style="margin-bottom:12px;"><div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-mono);margin-bottom:6px;"><i class="fas fa-users" style="color:var(--gold);margin-right:4px;"></i>Growers (${growers.length})</div><div style="display:flex;flex-wrap:wrap;gap:5px;">${growers.map(g=>`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);color:var(--text2);">${g}</span>`).join('')}</div></div>`:''}
+        ${localities.length?`<div><div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-mono);margin-bottom:6px;"><i class="fas fa-map-pin" style="color:var(--blue);margin-right:4px;"></i>Localities (${localities.length})</div><div style="display:flex;flex-wrap:wrap;gap:5px;">${localities.map(l=>`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--text2);">${l}</span>`).join('')}</div></div>`:''}
+      `;
+    }
+  }
+  openModal('comp-2026-modal');
+}
+
+// ── SEASON SUMMARY (for 2024/2025 aggregate-level entry)
 // ============================================================
 function openSeasonSummary(year, season) {
   document.getElementById('csm-year').value   = year;
@@ -5274,6 +5492,243 @@ function saveSeasonSummary() {
   renderComparative();
   toast(`Season summary saved for ${season} ${year} ✓`);
 }
+
+// ============================================================
+//  GLOBAL SEARCH  (Grower Name · Locality · Variety · Pest/Disease)
+// ============================================================
+let _gsearchType = 'all';
+let _gsearchDebounce = null;
+
+function openGlobalSearch(){
+  // Populate dropdowns
+  const allLoc = [...new Set(Object.values(ZONE_LOCALITIES).flat())].sort();
+  const locSel = document.getElementById('gsf-locality');
+  if(locSel){
+    locSel.innerHTML = '<option value="">All Localities</option>' +
+      allLoc.map(l=>`<option value="${l}">${l}</option>`).join('');
+  }
+  const varSel = document.getElementById('gsf-variety');
+  if(varSel){
+    varSel.innerHTML = '<option value="">All Varieties</option>' +
+      (STATE.varieties||[]).map(v=>`<option value="${v}">${v}</option>`).join('');
+  }
+  // Populate pest/disease filter
+  const pestSel = document.getElementById('gsf-pest');
+  if(pestSel && pestSel.options.length <= 1){
+    [...DISEASES,...PESTS].forEach(f=>{
+      const o = document.createElement('option');
+      o.value = f; o.textContent = (PEST_ICONS[f]||'') + ' ' + f;
+      pestSel.appendChild(o);
+    });
+  }
+  openModal('global-search-modal');
+  setTimeout(()=>{ const q=document.getElementById('gsearch-q'); if(q){q.value='';q.focus();} runGlobalSearch(); }, 80);
+}
+
+function setGSearchType(type){
+  _gsearchType = type;
+  document.querySelectorAll('.gsearch-filter-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.type === type);
+  });
+  // Show/hide pest filter row
+  const pestRow = document.getElementById('gsearch-pest-row');
+  if(pestRow) pestRow.style.display = (type==='pests') ? 'block' : 'none';
+  runGlobalSearch();
+}
+
+function runGlobalSearch(){
+  clearTimeout(_gsearchDebounce);
+  _gsearchDebounce = setTimeout(_doGlobalSearch, 120);
+}
+
+function _highlight(text, query){
+  if(!query) return text;
+  try{
+    const escaped = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,'\\$&');
+    return String(text).replace(new RegExp('('+escaped+')', 'gi'),
+      '<mark style="background:rgba(59,130,246,.35);color:var(--text);border-radius:2px;padding:0 1px;">$1</mark>');
+  }catch(e){ return String(text); }
+}
+
+function _doGlobalSearch(){
+  const q     = (document.getElementById('gsearch-q')?.value||'').trim().toLowerCase();
+  const fLoc  = document.getElementById('gsf-locality')?.value||'';
+  const fVar  = document.getElementById('gsf-variety')?.value||'';
+  const fZone = document.getElementById('gsf-zone')?.value||'';
+  const fSeas = document.getElementById('gsf-season')?.value||'';
+  const fPest = document.getElementById('gsf-pest')?.value||'';
+  const type  = _gsearchType;
+
+  const results = { growers:[], plantation:[], pests:[], yield:[] };
+
+  // ── GROWERS ────────────────────────────────────────────────
+  if(type==='all' || type==='growers'){
+    STATE.growers.forEach(g=>{
+      if(fZone && g.zone!==fZone) return;
+      if(fLoc  && g.locality!==fLoc) return;
+      const searchStr = [g.name,g.locality,g.zone,g.contact||''].join(' ').toLowerCase();
+      if(q && !searchStr.includes(q)) return;
+      results.growers.push(g);
+    });
+  }
+
+  // ── PLANTATION ─────────────────────────────────────────────
+  if(type==='all' || type==='plantation'){
+    STATE.plantation.forEach(r=>{
+      if(fLoc  && r.locality!==fLoc) return;
+      if(fVar  && r.variety!==fVar)  return;
+      if(fZone && r.zone!==fZone)    return;
+      if(fSeas && r.season!==fSeas)  return;
+      const searchStr = [r.grower,r.locality,r.variety,r.zone,r.season,r.datePlanted||''].join(' ').toLowerCase();
+      if(q && !searchStr.includes(q)) return;
+      results.plantation.push(r);
+    });
+  }
+
+  // ── PEST / DISEASE RECORDS ─────────────────────────────────
+  if(type==='all' || type==='pests'){
+    STATE.pestRecords.forEach(r=>{
+      if(fSeas && r.season!==fSeas) return;
+      // Zone filter via grower lookup
+      if(fZone){
+        const gz = STATE.growers.find(g=>g.name===r.grower)?.zone||'';
+        if(gz!==fZone) return;
+      }
+      if(fLoc && (r.locality||'')!==fLoc) return;
+      // Collect all pests/diseases recorded
+      const allPestNames = (r.visits||[]).flatMap(v=>Object.keys(v.pests||{}));
+      if(fPest && !allPestNames.includes(fPest)) return;
+      const searchStr = [r.grower,r.locality||'',r.season,...allPestNames].join(' ').toLowerCase();
+      if(q && !searchStr.includes(q)) return;
+      // Include severity info
+      const sevCount = {High:0,Moderate:0,Low:0};
+      (r.visits||[]).forEach(v=>Object.values(v.pests||{}).forEach(p=>{ if(p.sev) sevCount[p.sev]=(sevCount[p.sev]||0)+1; }));
+      results.pests.push({...r, _allPests:allPestNames, _sevCount:sevCount});
+    });
+  }
+
+  // ── YIELD ASSESSMENTS ─────────────────────────────────────
+  if(type==='all' || type==='yield'){
+    STATE.yieldAssessments.forEach(r=>{
+      if(fVar  && r.variety!==fVar)  return;
+      if(fLoc  && (r.locality||'')!==fLoc) return;
+      if(fSeas && r.season!==fSeas)  return;
+      if(fZone && r.zone!==fZone)    return;
+      const searchStr = [r.grower,r.locality||'',r.variety||'',r.zone||'',r.season].join(' ').toLowerCase();
+      if(q && !searchStr.includes(q)) return;
+      results.yield.push(r);
+    });
+  }
+
+  // ── RENDER ────────────────────────────────────────────────
+  const totalCount = results.growers.length + results.plantation.length + results.pests.length + results.yield.length;
+  const countBadge = document.getElementById('gsearch-count');
+  if(countBadge) countBadge.textContent = totalCount ? totalCount + ' results' : '';
+
+  const container = document.getElementById('gsearch-results');
+  if(!container) return;
+
+  if(!totalCount && (q||fLoc||fVar||fZone||fSeas||fPest)){
+    container.innerHTML = `<div class="gsearch-empty">
+      <div class="gsearch-empty-icon">🔎</div>
+      <div class="gsearch-empty-text">No results found for "${q||'(filter)'}"</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Try broadening your search or clearing filters</div>
+    </div>`;
+    return;
+  }
+  if(!totalCount){
+    container.innerHTML = `<div class="gsearch-empty">
+      <div class="gsearch-empty-icon">🔍</div>
+      <div class="gsearch-empty-text">Start typing to search across all records</div>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+
+  // Growers section
+  if(results.growers.length){
+    html += `<div class="gsearch-section-label"><i class="fas fa-users" style="color:var(--gold);margin-right:5px;"></i>Growers <span class="gsearch-count-badge" style="margin-left:4px;">${results.growers.length}</span></div>`;
+    html += results.growers.slice(0,12).map(g=>{
+      const plots = STATE.plantation.filter(p=>p.grower===g.name).length;
+      const area  = STATE.plantation.filter(p=>p.grower===g.name).reduce((s,r)=>s+(r.area||0),0);
+      const zc    = ZONE_COLORS[g.zone]||'#888';
+      return `<div class="gsearch-result-row" onclick="closeModal('global-search-modal');showSection('growers');">
+        <div class="gsearch-result-icon" style="background:${zc}22;color:${zc};"><i class="fas fa-user"></i></div>
+        <div class="gsearch-result-main">
+          <div class="gsearch-result-title">${_highlight(g.name,q)}</div>
+          <div class="gsearch-result-sub"><i class="fas fa-map-pin" style="color:${zc};margin-right:3px;"></i>${_highlight(g.locality||'—',q)} · Zone ${g.zone||'—'} · ${plots} plot${plots!==1?'s':''} · ${area.toFixed(2)} ha</div>
+        </div>
+        <div class="gsearch-result-badge"><span class="badge" style="background:${zc}22;color:${zc};border:1px solid ${zc}44;">${g.zone||'—'}</span></div>
+      </div>`;
+    }).join('');
+    if(results.growers.length>12) html+=`<div style="font-size:11px;color:var(--text3);padding:5px 10px;">…and ${results.growers.length-12} more growers</div>`;
+  }
+
+  // Plantation section
+  if(results.plantation.length){
+    html += `<div class="gsearch-section-label"><i class="fas fa-seedling" style="color:var(--green);margin-right:5px;"></i>Plantation Records <span class="gsearch-count-badge" style="margin-left:4px;">${results.plantation.length}</span></div>`;
+    html += results.plantation.slice(0,12).map(r=>{
+      const sc  = r.season==='Season 1'?'var(--blue)':'var(--purple)';
+      const sBg = r.season==='Season 1'?'var(--blue-dim)':'var(--purple-dim)';
+      return `<div class="gsearch-result-row" onclick="closeModal('global-search-modal');showSection('plantation');">
+        <div class="gsearch-result-icon" style="background:var(--green-dim);color:var(--green);"><i class="fas fa-seedling"></i></div>
+        <div class="gsearch-result-main">
+          <div class="gsearch-result-title">${_highlight(r.grower,q)} <span style="font-size:11px;font-weight:500;color:var(--text2);">· ${_highlight(r.variety||'—',q)}</span></div>
+          <div class="gsearch-result-sub"><i class="fas fa-map-pin" style="color:var(--text3);margin-right:3px;"></i>${_highlight(r.locality||'—',q)} · ${r.datePlanted||'—'} · ${(r.area||0).toFixed(2)} ha</div>
+        </div>
+        <div class="gsearch-result-badge"><span class="badge" style="background:${sBg};color:${sc};border:1px solid ${sc}44;font-size:9px;">${r.season==='Season 1'?'S1':'S2'}</span></div>
+      </div>`;
+    }).join('');
+    if(results.plantation.length>12) html+=`<div style="font-size:11px;color:var(--text3);padding:5px 10px;">…and ${results.plantation.length-12} more plantation records</div>`;
+  }
+
+  // Pest/Disease section
+  if(results.pests.length){
+    html += `<div class="gsearch-section-label"><i class="fas fa-bug" style="color:var(--orange);margin-right:5px;"></i>Pest &amp; Disease Records <span class="gsearch-count-badge" style="margin-left:4px;">${results.pests.length}</span></div>`;
+    html += results.pests.slice(0,12).map(r=>{
+      const highCount = r._sevCount?.High||0;
+      const topPests = r._allPests.slice(0,3).map(f=>(PEST_ICONS[f]||'') + ' ' + f).join(', ');
+      const alertColor = highCount ? 'var(--red)' : 'var(--orange)';
+      return `<div class="gsearch-result-row" onclick="closeModal('global-search-modal');showSection('pests');">
+        <div class="gsearch-result-icon" style="background:${highCount?'var(--red-dim)':'var(--orange-dim)'};color:${alertColor};"><i class="fas fa-bug"></i></div>
+        <div class="gsearch-result-main">
+          <div class="gsearch-result-title">${_highlight(r.grower,q)} <span style="font-size:11px;color:var(--text2);">· ${_highlight(r.locality||'—',q)}</span></div>
+          <div class="gsearch-result-sub" style="white-space:normal;line-height:1.4;">${_highlight(topPests,q)}${r._allPests.length>3?' +more':''} · ${r.season}</div>
+        </div>
+        <div class="gsearch-result-badge">${highCount?`<span class="badge badge-red" style="font-size:9px;"><i class="fas fa-exclamation-triangle"></i> ${highCount} High</span>`:'<span class="badge badge-orange" style="font-size:9px;">Active</span>'}</div>
+      </div>`;
+    }).join('');
+    if(results.pests.length>12) html+=`<div style="font-size:11px;color:var(--text3);padding:5px 10px;">…and ${results.pests.length-12} more pest records</div>`;
+  }
+
+  // Yield section
+  if(results.yield.length){
+    html += `<div class="gsearch-section-label"><i class="fas fa-weight-scale" style="color:var(--teal);margin-right:5px;"></i>Yield Assessments <span class="gsearch-count-badge" style="margin-left:4px;">${results.yield.length}</span></div>`;
+    html += results.yield.slice(0,8).map(r=>{
+      return `<div class="gsearch-result-row" onclick="closeModal('global-search-modal');showSection('yield-assess');">
+        <div class="gsearch-result-icon" style="background:var(--teal-dim);color:var(--teal);"><i class="fas fa-weight-scale"></i></div>
+        <div class="gsearch-result-main">
+          <div class="gsearch-result-title">${_highlight(r.grower,q)} <span style="font-size:11px;color:var(--text2);">· ${_highlight(r.variety||'—',q)}</span></div>
+          <div class="gsearch-result-sub">${_highlight(r.locality||'—',q)} · ${r.date||'—'} · ${r.yieldHa?r.yieldHa+' T/ha':'—'}</div>
+        </div>
+        <div class="gsearch-result-badge"><span class="badge badge-teal" style="font-size:9px;background:var(--teal-dim);color:var(--teal);border:1px solid rgba(20,184,166,.3);">${r.season==='Season 1'?'S1':'S2'}</span></div>
+      </div>`;
+    }).join('');
+    if(results.yield.length>8) html+=`<div style="font-size:11px;color:var(--text3);padding:5px 10px;">…and ${results.yield.length-8} more yield assessments</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// Keyboard shortcut: Ctrl+K / Cmd+K to open search
+document.addEventListener('keydown', function(e){
+  if((e.ctrlKey||e.metaKey) && e.key==='k'){
+    e.preventDefault();
+    openGlobalSearch();
+  }
+});
+
 </script>
 
 <!-- ===== CHANGE PASSWORD MODAL ===== -->
@@ -5319,5 +5774,126 @@ function saveSeasonSummary() {
   </div>
 </div>
 
+
+<!-- ===== SEASON SUMMARY MODAL ===== -->
+<div class="modal-overlay" id="comp-summary-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-table" style="color:var(--gold);"></i> <span id="csm-title">Season Summary</span></div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('comp-summary-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="csm-year">
+      <input type="hidden" id="csm-season">
+      <div style="background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.15);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6;">
+        <i class="fas fa-info-circle" style="color:var(--gold);margin-right:5px;"></i>
+        Enter aggregated season-level data directly. These figures will appear in the comparison table and charts for this year/season.
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Number of Plots</label>
+          <input type="number" id="csm-plots" class="form-control" min="0" step="1" placeholder="0" oninput="csmCalc()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total Area (ha)</label>
+          <input type="number" id="csm-area" class="form-control" step="0.01" placeholder="0.00" oninput="csmCalc()">
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Est. Production (T)</label>
+          <input type="number" id="csm-prod" class="form-control" step="0.1" placeholder="Auto-calculated" oninput="csmCalc()">
+          <div class="form-hint" id="csm-prod-hint"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Avg Yield (T/ha)</label>
+          <input type="number" id="csm-yield" class="form-control" step="0.1" placeholder="e.g. 20" oninput="csmCalc()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pest Severity (avg)</label>
+        <select id="csm-pest" class="form-control">
+          <option value="">— Not recorded —</option>
+          <option value="0.5">Low</option>
+          <option value="1.5">Moderate</option>
+          <option value="2.5">High</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea id="csm-notes" class="form-control" rows="2" placeholder="Optional notes for this season summary…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('comp-summary-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveSeasonSummary()"><i class="fas fa-save"></i> Save Summary</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== GLOBAL SEARCH MODAL ===== -->
+<div class="modal-overlay" id="global-search-modal" role="dialog" aria-modal="true" aria-labelledby="gsearch-title">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header" style="padding-bottom:10px;">
+      <div class="modal-title" id="gsearch-title" style="gap:8px;">
+        <i class="fas fa-search" style="color:var(--blue);"></i> Global Search
+        <span class="gsearch-count-badge" id="gsearch-count" style="margin-left:4px;"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+        <span class="gsearch-kbd">Ctrl+K</span>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('global-search-modal')" aria-label="Close"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="modal-body" style="padding-top:8px;">
+      <!-- Search bar -->
+      <div class="gsearch-input-wrap" style="margin-bottom:12px;">
+        <i class="fas fa-search gsearch-icon"></i>
+        <input class="gsearch-input" id="gsearch-q" type="text" placeholder="Search growers, localities, varieties, pests…"
+          autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+          oninput="runGlobalSearch()">
+      </div>
+      <!-- Type filter pills -->
+      <div class="gsearch-filters">
+        <span style="font-size:11px;color:var(--text3);font-family:var(--font-mono);align-self:center;margin-right:4px;">FILTER:</span>
+        <button class="gsearch-filter-btn active" data-type="all" onclick="setGSearchType('all')"><i class="fas fa-border-all"></i> All</button>
+        <button class="gsearch-filter-btn" data-type="growers" onclick="setGSearchType('growers')"><i class="fas fa-users"></i> Growers</button>
+        <button class="gsearch-filter-btn" data-type="plantation" onclick="setGSearchType('plantation')"><i class="fas fa-seedling"></i> Plantation</button>
+        <button class="gsearch-filter-btn" data-type="pests" onclick="setGSearchType('pests')"><i class="fas fa-bug"></i> Pests/Diseases</button>
+        <button class="gsearch-filter-btn" data-type="yield" onclick="setGSearchType('yield')"><i class="fas fa-weight-scale"></i> Yield</button>
+      </div>
+      <!-- Dropdown filters -->
+      <div class="gsearch-filter-selects" id="gsearch-dropdowns">
+        <select id="gsf-locality" class="form-control" style="font-size:11px;" onchange="runGlobalSearch()">
+          <option value="">All Localities</option>
+        </select>
+        <select id="gsf-variety" class="form-control" style="font-size:11px;" onchange="runGlobalSearch()">
+          <option value="">All Varieties</option>
+        </select>
+        <select id="gsf-zone" class="form-control" style="font-size:11px;" onchange="runGlobalSearch()">
+          <option value="">All Zones</option>
+          <option>E1</option><option>E2</option><option>E3</option><option>E4</option>
+        </select>
+        <select id="gsf-season" class="form-control" style="font-size:11px;" onchange="runGlobalSearch()">
+          <option value="">All Seasons</option>
+          <option>Season 1</option><option>Season 2</option>
+        </select>
+      </div>
+      <!-- Pest/Disease specific filter (shown when type = pests) -->
+      <div id="gsearch-pest-row" style="display:none;margin-bottom:12px;">
+        <select id="gsf-pest" class="form-control" style="font-size:12px;" onchange="runGlobalSearch()">
+          <option value="">All Pests/Diseases</option>
+        </select>
+      </div>
+      <!-- Results -->
+      <div class="gsearch-results" id="gsearch-results">
+        <div class="gsearch-empty">
+          <div class="gsearch-empty-icon">🔍</div>
+          <div class="gsearch-empty-text">Start typing to search across all records</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
