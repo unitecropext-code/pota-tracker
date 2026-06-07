@@ -564,6 +564,115 @@ tr:hover .row-actions{opacity:1;}
 .step{flex:1;text-align:center;font-size:10px;font-weight:700;padding:7px 4px;color:var(--text3);border-bottom:2px solid var(--border);transition:all .2s;font-family:var(--font-mono);}
 .step.active{color:var(--gold);border-color:var(--gold);}
 .step.done{color:var(--green);border-color:var(--green);}
+
+/* ===== MOBILE ZONE SELECTOR ===== */
+#mob-zone-bar{display:none;position:sticky;top:var(--topbar);z-index:190;background:rgba(6,8,14,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:7px 12px;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+#mob-zone-bar::-webkit-scrollbar{display:none;}
+@media(max-width:899px){#mob-zone-bar{display:flex;flex-wrap:nowrap;align-items:center;}}
+.mob-zone-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 13px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.5px;cursor:pointer;font-family:var(--font-mono);border:1.5px solid var(--border2);background:rgba(255,255,255,.04);color:var(--text2);transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.mob-zone-pill:active{transform:scale(.95);}
+.mob-zone-pill.active-e1{background:rgba(240,165,0,.15);color:var(--gold);border-color:rgba(240,165,0,.4);}
+.mob-zone-pill.active-e2{background:rgba(59,130,246,.15);color:var(--blue);border-color:rgba(59,130,246,.4);}
+.mob-zone-pill.active-e3{background:rgba(34,197,94,.15);color:var(--green);border-color:rgba(34,197,94,.4);}
+.mob-zone-pill.active-e4{background:rgba(168,85,247,.15);color:var(--purple);border-color:rgba(168,85,247,.4);}
+.mob-zone-pill.active-all{background:rgba(255,255,255,.08);color:var(--text);border-color:var(--border2);}
+.mob-zone-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* ===== MOBILE HOME SECTION ===== */
+#sec-mobile-home{display:none;}
+#sec-mobile-home.active{display:block;}
+@media(max-width:899px){
+  #sec-mobile-home{display:none;}
+  #sec-mobile-home.active{display:block;}
+}
+.mob-alert-banner{
+  background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(249,115,22,.08));
+  border:1px solid rgba(239,68,68,.3);border-radius:10px;
+  padding:9px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px;
+  animation:alertPulse 2s ease-in-out infinite;
+}
+@keyframes alertPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.2);}50%{box-shadow:0 0 0 6px rgba(239,68,68,0);}}
+.mob-alert-icon{width:34px;height:34px;border-radius:8px;background:var(--red-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:var(--red);}
+.mob-alert-text{flex:1;min-width:0;}
+.mob-alert-title{font-size:12px;font-weight:700;color:var(--red);}
+.mob-alert-sub{font-size:10px;color:var(--text2);margin-top:1px;}
+
+/* Mini stat cards (3-col mobile grid) */
+.mob-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.mob-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+.mob-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.mob-stat.c-gold::before{background:linear-gradient(90deg,var(--gold),var(--orange));}
+.mob-stat.c-green::before{background:linear-gradient(90deg,var(--green),var(--teal));}
+.mob-stat.c-blue::before{background:linear-gradient(90deg,var(--blue),var(--purple));}
+.mob-stat.c-red::before{background:linear-gradient(90deg,var(--red),var(--orange));}
+.mob-stat.c-teal::before{background:linear-gradient(90deg,var(--teal),var(--green));}
+.mob-stat.c-purple::before{background:linear-gradient(90deg,var(--purple),var(--blue));}
+.mob-stat:active{transform:scale(.95);}
+.mob-stat-icon{font-size:15px;margin-bottom:3px;}
+.mob-stat-val{font-family:var(--font-display);font-size:18px;font-weight:800;line-height:1.1;}
+.mob-stat-label{font-size:8px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text2);font-family:var(--font-mono);margin-top:1px;}
+
+/* 3-column action button grid */
+.mob-btn-grid-title{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);font-family:var(--font-mono);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.mob-btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px;}
+.mob-action-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:7px;padding:14px 6px 12px;
+  border-radius:14px;border:1.5px solid transparent;
+  background:var(--card2);cursor:pointer;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s,border-color .15s;
+  font-family:var(--font-body);position:relative;overflow:hidden;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+}
+.mob-action-btn:active{transform:scale(.92);}
+.mob-action-btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 8px 24px rgba(0,0,0,.35);}
+.mob-action-icon{
+  width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.mob-action-btn:active .mob-action-icon{transform:scale(.9);}
+.mob-action-label{font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-mono);text-align:center;line-height:1.3;}
+/* notification dot on action button */
+.mob-action-badge{position:absolute;top:8px;right:8px;min-width:16px;height:16px;border-radius:8px;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 4px;font-family:var(--font-mono);}
+.mob-action-badge.show{display:inline-flex;}
+
+/* ===== ZONE SEVERITY HEATMAP GRID (Pests tab) ===== */
+.zone-sev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+@media(min-width:600px){.zone-sev-grid{grid-template-columns:repeat(4,1fr);}}
+.zone-sev-tile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.zone-sev-tile.pulse-high{animation:zonePulse 1.8s ease-in-out infinite;}
+@keyframes zonePulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4);}50%{box-shadow:0 0 0 10px rgba(239,68,68,0);}}
+.zone-sev-tile.pulse-moderate{animation:zonePulseOrange 2.5s ease-in-out infinite;}
+@keyframes zonePulseOrange{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.3);}50%{box-shadow:0 0 0 8px rgba(249,115,22,0);}}
+.zone-sev-name{font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:3px;}
+.zone-sev-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;font-family:var(--font-mono);}
+.zone-sev-bar-wrap{display:flex;gap:2px;margin-top:8px;height:5px;border-radius:3px;overflow:hidden;}
+.zone-sev-bar-seg{flex:1;border-radius:2px;transition:opacity .3s;}
+.zone-sev-sub{font-size:9px;color:var(--text2);margin-top:4px;}
+
+/* ===== PEST SEVERITY by zone — per-disease segment bars ===== */
+.zone-sev-disease-row{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.zone-sev-disease-row:last-child{border-bottom:none;}
+.zone-sev-disease-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.zone-seg-bars{display:flex;gap:3px;align-items:flex-end;height:28px;}
+.zone-seg-bar{flex:1;border-radius:3px 3px 0 0;transition:height .5s var(--ease);min-height:2px;position:relative;}
+.zone-seg-bar-label{position:absolute;bottom:-14px;left:0;right:0;text-align:center;font-size:8px;font-weight:700;font-family:var(--font-mono);color:var(--text3);}
+.zone-seg-wrap{display:flex;gap:3px;align-items:flex-end;height:28px;position:relative;padding-bottom:14px;}
+
+/* ===== SEASON EVOLUTION CHART CARD ===== */
+.mob-season-chart{display:flex;gap:4px;align-items:flex-end;height:60px;padding:0 2px;}
+.mob-season-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s var(--ease);position:relative;}
+.mob-season-bar-tip{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:700;color:var(--text2);white-space:nowrap;font-family:var(--font-mono);}
+
+/* ===== ENHANCED MOBILE NAV (5 tabs) ===== */
+#mobile-nav{grid-template-columns:repeat(5,1fr);}
+.mob-nav-item{position:relative;}
+.mob-nav-badge{position:absolute;top:4px;right:12px;min-width:14px;height:14px;border-radius:7px;background:var(--red);color:#fff;font-size:8px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 3px;font-family:var(--font-mono);}
+.mob-nav-badge.show{display:inline-flex;}
+
+/* ===== MOBILE-ONLY: hide home section on desktop ===== */
+@media(min-width:900px){#sec-mobile-home{display:none!important;}#mob-zone-bar{display:none!important;}}
+
 </style>
 <style>.photo-upload-area{border:2px dashed var(--border2);border-radius:9px;padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,.02);font-size:12px;color:var(--text2);}.photo-upload-area:hover{border-color:var(--gold);background:var(--gold-dim);color:var(--gold);}
 /* ===== GLOBAL SEARCH MODAL ===== */
@@ -1037,6 +1146,26 @@ function openOthersModal(t){}
     <button class="btn btn-ghost btn-sm" onclick="showSection('weekly-report')"><i class="fas fa-file-alt"></i><span class="hide-xs"> Report</span></button>
     <button class="btn btn-gold btn-sm" onclick="openModal('add-plantation-modal')"><i class="fas fa-plus"></i><span class="hide-xs"> Add</span></button>
   </div>
+
+<!-- MOBILE ZONE SELECTOR BAR -->
+<div id="mob-zone-bar" role="navigation" aria-label="Zone filter">
+  <div class="mob-zone-pill active-all" id="mzp-all" onclick="setMobZone('')" title="All Zones">
+    <span class="mob-zone-dot" style="background:var(--text2);"></span> All
+  </div>
+  <div class="mob-zone-pill" id="mzp-e1" onclick="setMobZone('E1')" title="Zone E1 – Moka">
+    <span class="mob-zone-dot" style="background:var(--gold);"></span> E1
+  </div>
+  <div class="mob-zone-pill" id="mzp-e2" onclick="setMobZone('E2')" title="Zone E2 – Flacq West">
+    <span class="mob-zone-dot" style="background:var(--blue);"></span> E2
+  </div>
+  <div class="mob-zone-pill" id="mzp-e3" onclick="setMobZone('E3')" title="Zone E3 – Flacq Coast">
+    <span class="mob-zone-dot" style="background:var(--green);"></span> E3
+  </div>
+  <div class="mob-zone-pill" id="mzp-e4" onclick="setMobZone('E4')" title="Zone E4 – Grand Port">
+    <span class="mob-zone-dot" style="background:var(--purple);"></span> E4
+  </div>
+  <span id="mob-zone-label" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-left:6px;white-space:nowrap;flex-shrink:0;"></span>
+</div>
 </header>
 
 <!-- Sync status bar -->
@@ -1047,6 +1176,136 @@ function openOthersModal(t){}
 <main id="main">
 
 <!-- ========== DASHBOARD ========== -->
+
+<!-- ========== MOBILE HOME ========== -->
+<section id="sec-mobile-home" class="section">
+  <!-- Alert banner (shown if high alerts) -->
+  <div id="mob-alert-banner" style="display:none;">
+    <div class="mob-alert-banner">
+      <div class="mob-alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+      <div class="mob-alert-text">
+        <div class="mob-alert-title" id="mob-alert-title">Active High-Severity Alerts</div>
+        <div class="mob-alert-sub" id="mob-alert-sub">Tap Pests for details</div>
+      </div>
+      <button class="btn btn-red btn-sm" onclick="showSection('pests')" style="flex-shrink:0;font-size:11px;padding:5px 10px;">View</button>
+    </div>
+  </div>
+
+  <!-- Mini stat cards -->
+  <div class="mob-stats-row">
+    <div class="mob-stat c-gold" onclick="showSection('growers')">
+      <div class="mob-stat-icon" style="color:var(--gold);"><i class="fas fa-users"></i></div>
+      <div class="mob-stat-val" id="msh-growers" style="color:var(--gold);">—</div>
+      <div class="mob-stat-label">Growers</div>
+    </div>
+    <div class="mob-stat c-green" onclick="showSection('plantation')">
+      <div class="mob-stat-icon" style="color:var(--green);"><i class="fas fa-map"></i></div>
+      <div class="mob-stat-val" id="msh-area" style="color:var(--green);">—</div>
+      <div class="mob-stat-label">Area ha</div>
+    </div>
+    <div class="mob-stat c-red" onclick="showSection('pests')">
+      <div class="mob-stat-icon" style="color:var(--red);"><i class="fas fa-bug"></i></div>
+      <div class="mob-stat-val" id="msh-alerts" style="color:var(--red);">—</div>
+      <div class="mob-stat-label">Alerts</div>
+    </div>
+    <div class="mob-stat c-blue" onclick="showSection('production')">
+      <div class="mob-stat-icon" style="color:var(--blue);"><i class="fas fa-weight"></i></div>
+      <div class="mob-stat-val" id="msh-prod" style="color:var(--blue);">—</div>
+      <div class="mob-stat-label">Est T</div>
+    </div>
+    <div class="mob-stat c-teal" onclick="showSection('plantation')">
+      <div class="mob-stat-icon" style="color:var(--teal);"><i class="fas fa-seedling"></i></div>
+      <div class="mob-stat-val" id="msh-plots" style="color:var(--teal);">—</div>
+      <div class="mob-stat-label">Plots</div>
+    </div>
+    <div class="mob-stat c-purple" onclick="showSection('trends')">
+      <div class="mob-stat-icon" style="color:var(--purple);"><i class="fas fa-chart-line"></i></div>
+      <div class="mob-stat-val" id="msh-seasons" style="color:var(--purple);">2</div>
+      <div class="mob-stat-label">Seasons</div>
+    </div>
+  </div>
+
+  <!-- Zone Pest Heatmap -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--orange),var(--red));"></div>
+    <div class="card-title" style="margin-bottom:10px;"><i class="fas fa-fire-alt" style="color:var(--orange);"></i> Zone Pest Status</div>
+    <div class="zone-sev-grid" id="mob-zone-sev-grid"></div>
+  </div>
+
+  <!-- Season Pest Evolution mini chart -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--red),var(--orange),var(--green));"></div>
+    <div class="card-title" style="margin-bottom:10px;font-size:12px;">
+      <i class="fas fa-chart-area" style="color:var(--teal);"></i> Pest Severity — Last 8 Weeks
+      <select id="mob-sev-zone-sel" class="form-control btn-sm" style="font-size:10px;padding:3px 8px;min-height:28px;margin-left:auto;max-width:80px;" onchange="renderMobSeasonChart()">
+        <option value="">All</option><option value="E1">E1</option><option value="E2">E2</option><option value="E3">E3</option><option value="E4">E4</option>
+      </select>
+    </div>
+    <div id="mob-season-chart-wrap" style="padding:4px 0 14px;position:relative;"></div>
+  </div>
+
+  <!-- Quick Actions 3-column grid -->
+  <div class="mob-btn-grid-title"><i class="fas fa-grip-vertical" style="color:var(--gold);font-size:11px;"></i> Quick Actions</div>
+  <div class="mob-btn-grid">
+    <div class="mob-action-btn" onclick="openGlobalSearch()" style="border-color:rgba(59,130,246,.25);">
+      <div class="mob-action-icon" style="background:var(--blue-dim);color:var(--blue);"><i class="fas fa-search"></i></div>
+      <div class="mob-action-label" style="color:var(--blue);">Search</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('growers')" style="border-color:rgba(240,165,0,.25);">
+      <div class="mob-action-icon" style="background:var(--gold-dim);color:var(--gold);"><i class="fas fa-user-plus"></i></div>
+      <div class="mob-action-label" style="color:var(--gold);">Register</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('plantation')" style="border-color:rgba(34,197,94,.25);">
+      <div class="mob-action-icon" style="background:var(--green-dim);color:var(--green);"><i class="fas fa-seedling"></i></div>
+      <div class="mob-action-label" style="color:var(--green);">Plantation</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('pests')" style="border-color:rgba(239,68,68,.25);">
+      <div class="mob-action-icon" style="background:var(--red-dim);color:var(--red);"><i class="fas fa-bug"></i></div>
+      <div class="mob-action-label" style="color:var(--red);">Pest Alert</div>
+      <div class="mob-action-badge" id="mob-pest-badge"></div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('yield-assess')" style="border-color:rgba(20,184,166,.25);">
+      <div class="mob-action-icon" style="background:var(--teal-dim);color:var(--teal);"><i class="fas fa-weight-scale"></i></div>
+      <div class="mob-action-label" style="color:var(--teal);">Yield Calc</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('map')" style="border-color:rgba(168,85,247,.25);">
+      <div class="mob-action-icon" style="background:var(--purple-dim);color:var(--purple);"><i class="fas fa-map-marked-alt"></i></div>
+      <div class="mob-action-label" style="color:var(--purple);">Yield Map</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('trends')" style="border-color:rgba(59,130,246,.2);">
+      <div class="mob-action-icon" style="background:var(--blue-dim);color:var(--blue);"><i class="fas fa-chart-line"></i></div>
+      <div class="mob-action-label" style="color:var(--blue);">GH Data</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('comparative')" style="border-color:rgba(249,115,22,.2);">
+      <div class="mob-action-icon" style="background:var(--orange-dim);color:var(--orange);"><i class="fas fa-balance-scale"></i></div>
+      <div class="mob-action-label" style="color:var(--orange);">Variety Perf</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('weekly-report')" style="border-color:rgba(34,197,94,.2);">
+      <div class="mob-action-icon" style="background:var(--green-dim);color:var(--green);"><i class="fas fa-file-alt"></i></div>
+      <div class="mob-action-label" style="color:var(--green);">YLF Report</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('production')" style="border-color:rgba(240,165,0,.2);">
+      <div class="mob-action-icon" style="background:var(--gold-dim);color:var(--gold);"><i class="fas fa-industry"></i></div>
+      <div class="mob-action-label" style="color:var(--gold);">Production</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('campaign')" style="border-color:rgba(20,184,166,.2);">
+      <div class="mob-action-icon" style="background:var(--teal-dim);color:var(--teal);"><i class="fas fa-table"></i></div>
+      <div class="mob-action-label" style="color:var(--teal);">Campaign</div>
+    </div>
+    <div class="mob-action-btn" onclick="showSection('settings')" style="border-color:rgba(122,141,170,.2);">
+      <div class="mob-action-icon" style="background:rgba(122,141,170,.12);color:var(--text2);"><i class="fas fa-cog"></i></div>
+      <div class="mob-action-label" style="color:var(--text2);">Settings</div>
+    </div>
+  </div>
+
+  <!-- Online Now indicator -->
+  <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+    <div class="sync-dot" style="width:8px;height:8px;"></div>
+    <span id="mob-online-label" style="font-size:11px;color:var(--text2);font-family:var(--font-mono);">Online — ready to sync</span>
+    <button class="btn btn-ghost btn-sm" onclick="syncToSheets()" style="margin-left:auto;font-size:11px;padding:4px 10px;min-height:30px;"><i class="fas fa-cloud-upload-alt"></i> Sync</button>
+  </div>
+</section>
+
 <section id="sec-dashboard" class="section active">
   <!-- Stat cards with sparklines -->
   <div class="stats-grid">
@@ -2030,12 +2289,12 @@ function openOthersModal(t){}
 </div>
 
 <!-- MOBILE BOTTOM NAV -->
-<nav id="mobile-nav">
-  <div class="mob-nav-item active" id="mob-nav-dashboard" onclick="showSection('dashboard')"><i class="fas fa-chart-pie"></i>Dash</div>
-  <div class="mob-nav-item" id="mob-nav-growers" onclick="showSection('growers')"><i class="fas fa-users"></i>Growers</div>
-  <div class="mob-nav-item" id="mob-nav-plantation" onclick="showSection('plantation')"><i class="fas fa-seedling"></i>Plants</div>
-  <div class="mob-nav-item" id="mob-nav-pests" onclick="showSection('pests')"><i class="fas fa-bug"></i>Pests</div>
-  <div class="mob-nav-item" id="mob-nav-map" onclick="showSection('map')"><i class="fas fa-map"></i>Map</div>
+<nav id="mobile-nav" role="navigation" aria-label="Main navigation">
+  <div class="mob-nav-item active" id="mob-nav-mobile-home" onclick="showSection('mobile-home')"><i class="fas fa-home"></i>Home</div>
+  <div class="mob-nav-item" id="mob-nav-pests" onclick="showSection('pests')"><i class="fas fa-bug"></i>Pests<div class="mob-nav-badge" id="mob-nav-pest-badge"></div></div>
+  <div class="mob-nav-item" id="mob-nav-map" onclick="showSection('map')"><i class="fas fa-map-marked-alt"></i>Map</div>
+  <div class="mob-nav-item" id="mob-nav-dashboard" onclick="showSection('dashboard')"><i class="fas fa-chart-pie"></i>Data</div>
+  <div class="mob-nav-item" id="mob-nav-growers" onclick="showSection('growers')"><i class="fas fa-users"></i>More</div>
 </nav>
 
 <div id="toast-stack"></div>
@@ -3349,6 +3608,11 @@ function updateAlertBadge(){
   const high = STATE.pestRecords.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
   const badge = document.getElementById('alert-badge');
   if(badge){ badge.textContent=high; badge.style.display=high?'inline-flex':'none'; }
+  // update mobile badges
+  const navPestBadge = document.getElementById('mob-nav-pest-badge');
+  if(navPestBadge){ navPestBadge.textContent=high; navPestBadge.className='mob-nav-badge'+(high?' show':''); }
+  const mobPestBadge = document.getElementById('mob-pest-badge');
+  if(mobPestBadge){ mobPestBadge.textContent=high; mobPestBadge.className='mob-action-badge'+(high?' show':''); }
 }
 
 // ============================================================
@@ -5970,6 +6234,220 @@ function _doGlobalSearch(){
 
   container.innerHTML = html;
 }
+
+
+
+// ============================================================
+//  MOBILE HOME — zone filter state
+// ============================================================
+let MOB_ACTIVE_ZONE = '';
+
+function setMobZone(zone) {
+  MOB_ACTIVE_ZONE = zone;
+  // Update pill styles
+  ['','E1','E2','E3','E4'].forEach(z => {
+    const pill = document.getElementById('mzp-' + (z||'all').toLowerCase());
+    if (!pill) return;
+    pill.className = 'mob-zone-pill';
+    if (z === zone) {
+      const cls = z ? 'active-' + z.toLowerCase() : 'active-all';
+      pill.classList.add(cls);
+    }
+  });
+  // Update label
+  const lbl = document.getElementById('mob-zone-label');
+  const zoneNames = {E1:'Moka',E2:'Flacq W',E3:'Flacq Coast',E4:'Grand Port'};
+  if (lbl) lbl.textContent = zone ? '— ' + zone + ': ' + (zoneNames[zone]||'') : '';
+  // Refresh mobile home cards
+  renderMobileHome();
+}
+
+function renderMobileHome() {
+  if (!STATE) return;
+  const z = MOB_ACTIVE_ZONE;
+
+  // Filter by zone if set
+  const growerNames = z ? STATE.growers.filter(g=>g.zone===z).map(g=>g.name) : STATE.growers.map(g=>g.name);
+  const plots = z ? STATE.plantation.filter(r=>growerNames.includes(r.grower)) : STATE.plantation;
+  const pestRecs = z ? STATE.pestRecords.filter(r=>growerNames.includes(r.grower)) : STATE.pestRecords;
+
+  const totalArea = plots.reduce((s,r)=>s+(r.area||0),0);
+  const estProd = plots.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0);
+  const highAlerts = pestRecs.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
+
+  // Update mini stats
+  const set = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('msh-growers', z ? growerNames.length : STATE.growers.length);
+  set('msh-area', totalArea.toFixed(1));
+  set('msh-alerts', highAlerts);
+  set('msh-prod', Math.round(estProd));
+  set('msh-plots', plots.length);
+
+  // Alert banner
+  const banner = document.getElementById('mob-alert-banner');
+  if (banner) banner.style.display = highAlerts ? 'block' : 'none';
+  const alertTitle = document.getElementById('mob-alert-title');
+  const alertSub = document.getElementById('mob-alert-sub');
+  if (alertTitle) alertTitle.textContent = highAlerts + ' High-Severity Alert' + (highAlerts!==1?'s':'') + (z?' in Zone '+z:'');
+  if (alertSub) alertSub.textContent = 'Tap Pests for details';
+
+  // Pest badge on action button
+  const pestBadge = document.getElementById('mob-pest-badge');
+  if (pestBadge) { pestBadge.textContent = highAlerts; pestBadge.className = 'mob-action-badge' + (highAlerts?' show':''); }
+  const navPestBadge = document.getElementById('mob-nav-pest-badge');
+  if (navPestBadge) { navPestBadge.textContent = highAlerts; navPestBadge.className = 'mob-nav-badge' + (highAlerts?' show':''); }
+
+  // Online label
+  const onlineLbl = document.getElementById('mob-online-label');
+  if (onlineLbl) onlineLbl.textContent = navigator.onLine ? 'Online — ready to sync' : 'Offline — changes saved locally';
+
+  renderZoneSevGrid();
+  renderMobSeasonChart();
+}
+
+function renderZoneSevGrid() {
+  const el = document.getElementById('mob-zone-sev-grid');
+  if (!el) return;
+  const sevScore = {Low:1, Moderate:2, High:3};
+  const zoneColors = {E1:'var(--gold)',E2:'var(--blue)',E3:'var(--green)',E4:'var(--purple)'};
+  const zoneBg    = {E1:'var(--gold-dim)',E2:'var(--blue-dim)',E3:'var(--green-dim)',E4:'var(--purple-dim)'};
+  const severityColor = pct => pct>=80?'var(--red)':pct>=55?'var(--orange)':pct>=30?'#eab308':'var(--green)';
+
+  el.innerHTML = ['E1','E2','E3','E4'].map(zone => {
+    const gnames = STATE.growers.filter(g=>g.zone===zone).map(g=>g.name);
+    const recs = STATE.pestRecords.filter(r=>gnames.includes(r.grower));
+    const scores = recs.flatMap(r=>(r.visits||[]).flatMap(v=>Object.values(v.pests||{}).map(p=>sevScore[p.sev]||0).filter(Boolean)));
+    const avg = scores.length ? scores.reduce((s,v)=>s+v,0)/scores.length : 0;
+    const pct = Math.round((avg/3)*100);
+    const label = avg===0?'Clear':avg<1.5?'Low':avg<2.5?'Moderate':'High';
+    const pulse = avg>=2.5?'pulse-high':avg>=1.5?'pulse-moderate':'';
+    const plots = STATE.plantation.filter(r=>gnames.includes(r.grower)).length;
+    const col = zoneColors[zone];
+    const bg = zoneBg[zone];
+    const barCol = severityColor(pct);
+
+    // 4-segment severity bar (one per sub-locality severity quartile)
+    const segColors = ['var(--green)','#eab308','var(--orange)','var(--red)'];
+    const segs = [0,25,50,75].map((threshold,i) => {
+      const opacity = pct > threshold ? 1 : 0.15;
+      return `<div class="zone-sev-bar-seg" style="background:${segColors[i]};opacity:${opacity};"></div>`;
+    }).join('');
+
+    return `<div class="zone-sev-tile ${pulse}" onclick="setMobZone('${zone}')" style="border-color:${MOB_ACTIVE_ZONE===zone?col:'var(--border)'};background:${MOB_ACTIVE_ZONE===zone?bg:'var(--card)'};">
+      <div class="zone-sev-name" style="color:${col};">${zone}</div>
+      <div class="zone-sev-label" style="color:${barCol};">${label}</div>
+      <div class="zone-sev-bar-wrap">${segs}</div>
+      <div class="zone-sev-sub">${plots} plot${plots!==1?'s':''} · ${gnames.length} grower${gnames.length!==1?'s':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMobSeasonChart() {
+  const el = document.getElementById('mob-season-chart-wrap');
+  if (!el) return;
+  const zone = document.getElementById('mob-sev-zone-sel')?.value || '';
+  const sevScore = {Low:1, Moderate:2, High:3};
+  const now = new Date();
+
+  // Build 8-week buckets going back from today
+  const weeks = Array.from({length:8},(_,i) => {
+    const d = new Date(now); d.setDate(d.getDate() - (7*(7-i)));
+    return d;
+  });
+
+  const gnames = zone ? STATE.growers.filter(g=>g.zone===zone).map(g=>g.name) : null;
+  const pestRecs = gnames ? STATE.pestRecords.filter(r=>gnames.includes(r.grower)) : STATE.pestRecords;
+
+  const data = weeks.map((wStart,i) => {
+    const wEnd = new Date(wStart); wEnd.setDate(wEnd.getDate()+7);
+    const visits = pestRecs.flatMap(r=>(r.visits||[]).filter(v=>{ if(!v.date) return false; const d=new Date(v.date); return d>=wStart&&d<wEnd; }));
+    const scores = visits.flatMap(v=>Object.values(v.pests||{}).map(p=>sevScore[p.sev]||0).filter(Boolean));
+    return scores.length ? scores.reduce((s,v)=>s+v,0)/scores.length/3*100 : 0;
+  });
+
+  const maxVal = Math.max(...data, 5);
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const colOf = v => v>=67?'var(--red)':v>=34?'var(--orange)':v>0?'#eab308':'var(--border2)';
+
+  const bars = data.map((v,i) => {
+    const h = Math.max(3, Math.round((v/maxVal)*52));
+    const wDate = weeks[i];
+    const label = MONTHS_SHORT[wDate.getMonth()] + ' ' + wDate.getDate();
+    const tip = v>0 ? Math.round(v)+'%' : '';
+    return `<div class="mob-season-bar" style="height:${h}px;background:${colOf(v)};" title="${label}: ${Math.round(v)}%">
+      ${tip?`<div class="mob-season-bar-tip">${tip}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const axisLabels = [0,3,7].map(i => {
+    const d = weeks[i];
+    return `<span style="flex:${i===0?1:i===3?1:1};text-align:${i===0?'left':i===3?'center':'right'};font-size:8px;color:var(--text3);font-family:var(--font-mono);">${MONTHS_SHORT[d.getMonth()]+' '+d.getDate()}</span>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="mob-season-chart" style="padding-bottom:4px;">${bars}</div>
+    <div style="display:flex;justify-content:space-between;margin-top:2px;">
+      ${axisLabels}
+    </div>
+    <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
+      <span style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text2);"><span style="width:8px;height:8px;background:var(--green);border-radius:2px;display:inline-block;"></span>Low</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text2);"><span style="width:8px;height:8px;background:#eab308;border-radius:2px;display:inline-block;"></span>Moderate</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text2);"><span style="width:8px;height:8px;background:var(--red);border-radius:2px;display:inline-block;"></span>High</span>
+    </div>
+  `;
+}
+
+// Override showSection to handle mobile-home
+const _origShowSection = showSection;
+showSection = function(id) {
+  // handle mobile-home special routing
+  if (id === 'mobile-home') {
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.mob-nav-item').forEach(n=>n.classList.remove('active'));
+    const sec = document.getElementById('sec-mobile-home');
+    if (sec) sec.classList.add('active');
+    const mn = document.getElementById('mob-nav-mobile-home');
+    if (mn) mn.classList.add('active');
+    if (typeof renderMobileHome === 'function') renderMobileHome();
+    const pt = document.getElementById('page-title');
+    const ps = document.getElementById('page-sub');
+    if (pt) pt.textContent = 'Home';
+    if (ps) ps.textContent = 'PoTaTo Tracker';
+    // close sidebar on mobile
+    const sb = document.getElementById('sidebar');
+    if (sb && window.innerWidth < 900) sb.classList.remove('open');
+    return;
+  }
+  _origShowSection(id);
+  // also close sidebar on mobile for any navigation
+  if (window.innerWidth < 900) {
+    const sb = document.getElementById('sidebar');
+    if (sb) sb.classList.remove('open');
+  }
+  // sync mob-nav active state for the 5-tab bar
+  const mobNavMap = {
+    'pests':'mob-nav-pests','map':'mob-nav-map',
+    'dashboard':'mob-nav-dashboard','growers':'mob-nav-growers',
+    'mobile-home':'mob-nav-mobile-home'
+  };
+  document.querySelectorAll('.mob-nav-item').forEach(n=>n.classList.remove('active'));
+  const mn = document.getElementById(mobNavMap[id]);
+  if (mn) mn.classList.add('active');
+};
+
+// Patch initApp to show mobile-home on small screens
+const _origInitApp_mobileHome = initApp;
+initApp = async function(){
+  await _origInitApp_mobileHome();
+  // After init, if on mobile, show mobile-home instead of dashboard
+  if (window.innerWidth < 900) {
+    showSection('mobile-home');
+  }
+  // Initial render of mobile home data
+  renderMobileHome();
+};
+
 
 // Keyboard shortcut: Ctrl+K / Cmd+K to open search
 document.addEventListener('keydown', function(e){
