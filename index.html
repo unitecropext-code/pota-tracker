@@ -3124,20 +3124,26 @@ async function initApp(){
 
 // Sign action + timestamp + data with HMAC-SHA256 (Web Crypto).
 // Returns { sig, ts } or { sig:'', ts:'' } when no secret is configured.
+// FIX: race the whole signing op against a 3 s timeout — crypto.subtle can hang
+//      on file:// or insecure mobile contexts, stalling the entire login chain.
 async function _signGasPayload(action, dataStr) {
   if (!GAS_SECRET) return { sig: '', ts: '' };
   const ts = String(Date.now());
   const message = action + ':' + ts + ':' + dataStr;
   try {
-    const keyMaterial = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(GAS_SECRET),
-      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
-    );
-    const sigBuf = await crypto.subtle.sign('HMAC', keyMaterial, new TextEncoder().encode(message));
-    const sig = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const signP = (async () => {
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', new TextEncoder().encode(GAS_SECRET),
+        { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+      );
+      const sigBuf = await crypto.subtle.sign('HMAC', keyMaterial, new TextEncoder().encode(message));
+      return Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    })();
+    const timeoutP = new Promise((_,rej) => setTimeout(() => rej(new Error('sign-timeout')), 3000));
+    const sig = await Promise.race([signP, timeoutP]);
     return { sig, ts };
   } catch(e) {
-    console.warn('HMAC signing failed:', e.message);
+    console.warn('HMAC signing skipped (no secure context or timeout):', e.message);
     return { sig: '', ts: '' };
   }
 }
@@ -3157,7 +3163,7 @@ async function callGAS(action, data = {}){
   const { sig, ts } = await _signGasPayload(action, dataStr);
 
   const controller = new AbortController();
-  const timeoutId  = setTimeout(() => controller.abort(), 15000);
+  const timeoutId  = setTimeout(() => controller.abort(), 6000); // was 15 s — must be < 8 s doLogin safety timeout
 
   try{
     const params = new URLSearchParams();
@@ -3181,7 +3187,7 @@ async function callGAS(action, data = {}){
   } catch(e){
     clearTimeout(timeoutId);
     if(e.name === 'AbortError')
-      return {success:false, error:'Request timed out (>15 s). Check GAS URL.'};
+      return {success:false, error:'Request timed out (>6 s). Check GAS URL.'};
     return {success:false, error: e.message};
   }
 }
