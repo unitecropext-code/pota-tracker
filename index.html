@@ -4681,7 +4681,61 @@ function deleteCompRecord(id){
   renderDashboard();
   undoDelete('Plantation record deleted', ()=>{ STATE.plantation.push(_r); saveLocal(); renderCompRecordsBody(_compRecordsCtx.year, _compRecordsCtx.season); renderComparative(); renderDashboard(); });
 }
-
+<!-- ===== SEASON SUMMARY MODAL ===== -->
+<div class="modal-overlay" id="comp-summary-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-table" style="color:var(--gold);"></i> <span id="csm-title">Season Summary</span></div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('comp-summary-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="csm-year">
+      <input type="hidden" id="csm-season">
+      <div style="background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.15);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6;">
+        <i class="fas fa-info-circle" style="color:var(--gold);margin-right:5px;"></i>
+        Enter aggregated season-level data directly. These figures will appear in the comparison table and charts for this year/season.
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Number of Plots</label>
+          <input type="number" id="csm-plots" class="form-control" min="0" step="1" placeholder="0" oninput="csmCalc()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total Area (ha)</label>
+          <input type="number" id="csm-area" class="form-control" step="0.01" placeholder="0.00" oninput="csmCalc()">
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">Est. Production (T)</label>
+          <input type="number" id="csm-prod" class="form-control" step="0.1" placeholder="Auto-calculated" oninput="csmCalc()">
+          <div class="form-hint" id="csm-prod-hint"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Avg Yield (T/ha)</label>
+          <input type="number" id="csm-yield" class="form-control" step="0.1" placeholder="e.g. 20" oninput="csmCalc()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pest Severity (avg)</label>
+        <select id="csm-pest" class="form-control">
+          <option value="">— Not recorded —</option>
+          <option value="0.5">Low</option>
+          <option value="1.5">Moderate</option>
+          <option value="2.5">High</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea id="csm-notes" class="form-control" rows="2" placeholder="Optional notes for this season summary…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('comp-summary-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveSeasonSummary()"><i class="fas fa-save"></i> Save Summary</button>
+    </div>
+  </div>
+</div>
 // ============================================================
 //  CAMPAIGN TABLE
 // ============================================================
@@ -5157,6 +5211,66 @@ window.addEventListener('DOMContentLoaded',()=>{
     }
   }catch(e){ localStorage.removeItem('pota_current_user'); }
 });
+
+// ============================================================
+//  SEASON SUMMARY (for 2024/2025 aggregate-level entry)
+// ============================================================
+function openSeasonSummary(year, season) {
+  document.getElementById('csm-year').value   = year;
+  document.getElementById('csm-season').value = season;
+  document.getElementById('csm-title').textContent = `Season Summary — ${season} ${year}`;
+
+  // Pre-fill if existing summary
+  if(!STATE.seasonSummaries) STATE.seasonSummaries = {};
+  const key  = `${year}|${season}`;
+  const existing = STATE.seasonSummaries[key] || {};
+  document.getElementById('csm-plots').value = existing.plots || '';
+  document.getElementById('csm-area').value  = existing.area  || '';
+  document.getElementById('csm-prod').value  = existing.prod  || '';
+  document.getElementById('csm-yield').value = existing.yield || '';
+  document.getElementById('csm-pest').value  = existing.pest  || '';
+  document.getElementById('csm-notes').value = existing.notes || '';
+  document.getElementById('csm-prod-hint').textContent = '';
+
+  openModal('comp-summary-modal');
+}
+
+function csmCalc() {
+  const area  = parseFloat(document.getElementById('csm-area').value)  || 0;
+  const yield_ = parseFloat(document.getElementById('csm-yield').value) || 0;
+  const hint  = document.getElementById('csm-prod-hint');
+  const prodEl = document.getElementById('csm-prod');
+  if(area > 0 && yield_ > 0 && !prodEl.value) {
+    hint.textContent = `Auto: ${(area * yield_).toFixed(1)} T (area × yield)`;
+  } else {
+    hint.textContent = '';
+  }
+}
+
+function saveSeasonSummary() {
+  const year   = document.getElementById('csm-year').value;
+  const season = document.getElementById('csm-season').value;
+  const plots  = parseInt(document.getElementById('csm-plots').value)   || 0;
+  const area   = parseFloat(document.getElementById('csm-area').value)  || 0;
+  const yieldV = parseFloat(document.getElementById('csm-yield').value) || 0;
+  const pest   = document.getElementById('csm-pest').value;
+  const notes  = document.getElementById('csm-notes').value.trim();
+
+  // Auto-calc prod if not manually entered
+  const prodInput = parseFloat(document.getElementById('csm-prod').value);
+  const prod = prodInput || (area > 0 && yieldV > 0 ? area * yieldV : 0);
+
+  if(!area && !plots) { toast('Enter at least Area or Plots', 'error'); return; }
+
+  if(!STATE.seasonSummaries) STATE.seasonSummaries = {};
+  const key = `${year}|${season}`;
+  STATE.seasonSummaries[key] = { plots, area, prod, yield: yieldV, pest: pest ? parseFloat(pest) : 0, notes, year, season };
+
+  saveLocal();
+  closeModal('comp-summary-modal');
+  renderComparative();
+  toast(`Season summary saved for ${season} ${year} ✓`);
+}
 </script>
 
 <!-- ===== CHANGE PASSWORD MODAL ===== -->
