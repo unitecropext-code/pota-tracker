@@ -4431,9 +4431,12 @@ function renderComparative(){
         <td style="${tdStyle}text-align:center;">${sevLabel}</td>
         <td style="${tdStyle}text-align:center;">
           <div style="display:flex;gap:4px;justify-content:center;">
-            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompRecords('${y}','${s}')" title="View / Edit records"><i class="fas fa-pencil-alt" style="color:var(--gold);"></i></button>
-            <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompInsert('${y}','${s}')" title="Add record"><i class="fas fa-plus" style="color:var(--green);"></i></button>
-          </div>
+  <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompRecords('${y}','${s}')" title="View / Edit records"><i class="fas fa-pencil-alt" style="color:var(--gold);"></i></button>
+  ${m.fromSummary || (!m.plots && (y==='2024'||y==='2025'))
+    ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;border-color:rgba(240,165,0,.4);color:var(--gold);" onclick="openSeasonSummary('${y}','${s}')" title="Enter season summary data"><i class="fas fa-table-cells"></i></button>`
+    : `<button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;" onclick="openCompInsert('${y}','${s}')" title="Add individual record"><i class="fas fa-plus" style="color:var(--green);"></i></button>`
+  }
+</div>
         </td>
       </tr>`;
     });
