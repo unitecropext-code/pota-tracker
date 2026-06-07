@@ -1213,6 +1213,7 @@ function openOthersModal(t){}
     <div class="map-toggle on" id="toggle-growers" onclick="toggleLayer('growers')"><i class="fas fa-users"></i> Growers</div>
     <div class="map-toggle on" id="toggle-zones" onclick="toggleLayer('zones')"><i class="fas fa-draw-polygon"></i> Zones</div>
     <div class="map-toggle" id="toggle-plantations" onclick="toggleLayer('plantations')"><i class="fas fa-seedling"></i> Plantations</div>
+    <div class="map-toggle" id="toggle-disease" onclick="toggleLayer('disease')" style="border-color:rgba(239,68,68,.25);"><i class="fas fa-biohazard"></i> Disease Heat</div>
     <div style="margin-left:auto;font-size:11px;color:var(--text3);"><i class="fas fa-pencil-alt"></i> Use toolbar on map to draw</div>
   </div>
   <div id="map-container"></div>
@@ -1229,6 +1230,11 @@ function openOthersModal(t){}
     <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div>High severity</div>
     <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div>Season 1 plot</div>
     <div class="legend-item"><div class="legend-dot" style="background:#a855f7;"></div>Season 2 plot</div>
+    <div class="legend-item" style="border-top:1px solid rgba(255,255,255,.06);padding-top:6px;margin-top:2px;width:100%;">
+      <span style="font-size:10px;color:var(--text3);margin-right:6px;">Disease Heat:</span>
+      <div style="height:8px;width:100px;border-radius:4px;background:linear-gradient(90deg,#22c55e,#f97316,#ef4444);flex-shrink:0;"></div>
+      <span style="font-size:9px;color:var(--text3);margin-left:5px;">Low → High</span>
+    </div>
   </div>
 
   <!-- Pest/Disease Severity Intensity Bar -->
@@ -1701,70 +1707,6 @@ function openOthersModal(t){}
 <!-- ========== SETTINGS ========== -->
 <section id="sec-settings" class="section">
 
-  <!-- ADMIN CONTROL PANEL (Admin-only action hub) -->
-  <div class="card fo-admin-hidden" id="admin-control-panel" style="padding-bottom:18px;">
-    <div class="card-accent" style="background:linear-gradient(90deg,#1a6b3a,#0e9e5a,#1a6b3a);"></div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1a6b3a,#0e9e5a);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <i class="fas fa-shield-alt" style="color:#fff;font-size:17px;"></i>
-      </div>
-      <div>
-        <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:.3px;">Admin Control Panel</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:1px;">PoTaTo Tracker v4.0 · Quick Actions</div>
-      </div>
-      <span style="margin-left:auto;background:linear-gradient(90deg,#f0a500,#fbbf24);color:#111;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.8px;text-transform:uppercase;">ADMIN ONLY</span>
-    </div>
-    <div class="admin-btn-grid">
-      <button class="admin-btn admin-btn-search" onclick="openGlobalSearch()">
-        <div class="admin-btn-icon"><i class="fas fa-search"></i></div>
-        <div class="admin-btn-label">SEARCH</div>
-      </button>
-      <button class="admin-btn admin-btn-completed" onclick="showSection('plantation')">
-        <div class="admin-btn-icon"><i class="fas fa-check-double"></i></div>
-        <div class="admin-btn-label">COMPLETED</div>
-      </button>
-      <button class="admin-btn admin-btn-register" onclick="openModal('add-grower-modal')">
-        <div class="admin-btn-icon"><i class="fas fa-user-plus"></i></div>
-        <div class="admin-btn-label">REGISTER</div>
-      </button>
-      <button class="admin-btn admin-btn-ghdata" onclick="pullFromSheets()">
-        <div class="admin-btn-icon"><i class="fas fa-cloud-download-alt"></i></div>
-        <div class="admin-btn-label">GH DATA</div>
-      </button>
-      <button class="admin-btn admin-btn-yieldcalc" onclick="showSection('yield-assess')">
-        <div class="admin-btn-icon"><i class="fas fa-calculator"></i></div>
-        <div class="admin-btn-label">YIELD CALC</div>
-      </button>
-      <button class="admin-btn admin-btn-varietyperf" onclick="showSection('comparative')">
-        <div class="admin-btn-icon"><i class="fas fa-chart-bar"></i></div>
-        <div class="admin-btn-label">VARIETY PERF</div>
-      </button>
-      <button class="admin-btn admin-btn-decision" onclick="showSection('trends')">
-        <div class="admin-btn-icon"><i class="fas fa-brain"></i></div>
-        <div class="admin-btn-label">DECISION</div>
-      </button>
-      <button class="admin-btn admin-btn-activity" onclick="showSection('campaign')">
-        <div class="admin-btn-icon"><i class="fas fa-history"></i></div>
-        <div class="admin-btn-label">ACTIVITY</div>
-      </button>
-      <button class="admin-btn admin-btn-pestalert" onclick="showSection('pests')">
-        <div class="admin-btn-icon"><i class="fas fa-bug"></i></div>
-        <div class="admin-btn-label">PEST ALERT</div>
-      </button>
-      <button class="admin-btn admin-btn-ylfreport" onclick="showSection('weekly-report')">
-        <div class="admin-btn-icon"><i class="fas fa-file-alt"></i></div>
-        <div class="admin-btn-label">YLF REPORT</div>
-      </button>
-      <button class="admin-btn admin-btn-yieldmap" onclick="showSection('map')">
-        <div class="admin-btn-icon"><i class="fas fa-map-marked-alt"></i></div>
-        <div class="admin-btn-label">YIELD MAP</div>
-      </button>
-      <button class="admin-btn admin-btn-online" onclick="showSection('growers')">
-        <div class="admin-btn-icon"><i class="fas fa-users"></i><span class="online-dot"></span></div>
-        <div class="admin-btn-label">ONLINE NOW</div>
-      </button>
-    </div>
-  </div>
 
   <div class="card" id="fo-settings-card" style="display:none;">
     <div class="card-title"><i class="fas fa-key"></i> My Account</div>
@@ -4432,8 +4374,8 @@ function deleteYield(id){ const _r=STATE.yieldAssessments.find(x=>x.id==id); if(
 // ============================================================
 //  MAP
 // ============================================================
-let map=null, mapLayers={growers:null,zones:null,plantations:null};
-let layerState={growers:true,zones:true,plantations:false};
+let map=null, mapLayers={growers:null,zones:null,plantations:null,disease:null};
+let layerState={growers:true,zones:true,plantations:false,disease:false};
 let drawnItems=null;
 function getLocalityCoords(locality, zone){
   const k=zone+':'+locality;
@@ -4461,7 +4403,7 @@ function initMap(){
   map.addControl(dc);
   map.on(L.Draw.Event.CREATED,function(e){ drawnItems.addLayer(e.layer); updateDrawnShapesList(); toast(`${e.layerType} drawn ✓`); });
   map.on(L.Draw.Event.DELETED,function(){ updateDrawnShapesList(); });
-  renderMapLayers(); renderZoneStats(); renderMapSeverityBars();
+  renderMapLayers(); renderZoneStats(); renderMapSeverityBars(); renderDiseaseHeatLayer();
   setTimeout(()=>map.invalidateSize(),200);
 }
 function updateDrawnShapesList(){
@@ -4484,7 +4426,7 @@ function clearDrawnShapes(){ if(!drawnItems||!drawnItems.getLayers().length){ to
 function renderMapLayers(){
   if(!map) return;
   Object.values(mapLayers).forEach(l=>{ if(l) try{ map.removeLayer(l); }catch(e){} });
-  mapLayers={growers:null,zones:null,plantations:null};
+  mapLayers={growers:null,zones:null,plantations:null,disease:null};
   if(layerState.zones){
     const zl=L.layerGroup();
     Object.entries(ZONE_POLYGONS).forEach(([zone,coords])=>{
@@ -4517,7 +4459,124 @@ function renderMapLayers(){
     mapLayers.plantations=pl; pl.addTo(map);
   }
 }
-function toggleLayer(name){ layerState[name]=!layerState[name]; const btn=document.getElementById('toggle-'+name); if(btn) btn.classList.toggle('on',layerState[name]); renderMapLayers(); }
+function toggleLayer(name){ layerState[name]=!layerState[name]; const btn=document.getElementById('toggle-'+name); if(btn) btn.classList.toggle('on',layerState[name]); if(name==='disease'){ renderDiseaseHeatLayer(); } else { renderMapLayers(); } }
+
+// ── Zone Disease Heat-Map Overlay ─────────────────────────────────────────────
+// Paints each zone polygon with a green→orange→red fill proportional to the
+// combined severity × incidence score of all reported diseases in that zone.
+// Click a zone polygon to see the per-disease breakdown.
+function zoneHeatColor(t){
+  // t in [0,1]: 0=green, 0.5=orange, 1=red
+  let r,g,b;
+  if(t<=0.5){ const x=t*2; r=Math.round(34+(249-34)*x); g=Math.round(197+(115-197)*x); b=Math.round(94+(22-94)*x); }
+  else       { const x=(t-0.5)*2; r=Math.round(249+(239-249)*x); g=Math.round(115+(68-115)*x); b=Math.round(22+(68-22)*x); }
+  return `rgb(${r},${g},${b})`;
+}
+
+function renderDiseaseHeatLayer(){
+  if(!map) return;
+  // Remove old layer
+  if(mapLayers.disease){ try{ map.removeLayer(mapLayers.disease); }catch(e){} mapLayers.disease=null; }
+  if(!layerState.disease) return;
+
+  const sevScore={Low:1,Moderate:2,High:3};
+  const dl=L.layerGroup();
+
+  Object.entries(ZONE_POLYGONS).forEach(([zone,coords])=>{
+    const zoneGrowers=STATE.growers.filter(g=>g.zone===zone);
+    const totalGrowers=zoneGrowers.length;
+
+    // Collect all pest visits for this zone
+    const zoneRecs=STATE.pestRecords.filter(r=>zoneGrowers.some(g=>g.name===r.grower));
+
+    // Aggregate per disease: {scores[], growers:Set}
+    const diseaseData={};
+    zoneRecs.forEach(r=>{
+      (r.visits||[]).forEach(v=>{
+        Object.entries(v.pests||{}).forEach(([f,p])=>{
+          if(!p.sev) return;
+          if(!diseaseData[f]) diseaseData[f]={scores:[],growers:new Set()};
+          diseaseData[f].scores.push(sevScore[p.sev]||0);
+          diseaseData[f].growers.add(r.grower);
+        });
+      });
+    });
+
+    const diseases=Object.keys(diseaseData);
+    if(!diseases.length){
+      // Zone has growers but no records — show faint grey outline only
+      if(totalGrowers){
+        L.polygon(coords,{color:'#888',weight:1.5,dashArray:'3 4',fillColor:'#888',fillOpacity:0.04})
+          .bindPopup(`<div style="font-size:12px;"><strong>Zone ${zone}</strong><br><span style="color:#888;font-size:11px;">No disease records yet.</span></div>`)
+          .addTo(dl);
+      }
+      return;
+    }
+
+    // Per-disease combined score = avgSeverity(0-1) × incidence(0-1)
+    const perDiseaseScores=diseases.map(f=>{
+      const d=diseaseData[f];
+      const avgSev=d.scores.reduce((s,v)=>s+v,0)/d.scores.length/3;
+      const inc=totalGrowers>0?d.growers.size/totalGrowers:0;
+      return avgSev*inc;
+    });
+
+    // Zone score = mean of per-disease combined scores, normalised to 0-1
+    // 0.7 ≈ upper realistic threshold (all-High, all-growers-affected)
+    const rawScore=perDiseaseScores.reduce((s,v)=>s+v,0)/diseases.length;
+    const t=Math.min(1,rawScore/0.7);
+
+    const fillColor=zoneHeatColor(t);
+    const fillOpacity=0.12+t*0.48; // 0.12 (no data) to 0.60 (max)
+    const borderOpacity=0.5+t*0.4;
+    const overallCls=t>=0.65?'HIGH RISK':t>=0.35?'MODERATE':'LOW';
+
+    // Popup: top 5 diseases sorted by severity × incidence
+    const topDiseases=diseases
+      .map(f=>{
+        const d=diseaseData[f];
+        const avgSev=d.scores.reduce((s,v)=>s+v,0)/d.scores.length;
+        const incPct=totalGrowers>0?Math.round(d.growers.size/totalGrowers*100):0;
+        const cls=avgSev>=2.5?'High':avgSev>=1.5?'Moderate':'Low';
+        const col=avgSev>=2.5?'#ef4444':avgSev>=1.5?'#f97316':'#22c55e';
+        return {f,avgSev,incPct,cls,col};
+      })
+      .sort((a,b)=>(b.avgSev*b.incPct)-(a.avgSev*a.incPct))
+      .slice(0,6);
+
+    const popupRows=topDiseases.map(({f,cls,col,incPct})=>
+      `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+        <span style="font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${PEST_ICONS[f]||'🔴'} ${f}</span>
+        <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;background:${col}22;color:${col};border:1px solid ${col}44;">${cls}</span>
+        <span style="font-size:9px;color:#aaa;min-width:32px;text-align:right;">${incPct}%</span>
+      </div>`
+    ).join('');
+
+    L.polygon(coords,{
+      color:fillColor, weight:2.5, dashArray:'5 3', opacity:borderOpacity,
+      fillColor, fillOpacity
+    }).bindPopup(
+      `<div style="min-width:210px;font-family:'DM Sans',sans-serif;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="width:10px;height:10px;border-radius:3px;background:${fillColor};flex-shrink:0;"></div>
+          <strong style="font-size:13px;">Zone ${zone}</strong>
+          <span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:${fillColor}25;color:${fillColor};border:1px solid ${fillColor}50;">${overallCls}</span>
+        </div>
+        <div style="font-size:10px;color:#888;margin-bottom:8px;">${diseases.length} disease${diseases.length!==1?'s':''} recorded · ${totalGrowers} grower${totalGrowers!==1?'s':''}</div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#666;margin-bottom:5px;">Disease breakdown</div>
+        ${popupRows}
+        <div style="margin-top:8px;display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:5px;border-radius:3px;background:linear-gradient(90deg,#22c55e,#f97316,#ef4444);"></div>
+          <span style="font-size:9px;color:#aaa;">${Math.round(t*100)}% intensity</span>
+        </div>
+      </div>`
+    ).addTo(dl);
+  });
+
+  mapLayers.disease=dl;
+  dl.addTo(map);
+}
+
 function renderZoneStats(){
   const el=document.getElementById('zone-stats');
   if(!el) return;
@@ -4535,7 +4594,7 @@ function renderZoneStats(){
   }).join('');
 }
 
-// ── Map: Pest/Disease Severity Bars ─────────────────────────
+// ── Map: Pest/Disease Severity Bars — with Incidence & Evolution ─────────────
 function renderMapSeverityBars(){
   const grid   = document.getElementById('map-severity-grid');
   const empty  = document.getElementById('map-sev-empty');
@@ -4557,24 +4616,37 @@ function renderMapSeverityBars(){
   const sevScore  = {Low:1, Moderate:2, High:3};
   const SEV_COLOR = {Low:'var(--green)', Moderate:'var(--orange)', High:'var(--red)'};
   const SEV_BG    = {Low:'var(--green-dim)', Moderate:'var(--orange-dim)', High:'var(--red-dim)'};
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-  // Build: { locality -> { diseaseName -> [scores] } }
+  // ── Build rich locality data structure ─────────────────────────────────
+  // locData[loc][disease] = { scores:[], dates:[], growers:Set, bySeason:{S1:[],S2:[]} }
+  // locData[loc]._meta    = { allGrowers:Set, totalVisits:0 }
   const locData = {};
+
   STATE.pestRecords.forEach(r=>{
     if(filterSea && r.season !== filterSea) return;
     const loc = r.locality || (STATE.growers.find(g=>g.name===r.grower)?.locality) || 'Unknown';
-    if(!locData[loc]) locData[loc] = {};
+    if(!locData[loc]) locData[loc] = { _meta:{ allGrowers:new Set(), totalVisits:0 } };
+    locData[loc]._meta.allGrowers.add(r.grower);
     (r.visits||[]).forEach(v=>{
+      locData[loc]._meta.totalVisits++;
+      const vDate = v.date ? new Date(v.date) : null;
       Object.entries(v.pests||{}).forEach(([f,p])=>{
         if(!p.sev) return;
         if(filterDis && f !== filterDis) return;
-        if(!locData[loc][f]) locData[loc][f] = [];
-        locData[loc][f].push(sevScore[p.sev]||0);
+        if(!locData[loc][f]) locData[loc][f] = {
+          scores:[], dates:[], growers:new Set(), bySeason:{'Season 1':[],'Season 2':[]}
+        };
+        const sc = sevScore[p.sev]||0;
+        locData[loc][f].scores.push(sc);
+        locData[loc][f].dates.push(vDate);
+        locData[loc][f].growers.add(r.grower);
+        if(r.season) locData[loc][f].bySeason[r.season]=(locData[loc][f].bySeason[r.season]||[]).concat(sc);
       });
     });
   });
 
-  const locs = Object.keys(locData).sort();
+  const locs = Object.keys(locData).filter(k=>k!=='_meta'?true:false).sort();
   if(!locs.length){
     grid.innerHTML = '';
     if(empty) empty.style.display = 'block';
@@ -4582,37 +4654,126 @@ function renderMapSeverityBars(){
   }
   if(empty) empty.style.display = 'none';
 
+  // ── Helper: trend arrow comparing first-half vs second-half of sorted dates ─
+  function trendArrow(scores, dates){
+    if(scores.length < 4) return '';
+    const paired = scores.map((s,i)=>({s,d:dates[i]||new Date(0)}))
+                         .sort((a,b)=>a.d-b.d);
+    const mid = Math.floor(paired.length/2);
+    const earlyAvg = paired.slice(0,mid).reduce((s,x)=>s+x.s,0)/mid;
+    const lateAvg  = paired.slice(mid).reduce((s,x)=>s+x.s,0)/(paired.length-mid);
+    const diff = lateAvg - earlyAvg;
+    if(diff > 0.35)  return `<span title="Severity worsening" style="color:var(--red);font-size:12px;font-weight:700;">▲</span>`;
+    if(diff < -0.35) return `<span title="Severity improving" style="color:var(--green);font-size:12px;font-weight:700;">▼</span>`;
+    return `<span title="Severity stable" style="color:var(--text3);font-size:12px;">→</span>`;
+  }
+
+  // ── Helper: mini month heat strip (last 6 months) ──────────────────────────
+  function monthHeatStrip(scores, dates){
+    if(!scores.length) return '';
+    const now = new Date();
+    const months = Array.from({length:6},(_,i)=>{
+      const d = new Date(now.getFullYear(), now.getMonth()-5+i, 1);
+      return {y:d.getFullYear(), m:d.getMonth(), label:MONTHS_SHORT[d.getMonth()]};
+    });
+    const cells = months.map(({y,m,label})=>{
+      const mo = scores.filter((_,i)=>{ const d=dates[i]; return d&&d.getFullYear()===y&&d.getMonth()===m; });
+      if(!mo.length) return `<div title="${label}: no data" style="width:20px;height:8px;border-radius:2px;background:rgba(255,255,255,.06);"></div>`;
+      const avg = mo.reduce((s,v)=>s+v,0)/mo.length;
+      const col = avg>=2.5?'var(--red)':avg>=1.5?'var(--orange)':'var(--green)';
+      return `<div title="${label}: ${avg.toFixed(1)}/3" style="width:20px;height:8px;border-radius:2px;background:${col};opacity:${0.45+avg/3*0.55};"></div>`;
+    });
+    return `<div style="display:flex;gap:2px;margin-top:4px;align-items:center;">
+      <span style="font-size:8px;color:var(--text3);white-space:nowrap;margin-right:4px;font-family:var(--font-mono);">6mo▸</span>
+      ${cells.join('')}
+    </div>`;
+  }
+
+  // ── Helper: Season 1 vs Season 2 mini comparison ──────────────────────────
+  function seasonCompare(bySeason){
+    const s1 = (bySeason['Season 1']||[]);
+    const s2 = (bySeason['Season 2']||[]);
+    if(!s1.length && !s2.length) return '';
+    const avg1 = s1.length ? s1.reduce((a,b)=>a+b,0)/s1.length : null;
+    const avg2 = s2.length ? s2.reduce((a,b)=>a+b,0)/s2.length : null;
+    const fmt = v => v===null ? '<span style="color:var(--text3);">—</span>' :
+      `<span style="color:${v>=2.5?'var(--red)':v>=1.5?'var(--orange)':'var(--green)'};font-weight:700;">${['','Low','Mod','High'][Math.round(v)]||''}</span>`;
+    return `<div style="display:flex;gap:6px;margin-top:3px;font-size:9px;color:var(--text2);">
+      <span>S1: ${fmt(avg1)}</span><span style="color:var(--border2);">|</span><span>S2: ${fmt(avg2)}</span>
+    </div>`;
+  }
+
   grid.innerHTML = locs.map(loc=>{
-    const diseases = locData[loc];
-    const allNames = filterDis ? [filterDis] : [...DISEASES,...PESTS].filter(f=>diseases[f]);
+    const locObj   = locData[loc];
+    const meta     = locObj._meta;
+    const totalGrowers = meta.allGrowers.size;
+    const allNames = filterDis ? [filterDis] : [...DISEASES,...PESTS].filter(f=>locObj[f]);
+
     if(!allNames.length) return '';
+
     const rows = allNames.map(f=>{
-      const scores = diseases[f] || [];
-      if(!scores.length) return '';
+      const d = locObj[f];
+      if(!d || !d.scores.length) return '';
+      const {scores, dates, growers, bySeason} = d;
       const avg = scores.reduce((s,v)=>s+v,0)/scores.length;
       const pct = Math.round((avg/3)*100);
       const cls = avg>=2.5?'High':avg>=1.5?'Moderate':'Low';
-      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;" title="${f}: avg severity ${avg.toFixed(1)}/3 (${scores.length} record${scores.length!==1?'s':''})">
-        <span style="width:120px;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;">${PEST_ICONS[f]||''} ${f}</span>
-        <div style="flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:${SEV_COLOR[cls]};border-radius:4px;transition:width .4s;"></div>
+
+      // Incidence: how many distinct growers in this locality reported this disease
+      const incPct = totalGrowers>0 ? Math.round((growers.size/totalGrowers)*100) : 0;
+      const incCls = incPct>=70?'High':incPct>=35?'Moderate':'Low';
+
+      const trend = trendArrow(scores, dates);
+      const heat  = !filterSea ? monthHeatStrip(scores, dates) : '';
+      const seaCmp= !filterSea ? seasonCompare(bySeason) : '';
+
+      return `<div style="margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.04);" title="${f}: avg sev ${avg.toFixed(1)}/3 · incidence ${growers.size}/${totalGrowers} growers (${incPct}%)">
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span style="width:114px;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;">${PEST_ICONS[f]||''} ${f}</span>
+          <div style="flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${SEV_COLOR[cls]};border-radius:4px;transition:width .5s;"></div>
+          </div>
+          <span style="font-size:9px;font-weight:700;color:${SEV_COLOR[cls]};min-width:26px;text-align:right;font-family:var(--font-mono);">${pct}%</span>
+          <span style="font-size:9px;padding:1px 5px;border-radius:8px;background:${SEV_BG[cls]};color:${SEV_COLOR[cls]};border:1px solid ${SEV_COLOR[cls]}33;white-space:nowrap;">${cls}</span>
+          ${trend}
         </div>
-        <span style="font-size:9px;font-weight:700;color:${SEV_COLOR[cls]};min-width:30px;text-align:right;font-family:var(--font-mono);">${pct}%</span>
-        <span style="font-size:9px;padding:1px 6px;border-radius:8px;background:${SEV_BG[cls]};color:${SEV_COLOR[cls]};border:1px solid ${SEV_COLOR[cls]}33;white-space:nowrap;">${cls}</span>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:3px;padding-left:119px;">
+          <span style="font-size:8px;color:var(--text3);font-family:var(--font-mono);">INC:</span>
+          <div style="width:50px;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;">
+            <div style="height:100%;width:${incPct}%;background:${SEV_COLOR[incCls]};border-radius:2px;transition:width .5s;"></div>
+          </div>
+          <span style="font-size:8px;font-weight:700;color:${SEV_COLOR[incCls]};font-family:var(--font-mono);">${growers.size}/${totalGrowers}</span>
+          ${seaCmp}
+        </div>
+        ${heat}
       </div>`;
     }).filter(Boolean).join('');
+
     if(!rows) return '';
-    // Overall locality severity
-    const allScores = allNames.flatMap(f=>diseases[f]||[]);
-    const locAvg = allScores.length ? allScores.reduce((s,v)=>s+v,0)/allScores.length : 0;
-    const locCls = locAvg>=2.5?'High':locAvg>=1.5?'Moderate':locAvg>0?'Low':'None';
-    const locColor = locAvg>=2.5?'var(--red)':locAvg>=1.5?'var(--orange)':locAvg>0?'var(--green)':'var(--text3)';
-    const locBg = locAvg>=2.5?'rgba(239,68,68,.12)':locAvg>=1.5?'rgba(249,115,22,.12)':locAvg>0?'rgba(34,197,94,.12)':'rgba(255,255,255,.03)';
-    return `<div style="background:var(--card2);border:1px solid ${locAvg>=2.5?'rgba(239,68,68,.3)':locAvg>=1.5?'rgba(249,115,22,.3)':'var(--border)'};border-radius:10px;padding:12px;border-top:3px solid ${locColor};">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">
+
+    // Overall locality severity + incidence
+    const allScores  = allNames.flatMap(f=>(locObj[f]||{scores:[]}).scores);
+    const allGrowers = new Set(allNames.flatMap(f=>[...(locObj[f]||{growers:new Set()}).growers]));
+    const locAvg  = allScores.length ? allScores.reduce((s,v)=>s+v,0)/allScores.length : 0;
+    const locCls  = locAvg>=2.5?'High':locAvg>=1.5?'Moderate':locAvg>0?'Low':'None';
+    const locColor= locAvg>=2.5?'var(--red)':locAvg>=1.5?'var(--orange)':locAvg>0?'var(--green)':'var(--text3)';
+    const locBg   = locAvg>=2.5?'rgba(239,68,68,.12)':locAvg>=1.5?'rgba(249,115,22,.12)':locAvg>0?'rgba(34,197,94,.12)':'rgba(255,255,255,.03)';
+    const locBorder= locAvg>=2.5?'rgba(239,68,68,.3)':locAvg>=1.5?'rgba(249,115,22,.3)':'var(--border)';
+    const locIncPct = totalGrowers>0 ? Math.round((allGrowers.size/totalGrowers)*100) : 0;
+
+    return `<div style="background:var(--card2);border:1px solid ${locBorder};border-radius:10px;padding:12px;border-top:3px solid ${locColor};">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;">
         <i class="fas fa-map-pin" style="color:${locColor};font-size:11px;"></i>
         <span style="font-size:12px;font-weight:700;color:var(--text);flex:1;">${loc}</span>
+        <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">${allGrowers.size}/${totalGrowers} growers</span>
         <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${locBg};color:${locColor};border:1px solid ${locColor}33;">${locCls}</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center;">
+        <span style="font-size:8px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;font-family:var(--font-mono);">Overall incidence</span>
+        <div style="flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${locIncPct}%;background:${locColor};border-radius:3px;transition:width .5s;"></div>
+        </div>
+        <span style="font-size:9px;font-weight:700;color:${locColor};font-family:var(--font-mono);">${locIncPct}%</span>
       </div>
       ${rows}
     </div>`;
