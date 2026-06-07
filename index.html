@@ -1711,10 +1711,13 @@ function openOthersModal(t){}
   <div class="card" id="fo-settings-card" style="display:none;">
     <div class="card-title"><i class="fas fa-key"></i> My Account</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7;">
-      As a <strong>Field Officer</strong> you can update your login password below.
+      As a <strong>Field Officer</strong> you can update your login password and export a data backup below.
       Contact an Administrator to change your role, zone access, or username.
     </p>
-    <button class="btn btn-gold" onclick="openChangePasswordModal()"><i class="fas fa-key"></i> Change My Password</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-gold" onclick="openChangePasswordModal()"><i class="fas fa-key"></i> Change My Password</button>
+      <button class="btn btn-ghost" onclick="exportAllData()"><i class="fas fa-download"></i> Export Backup (JSON)</button>
+    </div>
   </div>
   <div class="grid-2 fo-admin-hidden">
     <div class="card">
@@ -1798,7 +1801,7 @@ function openOthersModal(t){}
     <hr class="divider">
     <div style="font-size:12px;color:var(--text2);"><i class="fas fa-info-circle" style="color:var(--blue);margin-right:5px;"></i>All data auto-saved to localStorage. Use Export/Import for backup.</div>
   </div>
-  <div class="card">
+  <div class="card fo-admin-hidden">
     <div class="card-title"><i class="fas fa-share-alt"></i> Viewer Share Link</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.7;">
       Generate a read-only link for managers or external reviewers. Anyone with this link
