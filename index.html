@@ -607,6 +607,137 @@ tr:hover .row-actions{opacity:1;}
 .gsearch-kbd{display:inline-block;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-size:10px;font-family:var(--font-mono);color:var(--text3);}
 .gsearch-count-badge{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;font-family:var(--font-mono);}
 
+
+/* ===== ADMIN CONTROL PANEL ===== */
+.admin-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (min-width: 600px) {
+  .admin-btn-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.admin-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 16px 8px 14px;
+  border-radius: 14px; border: 2px solid transparent;
+  background: var(--card2); cursor: pointer;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, border-color .15s, background .15s;
+  font-family: var(--font-body); position: relative; overflow: hidden;
+  user-select: none;
+}
+.admin-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: inherit; opacity: 0; transition: opacity .15s;
+}
+.admin-btn:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 10px 28px rgba(0,0,0,.35); }
+.admin-btn:active { transform: translateY(-1px) scale(.98); }
+.admin-btn-icon {
+  width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; position: relative; flex-shrink: 0;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.admin-btn:hover .admin-btn-icon { transform: scale(1.12); }
+.admin-btn-label {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+/* Online dot */
+.online-dot {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px; border-radius: 50%; background: #22c55e;
+  box-shadow: 0 0 6px #22c55e; animation: pulse-online 2s infinite;
+}
+@keyframes pulse-online {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px #22c55e; }
+  50% { opacity: .6; box-shadow: 0 0 14px #22c55e; }
+}
+/* Individual button color families */
+.admin-btn-search {
+  background: linear-gradient(135deg, #14532d, #166534);
+  border-color: #22c55e44;
+}
+.admin-btn-search .admin-btn-icon { background: rgba(34,197,94,.25); color: #4ade80; }
+.admin-btn-search .admin-btn-label { color: #86efac; }
+.admin-btn-search:hover { background: linear-gradient(135deg, #166534, #15803d); border-color: #22c55e88; box-shadow: 0 10px 28px rgba(34,197,94,.25); }
+
+.admin-btn-completed {
+  background: var(--card2); border-color: #22c55e33;
+}
+.admin-btn-completed .admin-btn-icon { background: rgba(34,197,94,.12); color: #22c55e; }
+.admin-btn-completed .admin-btn-label { color: #22c55e; }
+.admin-btn-completed:hover { border-color: #22c55eaa; box-shadow: 0 10px 28px rgba(34,197,94,.18); }
+
+.admin-btn-register {
+  background: var(--card2); border-color: #f97316aa;
+}
+.admin-btn-register .admin-btn-icon { background: rgba(249,115,22,.12); color: #f97316; }
+.admin-btn-register .admin-btn-label { color: #f97316; }
+.admin-btn-register:hover { border-color: #f97316; box-shadow: 0 10px 28px rgba(249,115,22,.22); }
+
+.admin-btn-ghdata {
+  background: var(--card2); border-color: #14b8a655;
+}
+.admin-btn-ghdata .admin-btn-icon { background: rgba(20,184,166,.12); color: #14b8a6; }
+.admin-btn-ghdata .admin-btn-label { color: #14b8a6; }
+.admin-btn-ghdata:hover { border-color: #14b8a6aa; box-shadow: 0 10px 28px rgba(20,184,166,.2); }
+
+.admin-btn-yieldcalc {
+  background: var(--card2); border-color: #a855f744;
+}
+.admin-btn-yieldcalc .admin-btn-icon { background: rgba(168,85,247,.12); color: #a855f7; }
+.admin-btn-yieldcalc .admin-btn-label { color: #a855f7; }
+.admin-btn-yieldcalc:hover { border-color: #a855f7aa; box-shadow: 0 10px 28px rgba(168,85,247,.2); }
+
+.admin-btn-varietyperf {
+  background: var(--card2); border-color: #3b82f644;
+}
+.admin-btn-varietyperf .admin-btn-icon { background: rgba(59,130,246,.12); color: #3b82f6; }
+.admin-btn-varietyperf .admin-btn-label { color: #3b82f6; }
+.admin-btn-varietyperf:hover { border-color: #3b82f6aa; box-shadow: 0 10px 28px rgba(59,130,246,.2); }
+
+.admin-btn-decision {
+  background: var(--card2); border-color: #8b5cf644;
+}
+.admin-btn-decision .admin-btn-icon { background: rgba(139,92,246,.12); color: #8b5cf6; }
+.admin-btn-decision .admin-btn-label { color: #8b5cf6; }
+.admin-btn-decision:hover { border-color: #8b5cf6aa; box-shadow: 0 10px 28px rgba(139,92,246,.2); }
+
+.admin-btn-activity {
+  background: var(--card2); border-color: #f0a50044;
+}
+.admin-btn-activity .admin-btn-icon { background: rgba(240,165,0,.12); color: #f0a500; }
+.admin-btn-activity .admin-btn-label { color: #f0a500; }
+.admin-btn-activity:hover { border-color: #f0a500aa; box-shadow: 0 10px 28px rgba(240,165,0,.2); }
+
+.admin-btn-pestalert {
+  background: var(--card2); border-color: #ef444444;
+}
+.admin-btn-pestalert .admin-btn-icon { background: rgba(239,68,68,.12); color: #ef4444; }
+.admin-btn-pestalert .admin-btn-label { color: #ef4444; }
+.admin-btn-pestalert:hover { border-color: #ef4444aa; box-shadow: 0 10px 28px rgba(239,68,68,.22); }
+
+.admin-btn-ylfreport {
+  background: var(--card2); border-color: #dc262644;
+}
+.admin-btn-ylfreport .admin-btn-icon { background: rgba(220,38,38,.12); color: #dc2626; }
+.admin-btn-ylfreport .admin-btn-label { color: #dc2626; }
+.admin-btn-ylfreport:hover { border-color: #dc2626aa; box-shadow: 0 10px 28px rgba(220,38,38,.2); }
+
+.admin-btn-yieldmap {
+  background: var(--card2); border-color: #0d948844;
+}
+.admin-btn-yieldmap .admin-btn-icon { background: rgba(13,148,136,.12); color: #0d9488; }
+.admin-btn-yieldmap .admin-btn-label { color: #0d9488; }
+.admin-btn-yieldmap:hover { border-color: #0d9488aa; box-shadow: 0 10px 28px rgba(13,148,136,.2); }
+
+.admin-btn-online {
+  background: var(--card2); border-color: #14b8a644;
+}
+.admin-btn-online .admin-btn-icon { background: rgba(20,184,166,.12); color: #14b8a6; }
+.admin-btn-online .admin-btn-label { color: #14b8a6; }
+.admin-btn-online:hover { border-color: #14b8a6aa; box-shadow: 0 10px 28px rgba(20,184,166,.2); }
+
 </style>
 <script>
 (function(){try{localStorage.setItem('pota_state_v3',atob('eyJncm93ZXJzIjpbeyJpZCI6MTc3OTk2MTUxNTYzNywibmFtZSI6Ikpvb2xpYSBhY2t0YXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTU2MDE1OSwibmFtZSI6IlVudXRoIGJoYXJkd2Fqc2luZ2giLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTY2ODE3NywibmFtZSI6Ikhhbm5haCBkaGlyYWoiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MTcyNjczNCwibmFtZSI6Ik1vaHVuIFJhbmRoaXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjIxNzAzMzUsIm5hbWUiOiJNb29rb29uZGVlIERldiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiVmVyZHVuIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjIyMjU4NzYsIm5hbWUiOiJwdXJib290ZWVhaCBTdXJla2hhIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMJ0F2ZW5pciIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYyMzUwMTMzLCJuYW1lIjoiQ2hhbmRvbyBWZWRhbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MjQwNDg3OCwibmFtZSI6IlVrbm93biAxIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYyNDc1MjExLCJuYW1lIjoiVWtub3duIDIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjI1MTAwOTAsIm5hbWUiOiJVbmtub3duIDMiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjI2OTQzMTEsIm5hbWUiOiJPb3plZXIgIE1vaGFtbWFkIE5pc2hhYXIgQWxpIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJQZXRpdCBWZXJnZXIiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2Mjc4NDg2NSwibmFtZSI6IkVsYWhlZWJvY2N1cyIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBdmVuaXIiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MjgyMzI5MiwibmFtZSI6Ik5lZXdvb3IgUmF2aW4iLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzAzNTM4NCwibmFtZSI6IkRpZGFyYWxseSBOb29yYW5pIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMwOTczMTUsIm5hbWUiOiJQb29ydW4gVG9vbXVuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMxNDczNzksIm5hbWUiOiJNYXRob29yYWggZGV2ZW5kcmFuYXRoIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJIZXJtaXRhZ2UiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzIzODIwOSwibmFtZSI6IlJhbXBlcnNhZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiSGVybWl0YWdlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMyNjkzMjMsIm5hbWUiOiJKb29saWEgQmVsYWwiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzMwMDgwNSwibmFtZSI6IkJ1Y2hvbyBTYW5kZWVhIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMzMzQ4NzAsIm5hbWUiOiJCdXJrdXRhbGx5IEVzaGFuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI4Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9LHsiaWQiOjE3Nzk5NjMzNzAzOTgsIm5hbWUiOiJCdXJrdXRhbGx5IFR3YWxlYiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzc5OTYzNDE5NDEzLCJuYW1lIjoiRHVyZ2FoZWUgTmF6aXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJjb250YWN0IjoiIiwicmVnaXN0cmF0aW9uRGF0ZSI6IjIwMjYtMDUtMjgiLCJzdGF0dXMiOiJBY3RpdmUiLCJ0b3RhbEFyZWEiOjAsIm5vdGVzIjoiIn0seyJpZCI6MTc3OTk2MzQ1ODQ3OSwibmFtZSI6Ikdvb2R1ciBnaGVlcmphbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBZ3JlbWVudCIsImNvbnRhY3QiOiIiLCJyZWdpc3RyYXRpb25EYXRlIjoiMjAyNi0wNS0yOCIsInN0YXR1cyI6IkFjdGl2ZSIsInRvdGFsQXJlYSI6MCwibm90ZXMiOiIifSx7ImlkIjoxNzgwMDQ1MzYwNjY0LCJuYW1lIjoiTW9vcnV0IGJhc3NhbnQiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwiY29udGFjdCI6IiIsInJlZ2lzdHJhdGlvbkRhdGUiOiIyMDI2LTA1LTI5Iiwic3RhdHVzIjoiQWN0aXZlIiwidG90YWxBcmVhIjowLCJub3RlcyI6IiJ9XSwicGxhbnRhdGlvbiI6W3siaWQiOjE3Nzk5NjM2MTYwODksImdyb3dlciI6Ikpvb2xpYSBhY2t0YXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJ2YXJpZXR5IjoiU3B1bnRhIExvY2FsIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA0LTIzIiwiYXJlYSI6Mi41MiwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiQXByIiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTYzNjcwNTQ0LCJncm93ZXIiOiJVbnV0aCBiaGFyZHdhanNpbmdoIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwidmFyaWV0eSI6IlNwdW50YSBMb2NhbCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNC0yMyIsImFyZWEiOjIuNTIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6IkFwciIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzY5MTExMiwiZ3Jvd2VyIjoiSGFubmFoIGRoaXJhaiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDQtMjMiLCJhcmVhIjoxLjA1LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJBcHIiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjM3MTU1NjQsImdyb3dlciI6Ik1vaHVuIFJhbmRoaXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkxhIExhdXJhIiwidmFyaWV0eSI6IlNwdW50YSBMb2NhbCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNC0yMyIsImFyZWEiOjEuMDUsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6IkFwciIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzgyOTI2OCwiZ3Jvd2VyIjoiTW9va29vbmRlZSBEZXYiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlZlcmR1biIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMDQiLCJhcmVhIjowLjA0LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjM4NjM4NjQsImdyb3dlciI6InB1cmJvb3RlZWFoIFN1cmVraGEiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkwnQXZlbmlyIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0wNSIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMSIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2MzkwMTcxOCwiZ3Jvd2VyIjoiQ2hhbmRvbyBWZWRhbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MC4yNSwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTYzOTkzMjY2LCJncm93ZXIiOiJDaGFuZG9vIFZlZGFuYW5kIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjQyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQzMjkzNDAsImdyb3dlciI6IlVrbm93biAxIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjIxLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQzNTYxMzQsImdyb3dlciI6IlVrbm93biAyIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJMYSBMYXVyYSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTEiLCJhcmVhIjowLjIxLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDEiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ0Nzc1MDQsImdyb3dlciI6IlVua25vd24gMyIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTGEgTGF1cmEiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MC4yMSwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY0NTgyMTg3LCJncm93ZXIiOiJPb3plZXIgIE1vaGFtbWFkIE5pc2hhYXIgQWxpIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJQZXRpdCBWZXJnZXIiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTExIiwiYXJlYSI6MS4xMywiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAxIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY0NjMxOTQxLCJncm93ZXIiOiJFbGFoZWVib2NjdXMiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkwnQXZlbmlyIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0xNCIsImFyZWEiOjAuMzIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMSIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NDcyMTE0NywiZ3Jvd2VyIjoiTmVld29vciBSYXZpbiIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTgiLCJhcmVhIjoxLjg5LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ3ODE5NzUsImdyb3dlciI6IkRpZGFyYWxseSBOb29yYW5pIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0xOCIsImFyZWEiOjAuNDIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NDg1NzgyNSwiZ3Jvd2VyIjoiUG9vcnVuIFRvb211biIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiQmFnYXRlbGxlIERhbSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMTgiLCJhcmVhIjowLjMyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjQ5NDU0OTUsImdyb3dlciI6Ik1hdGhvb3JhaCBkZXZlbmRyYW5hdGgiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6Ikhlcm1pdGFnZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjAiLCJhcmVhIjoxLjI2LCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjUyMjc4MjYsImdyb3dlciI6IlJhbXBlcnNhZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiSGVybWl0YWdlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMCIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTMwOTkwOSwiZ3Jvd2VyIjoiSm9vbGlhIEJlbGFsIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJCYWdhdGVsbGUgRGFtIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMCIsImFyZWEiOjMuMzYsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTM1NzYxNCwiZ3Jvd2VyIjoiQnVjaG9vIFNhbmRlZWEiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IkJhZ2F0ZWxsZSBEYW0iLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6Mi45NCwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY1NDMxNDgwLCJncm93ZXIiOiJCdXJrdXRhbGx5IEVzaGFuIiwiem9uZSI6IkUxIiwibG9jYWxpdHkiOiJSaXZpZXJlIEJhcHRpc3RlIiwidmFyaWV0eSI6IlNwdW50YSBJbXBvcnRlZCIsImRhdGVQbGFudGVkIjoiMjAyNi0wNS0yMSIsImFyZWEiOjAuODQsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTQ4MTQ1OSwiZ3Jvd2VyIjoiQnVya3V0YWxseSBUd2FsZWIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6MC44NCwiZXN0WWllbGQiOjEyLCJzZWFzb24iOiJTZWFzb24gMSIsImZvcnRuaWdodCI6IkZvcnRuaWdodCAyIiwibW9udGhBYmJyIjoiTWF5IiwiY29tbWVudHMiOiIifSx7ImlkIjoxNzc5OTY1NTQwOTQ4LCJncm93ZXIiOiJEaWRhcmFsbHkgTm9vcmFuaSIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiUml2aWVyZSBCYXB0aXN0ZSIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjEiLCJhcmVhIjo0LjIsImVzdFlpZWxkIjoxMiwic2Vhc29uIjoiU2Vhc29uIDEiLCJmb3J0bmlnaHQiOiJGb3J0bmlnaHQgMiIsIm1vbnRoQWJiciI6Ik1heSIsImNvbW1lbnRzIjoiIn0seyJpZCI6MTc3OTk2NTU5MDc5OCwiZ3Jvd2VyIjoiRHVyZ2FoZWUgTmF6aXIiLCJ6b25lIjoiRTEiLCJsb2NhbGl0eSI6IlJpdmllcmUgQmFwdGlzdGUiLCJ2YXJpZXR5IjoiU3B1bnRhIEltcG9ydGVkIiwiZGF0ZVBsYW50ZWQiOiIyMDI2LTA1LTIxIiwiYXJlYSI6Mi4xLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9LHsiaWQiOjE3Nzk5NjU2MjYwNTksImdyb3dlciI6Ikdvb2R1ciBnaGVlcmphbmFuZCIsInpvbmUiOiJFMSIsImxvY2FsaXR5IjoiTCdBZ3JlbWVudCIsInZhcmlldHkiOiJTcHVudGEgSW1wb3J0ZWQiLCJkYXRlUGxhbnRlZCI6IjIwMjYtMDUtMjEiLCJhcmVhIjoyLjUyLCJlc3RZaWVsZCI6MTIsInNlYXNvbiI6IlNlYXNvbiAxIiwiZm9ydG5pZ2h0IjoiRm9ydG5pZ2h0IDIiLCJtb250aEFiYnIiOiJNYXkiLCJjb21tZW50cyI6IiJ9XSwicGVzdFJlY29yZHMiOltdLCJ5aWVsZEFzc2Vzc21lbnRzIjpbXSwidmFyaWV0aWVzIjpbIkRlbGF3YXJlIiwiSmVsbHkiLCJNb25kaWFsIiwiUGFuYW1lcmEiLCJTcHVudGEgSW1wb3J0ZWQiLCJTcHVudGEgTG9jYWwiXSwiY2FtcGFpZ25EYXRhIjp7fSwid2Vla2x5UmVwb3J0cyI6W10sImhhcnZlc3REYXlzIjo5MCwiZGVmYXVsdFlpZWxkIjoxMiwidXNlcnMiOlt7InVzZXJuYW1lIjoic3VwZXJhZG1pbiIsImZ1bGxOYW1lIjoiU3VwZXIgQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBZG1pbmlzdHJhdG9yIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiNjIwZWI4ZTAyOTNlZmMwZmU3Y2Y5MGI0ZTNkMGFkZmZjMGQzYzJjMzU1ZGJhNGUyZWMxYWJhM2NmYTEyYTBkMyIsInN0YXR1cyI6IkFjdGl2ZSJ9LHsidXNlcm5hbWUiOiJhZG1pbiIsImZ1bGxOYW1lIjoiQWRtaW5pc3RyYXRvciIsInJvbGUiOiJBZG1pbmlzdHJhdG9yIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiZTI1Yzg5ZTM4YjI0NWI0YjlkZTE4MWI1NDU5YWNhNTRkMzVmOWE0Nzg0MDNlNThkNWIzMGIyNTE5YzZhODk5OCIsInN0YXR1cyI6IkFjdGl2ZSJ9LHsidXNlcm5hbWUiOiJlb3Nlb2tnIiwiZnVsbE5hbWUiOiJLZXNoYXYgR2FuZ2FkaW4iLCJyb2xlIjoiRmllbGQgT2ZmaWNlciIsInpvbmVBY2Nlc3MiOiJFYXN0IiwicGFzc3dvcmQiOiJiZWUyMzRiNzkxNWE5MWY2ZTdmOWQ5NjcyOWZmYzhhNDFjNzczZGNlOGVjMzYzMDUzNGQzZDU2YjJiNDkyN2RiIiwic3RhdHVzIjoiQWN0aXZlIn0seyJ1c2VybmFtZSI6ImVzb2tyIiwiZnVsbE5hbWUiOiJLZXNoYXYgUmFtaGVldCIsInJvbGUiOiJGaWVsZCBPZmZpY2VyIiwiem9uZUFjY2VzcyI6Ik5vcnRoIiwicGFzc3dvcmQiOiI1MjY5YjFmYzBkYzIwYjkyZTQ4ZWRiZjA5NDdmY2Y2MTZlZTI1ZGQ3MWFiODM4ODliZTc2Nzk5YzA1Mjc5ZDkxIiwic3RhdHVzIjoiQWN0aXZlIn0seyJ1c2VybmFtZSI6Im9mZmljZXIxIiwiZnVsbE5hbWUiOiJGaWVsZCBPZmZpY2VyIDEiLCJyb2xlIjoiRmllbGQgT2ZmaWNlciIsInpvbmVBY2Nlc3MiOiJBbGwiLCJwYXNzd29yZCI6IjExOGI4ZDM1YTE3YmNmMmM3ZDJkNzkwNTA5ZTEyMzA4ZGM2MzMyYzVkMjM0ZjAwOThkMmQ2YmU2NzAwYmViYjEiLCJzdGF0dXMiOiJBY3RpdmUifSx7InVzZXJuYW1lIjoib2ZmaWNlcjIiLCJmdWxsTmFtZSI6IkZpZWxkIE9mZmljZXIgMiIsInJvbGUiOiJGaWVsZCBPZmZpY2VyIiwiem9uZUFjY2VzcyI6IkFsbCIsInBhc3N3b3JkIjoiODQ2MzFkYWI4MDgyMTkxMzRkNjY2MWU2ODVlN2Y3NjdmZjQ2NTM2OTQzMzJlYjY0YjU2ODU5MWM2NWEwZjg3ZiIsInN0YXR1cyI6IkFjdGl2ZSJ9XX0='));}catch(e){}})();
@@ -1569,6 +1700,72 @@ function openOthersModal(t){}
 
 <!-- ========== SETTINGS ========== -->
 <section id="sec-settings" class="section">
+
+  <!-- ADMIN CONTROL PANEL (Admin-only action hub) -->
+  <div class="card fo-admin-hidden" id="admin-control-panel" style="padding-bottom:18px;">
+    <div class="card-accent" style="background:linear-gradient(90deg,#1a6b3a,#0e9e5a,#1a6b3a);"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1a6b3a,#0e9e5a);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fas fa-shield-alt" style="color:#fff;font-size:17px;"></i>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:.3px;">Admin Control Panel</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px;">PoTaTo Tracker v4.0 · Quick Actions</div>
+      </div>
+      <span style="margin-left:auto;background:linear-gradient(90deg,#f0a500,#fbbf24);color:#111;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.8px;text-transform:uppercase;">ADMIN ONLY</span>
+    </div>
+    <div class="admin-btn-grid">
+      <button class="admin-btn admin-btn-search" onclick="openGlobalSearch()">
+        <div class="admin-btn-icon"><i class="fas fa-search"></i></div>
+        <div class="admin-btn-label">SEARCH</div>
+      </button>
+      <button class="admin-btn admin-btn-completed" onclick="showSection('plantation')">
+        <div class="admin-btn-icon"><i class="fas fa-check-double"></i></div>
+        <div class="admin-btn-label">COMPLETED</div>
+      </button>
+      <button class="admin-btn admin-btn-register" onclick="openModal('add-grower-modal')">
+        <div class="admin-btn-icon"><i class="fas fa-user-plus"></i></div>
+        <div class="admin-btn-label">REGISTER</div>
+      </button>
+      <button class="admin-btn admin-btn-ghdata" onclick="pullFromSheets()">
+        <div class="admin-btn-icon"><i class="fas fa-cloud-download-alt"></i></div>
+        <div class="admin-btn-label">GH DATA</div>
+      </button>
+      <button class="admin-btn admin-btn-yieldcalc" onclick="showSection('yield-assess')">
+        <div class="admin-btn-icon"><i class="fas fa-calculator"></i></div>
+        <div class="admin-btn-label">YIELD CALC</div>
+      </button>
+      <button class="admin-btn admin-btn-varietyperf" onclick="showSection('comparative')">
+        <div class="admin-btn-icon"><i class="fas fa-chart-bar"></i></div>
+        <div class="admin-btn-label">VARIETY PERF</div>
+      </button>
+      <button class="admin-btn admin-btn-decision" onclick="showSection('trends')">
+        <div class="admin-btn-icon"><i class="fas fa-brain"></i></div>
+        <div class="admin-btn-label">DECISION</div>
+      </button>
+      <button class="admin-btn admin-btn-activity" onclick="showSection('campaign')">
+        <div class="admin-btn-icon"><i class="fas fa-history"></i></div>
+        <div class="admin-btn-label">ACTIVITY</div>
+      </button>
+      <button class="admin-btn admin-btn-pestalert" onclick="showSection('pests')">
+        <div class="admin-btn-icon"><i class="fas fa-bug"></i></div>
+        <div class="admin-btn-label">PEST ALERT</div>
+      </button>
+      <button class="admin-btn admin-btn-ylfreport" onclick="showSection('weekly-report')">
+        <div class="admin-btn-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="admin-btn-label">YLF REPORT</div>
+      </button>
+      <button class="admin-btn admin-btn-yieldmap" onclick="showSection('map')">
+        <div class="admin-btn-icon"><i class="fas fa-map-marked-alt"></i></div>
+        <div class="admin-btn-label">YIELD MAP</div>
+      </button>
+      <button class="admin-btn admin-btn-online" onclick="showSection('growers')">
+        <div class="admin-btn-icon"><i class="fas fa-users"></i><span class="online-dot"></span></div>
+        <div class="admin-btn-label">ONLINE NOW</div>
+      </button>
+    </div>
+  </div>
+
   <div class="card" id="fo-settings-card" style="display:none;">
     <div class="card-title"><i class="fas fa-key"></i> My Account</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7;">
@@ -1598,6 +1795,15 @@ function openOthersModal(t){}
         <button class="btn btn-green" onclick="testGasConnection()"><i class="fas fa-plug"></i> Test Connection</button>
         <button class="btn btn-blue" onclick="pullFromSheets()"><i class="fas fa-cloud-download-alt"></i> Pull Data</button>
         <button class="btn btn-ghost" onclick="initSheetsRemote()" style="color:var(--blue);border-color:rgba(59,130,246,.3);"><i class="fas fa-database"></i> Init Sheets</button>
+      </div>
+      <hr class="divider" style="margin:14px 0;">
+      <div class="form-group" style="margin-bottom:8px;">
+        <label class="form-label"><i class="fas fa-shield-alt" style="color:var(--teal);margin-right:5px;"></i> HMAC Shared Secret <span style="font-size:10px;font-weight:400;color:var(--text3);">(Security Fix #1)</span></label>
+        <div style="display:flex;gap:7px;">
+          <input class="form-control" id="gas-secret-input" type="password" placeholder="Min 16-char random secret — must match your GAS script" autocomplete="new-password">
+          <button class="btn btn-gold" onclick="saveGasSecret()" style="white-space:nowrap;"><i class="fas fa-key"></i> Save Secret</button>
+        </div>
+        <div class="form-hint" style="margin-top:5px;">Set the same secret in your GAS script via <code>PropertiesService.getScriptProperties().setProperty('HMAC_SECRET','…')</code>. GAS will reject unsigned/mismatched calls.</div>
       </div>
     </div>
   </div>
@@ -2320,6 +2526,8 @@ const DEFAULT_STATE = {
 };
 let STATE = {...DEFAULT_STATE};
 let GAS_URL = '';
+let GAS_SECRET = '';
+let SESSION_TOKEN = '';
 let CURRENT_USER = null;
 
 function loadLocal(){
@@ -2337,6 +2545,7 @@ function loadLocal(){
     if(STATE.defaultYield == null) STATE.defaultYield = 12;
     if(!STATE.labSubmissions) STATE.labSubmissions = [];
     GAS_URL = localStorage.getItem('pota_gas_url_v3') || '';
+    GAS_SECRET = localStorage.getItem('pota_gas_secret_v1') || '';
   } catch(e){ STATE = {...DEFAULT_STATE}; }
 }
 function saveLocal(){
@@ -2401,9 +2610,14 @@ async function doLogin(){
   }
 
   if(result){
+    // Security Fix #3: generate a session token; GAS resolves role by token
+    SESSION_TOKEN = randHex(16);
+    result.sessionToken = SESSION_TOKEN;
     CURRENT_USER = result;
     localStorage.setItem('pota_current_user', JSON.stringify(result));
     document.getElementById('login-screen').style.display = 'none';
+    // Register session token with GAS so server can verify role without trusting client body
+    if(GAS_URL) callGAS('registerSession',{sessionToken:SESSION_TOKEN,role:result.role,username:result.username}).catch(()=>{});
     initApp();
   } else {
     errEl.textContent = 'Invalid username or password. Please try again.';
@@ -2414,6 +2628,8 @@ async function doLogin(){
 
 function doLogout(){
   if(!confirm('Sign out?')) return;
+  if(GAS_URL && SESSION_TOKEN) callGAS('revokeSession',{sessionToken:SESSION_TOKEN}).catch(()=>{});
+  SESSION_TOKEN = '';
   CURRENT_USER = null;
   localStorage.removeItem('pota_current_user');
   document.getElementById('login-screen').style.display = 'flex';
@@ -2509,30 +2725,54 @@ async function initApp(){
 }
 
 // ============================================================
-//  GAS API  —  FIXED: Direct fetch to GAS URL (no proxy)
-//  Root cause of "Unexpected token '<'" was posting to /api/gas-proxy
-//  which doesn't exist in a standalone HTML file → 404 HTML → JSON.parse crash.
-//  Fix: send all calls as GET with URL-encoded params — avoids CORS preflight,
-//  works with GAS "Execute as: Me / Anyone" deployment. Read-only actions
-//  (ping, getData) use doGet; write actions fall through to doGet?action=X&data=…
-//  which doGet passes to doPost-equivalent handlers.
+//  GAS API  —  Security: HMAC-signed GET requests
+//  Fix #1: Every call is HMAC-SHA256 signed with GAS_SECRET.
+//  Fix #3: sessionToken replaces callerRole — GAS resolves the
+//  real role from PropertiesService keyed by sessionToken.
 // ============================================================
+
+// Sign action + timestamp + data with HMAC-SHA256 (Web Crypto).
+// Returns { sig, ts } or { sig:'', ts:'' } when no secret is configured.
+async function _signGasPayload(action, dataStr) {
+  if (!GAS_SECRET) return { sig: '', ts: '' };
+  const ts = String(Date.now());
+  const message = action + ':' + ts + ':' + dataStr;
+  try {
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(GAS_SECRET),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const sigBuf = await crypto.subtle.sign('HMAC', keyMaterial, new TextEncoder().encode(message));
+    const sig = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return { sig, ts };
+  } catch(e) {
+    console.warn('HMAC signing failed:', e.message);
+    return { sig: '', ts: '' };
+  }
+}
+
 async function callGAS(action, data = {}){
   if(!GAS_URL) return {success:false, error:'No GAS URL configured'};
 
-  // Always include caller role so GAS can enforce server-side access control
+  // Security Fix #3: send sessionToken instead of callerRole.
+  // GAS server resolves the real role from PropertiesService keyed by sessionToken.
   const payload = Object.assign({}, data, {
-    callerRole: CURRENT_USER?.role || 'Unknown'
+    sessionToken: SESSION_TOKEN || (CURRENT_USER?.sessionToken || ''),
+    _username: CURRENT_USER?.username || ''
   });
+
+  const dataStr = JSON.stringify(payload);
+  // Security Fix #1: HMAC-SHA256 sign the request
+  const { sig, ts } = await _signGasPayload(action, dataStr);
 
   const controller = new AbortController();
   const timeoutId  = setTimeout(() => controller.abort(), 15000);
 
   try{
-    // Encode payload as a single 'data' param to avoid CORS preflight
     const params = new URLSearchParams();
     params.set('action', action);
-    params.set('data', JSON.stringify(payload));
+    params.set('data', dataStr);
+    if (sig) { params.set('_sig', sig); params.set('_ts', ts); }
     const url = GAS_URL + (GAS_URL.includes('?') ? '&' : '?') + params.toString();
 
     const resp = await fetch(url, {
@@ -2544,7 +2784,6 @@ async function callGAS(action, data = {}){
     try{
       return JSON.parse(text);
     } catch(_){
-      // GAS sometimes wraps in a redirect — surface a clear error
       console.error('GAS non-JSON response:', text.slice(0,200));
       return {success:false, error:'GAS returned non-JSON. Check deployment: Execute as Me, Anyone can access.'};
     }
@@ -5021,6 +5260,12 @@ function saveGasUrl(){
   GAS_URL=url; localStorage.setItem('pota_gas_url_v3',url);
   updateSyncStatus('saved'); toast('GAS URL saved ✓');
 }
+function saveGasSecret(){
+  const s=(document.getElementById('gas-secret-input')?.value||'').trim();
+  if(!s){ toast('Enter a shared secret (min 16 chars recommended)','error'); return; }
+  GAS_SECRET=s; localStorage.setItem('pota_gas_secret_v1',s);
+  toast('GAS shared secret saved ✓ — requests will now be HMAC-signed');
+}
 async function testGasConnection(){
   if(!GAS_URL){ toast('Save GAS URL first','error'); return; }
   toast('Testing connection…','info');
@@ -5090,7 +5335,10 @@ function createUserLocal(){
   STATE.users.push({username,fullName,role,zoneAccess,password,status:'Active'});
   saveLocal(); renderUsersList(); toast('User "'+username+'" created ✓');
   ['nu-username','nu-fullname','nu-password'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  if(GAS_URL) callGAS('createUser',{username,fullName,role,zoneAccess,password}).then(r=>{ if(r.success) toast('User synced to Sheets ✓'); });
+  // Security Fix #2: never send plaintext password to GAS — send SHA-256 hash only
+  if(GAS_URL) hashPassword(password).then(hash=>{
+    callGAS('createUser',{username,fullName,role,zoneAccess,passwordHash:hash}).then(r=>{ if(r.success) toast('User synced to Sheets ✓'); });
+  });
 }
 
 // ============================================================
@@ -5330,6 +5578,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     const saved=localStorage.getItem('pota_current_user');
     if(saved){
       CURRENT_USER=JSON.parse(saved);
+      // Restore session token from saved user object
+      SESSION_TOKEN = CURRENT_USER.sessionToken || '';
       document.getElementById('login-screen').style.display='none';
       initApp();
     }
