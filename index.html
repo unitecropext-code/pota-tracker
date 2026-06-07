@@ -2653,33 +2653,70 @@ function revokeViewerLink(){
 }
 
 // ============================================================
-//  PASSWORD HASHING  (Web Crypto SHA-256, no external deps)
+//  PASSWORD HASHING  (crypto.subtle + pure-JS fallback for file:// contexts)
 // ============================================================
+// Pure-JS SHA-256 — used when crypto.subtle is unavailable (file:// protocol).
+// This ensures login never freezes regardless of browser security context.
+function _sha256js(str){
+  function rr(v,a){return(v>>>a)|(v<<(32-a));}
+  var pow=Math.pow,mw=pow(2,32),words=[],abl=str.length*8,i,j,h=[],k=[];
+  var pc=0,ic={};
+  for(var cd=2;pc<64;cd++){
+    if(!ic[cd]){
+      for(i=0;i<313;i+=cd)ic[i]=cd;
+      h[pc]=pow(cd,.5)*mw|0; k[pc++]=pow(cd,1/3)*mw|0;
+    }
+  }
+  str+='';
+  while(str.length%64!==56)str+=' ';
+  for(i=0;i<str.length;i++){words[i>>2]|=str.charCodeAt(i)<<((3-i%4)*8);}
+  words[words.length]=abl/mw|0; words[words.length]=abl;
+  for(j=0;j<words.length;){
+    var w=words.slice(j,j+=16),oh=h.slice(0);
+    h=h.slice(0,8);
+    for(i=0;i<64;i++){
+      var w15=w[i-15],w2=w[i-2],a=h[0],e=h[4];
+      var t1=h[7]+(rr(e,6)^rr(e,11)^rr(e,25))+(e&h[5]^~e&h[6])+k[i]+(w[i]=i<16?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^w15>>>3)+w[i-7]+(rr(w2,17)^rr(w2,19)^w2>>>10))|0);
+      var t2=(rr(a,2)^rr(a,13)^rr(a,22))+(a&h[1]^a&h[2]^h[1]&h[2]);
+      h=[t1+t2|0,a,h[1],h[2],h[3]+t1|0,h[4],h[5],h[6]];
+    }
+    h=h.map(function(x,i2){return(x+oh[i2])|0;});
+  }
+  return h.map(function(n){return('0000000'+((n<0?n+4294967296:n).toString(16))).slice(-8);}).join('');
+}
+
+// SHA-256 — tries crypto.subtle first (HTTPS/localhost), falls back to pure-JS (file://)
 async function hashPassword(plain){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  try{
+    if(window.crypto && crypto.subtle){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  // Fallback: pure-JS SHA-256 (works on file:// and any browser)
+  return _sha256js(plain);
 }
 async function verifyPassword(plain, storedHash){
-  // Support legacy plaintext during migration: if storedHash has no '$' prefix and
-  // isn't 64 hex chars, fall back to plaintext compare then upgrade on success.
   if(!storedHash) return false;
-  if(storedHash.length === 64 && /^[0-9a-f]+$/.test(storedHash)){
+  if(storedHash.length===64 && /^[0-9a-f]+$/.test(storedHash)){
     const h = await hashPassword(plain);
     return h === storedHash;
   }
-  // Legacy plaintext comparison — still works, will be hashed on next save
+  // Legacy plaintext fallback (migrates to hash on next save)
   return plain.trim() === storedHash.trim();
 }
-// Hash all plaintext passwords in STATE.users and re-save (called once on login success)
+// Hash any remaining plaintext passwords and re-save (called once after login)
 async function migratePasswords(){
-  let changed = false;
-  for(const u of STATE.users){
-    if(u.password && !(u.password.length === 64 && /^[0-9a-f]+$/.test(u.password))){
-      u.password = await hashPassword(u.password);
-      changed = true;
+  try{
+    let changed = false;
+    for(const u of STATE.users){
+      if(u.password && !(u.password.length===64 && /^[0-9a-f]+$/.test(u.password))){
+        u.password = await hashPassword(u.password);
+        changed = true;
+      }
     }
-  }
-  if(changed) saveLocal();
+    if(changed) saveLocal();
+  }catch(e){ console.warn('migratePasswords non-fatal:', e.message); }
 }
 
 
@@ -2914,6 +2951,11 @@ async function doLogin(){
 
   setLoginBusy(true);
   let result = null;
+  // Safety: auto-release the button after 8 seconds no matter what
+  const _loginTimeout = setTimeout(function(){
+    setLoginBusy(false);
+    document.getElementById('login-error').textContent = 'Login timed out — please try again.';
+  }, 8000);
 
   try {
     // ── 1. Try GAS only if URL is set ──────────────────────────
@@ -2943,7 +2985,8 @@ async function doLogin(){
       }
     }
   } finally {
-    // ── Always re-enable the button, no matter what happened ──
+    // ── Always re-enable the button and clear timeout ──
+    clearTimeout(_loginTimeout);
     setLoginBusy(false);
   }
 
@@ -2956,7 +2999,7 @@ async function doLogin(){
     document.getElementById('login-screen').style.display = 'none';
     // Register session token with GAS so server can verify role without trusting client body
     if(GAS_URL) callGAS('registerSession',{sessionToken:SESSION_TOKEN,role:result.role,username:result.username}).catch(()=>{});
-    initApp();
+    initApp().catch(function(e){ console.error("initApp failed after login:",e); toast("Login error – please refresh the page","error"); });
   } else {
     errEl.textContent = 'Invalid username or password. Please try again.';
     document.getElementById('login-pass').value = '';
@@ -2979,7 +3022,7 @@ function doLogout(){
 
 async function initApp(){
   if(!CURRENT_USER) return;
-  await migratePasswords();
+  try { await migratePasswords(); } catch(e){ console.warn('migratePasswords skipped:',e.message); }
   document.getElementById('user-name-display').textContent = CURRENT_USER.fullName || CURRENT_USER.username;
   document.getElementById('user-role-display').textContent = CURRENT_USER.role || 'Field Officer';
   document.getElementById('user-avatar').textContent = (CURRENT_USER.fullName || CURRENT_USER.username).charAt(0).toUpperCase();
@@ -6116,7 +6159,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   try{
     if(checkViewerTokenLogin()){
       document.getElementById('login-screen').style.display='none';
-      initApp();
+      initApp().catch(function(e){ console.error("initApp error (viewer):",e); document.getElementById("login-screen").style.display="flex"; });
       return;
     }
     const saved=localStorage.getItem('pota_current_user');
@@ -6125,7 +6168,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       // Restore session token from saved user object
       SESSION_TOKEN = CURRENT_USER.sessionToken || '';
       document.getElementById('login-screen').style.display='none';
-      initApp();
+      initApp().catch(function(e){ console.error("initApp error (session):",e); document.getElementById("login-screen").style.display="flex"; CURRENT_USER=null; localStorage.removeItem("pota_current_user"); });
     }
   }catch(e){ localStorage.removeItem('pota_current_user'); }
 });
