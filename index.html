@@ -2686,10 +2686,13 @@ function _sha256js(str){
 }
 
 // SHA-256 — tries crypto.subtle first (HTTPS/localhost), falls back to pure-JS (file://)
+// FIX: race crypto.subtle against a 3 s timeout so a hung Promise never stalls login.
 async function hashPassword(plain){
   try{
     if(window.crypto && crypto.subtle){
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
+      const hashP = crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
+      const timeoutP = new Promise((_,rej)=>setTimeout(()=>rej(new Error('hash-timeout')),3000));
+      const buf = await Promise.race([hashP, timeoutP]);
       return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
     }
   }catch(e){}
@@ -2928,7 +2931,7 @@ function saveLocal(){
 }
 
 // ============================================================
-//  LOGIN  —  FIX: timeout + finally guard prevents freeze
+//  LOGIN  —  FIX: timeout + finally guard + re-entry guard prevents freeze
 // ============================================================
 function setLoginBusy(busy){
   const btn     = document.getElementById('login-btn-el');
@@ -2938,7 +2941,11 @@ function setLoginBusy(busy){
   spinner.style.display = busy ? 'block' : 'none';
 }
 
+// FIX: guard against double-submission after the 8s safety timeout re-enables the button
+let _loginInFlight = false;
+
 async function doLogin(){
+  if(_loginInFlight) return; // already processing — ignore extra taps
   const user = document.getElementById('login-user').value.trim().toLowerCase().replace(/\s+/g,'');
   const pass = document.getElementById('login-pass').value.trim();
   const errEl = document.getElementById('login-error');
@@ -2949,10 +2956,12 @@ async function doLogin(){
     return;
   }
 
+  _loginInFlight = true;
   setLoginBusy(true);
   let result = null;
   // Safety: auto-release the button after 8 seconds no matter what
   const _loginTimeout = setTimeout(function(){
+    _loginInFlight = false;
     setLoginBusy(false);
     document.getElementById('login-error').textContent = 'Login timed out — please try again.';
   }, 8000);
@@ -2986,6 +2995,7 @@ async function doLogin(){
     }
   } finally {
     // ── Always re-enable the button and clear timeout ──
+    _loginInFlight = false;
     clearTimeout(_loginTimeout);
     setLoginBusy(false);
   }
