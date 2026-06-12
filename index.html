@@ -4,16 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#07090f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="PoTaTo Tracker">
+<link rel="manifest" id="pwa-manifest-link">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PoTaTo Tracker v4.0 — Potato Cultivation Monitoring System</title>
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22PoTaTo%20Tracker%22%2C%22short_name%22%3A%22PoTaTo%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2306080e%22%2C%22theme_color%22%3A%22%23f0a500%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%200%20192%20192%27%253e%253crect%2520width%3D%27192%27%2520height%3D%27192%27%2520rx%3D%2740%27%2520fill%3D%27%23f0a500%27%2F%253e%253ctext%2520y%3D%27140%27%2520x%3D%2796%27%2520text-anchor%3D%27middle%27%2520font-size%3D%27120%27%253e%F0%9F%A5%94%253c%2Ftext%253e%253c%2Fsvg%253e%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<meta name="mobile-web-app-capable" content="yes">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- Leaflet CSS: cdnjs primary, unpkg fallback -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+  onerror="var lf=document.createElement('link');lf.rel='stylesheet';lf.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.appendChild(lf);">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+<!-- Leaflet JS: cdnjs primary (synchronous), fallback chain via onerror keeps L defined before app JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="anonymous"
+  onerror="console.warn('Leaflet cdnjs failed');var _lf=document.createElement('script');_lf.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';_lf.crossOrigin='anonymous';_lf.async=false;_lf.onerror=function(){console.warn('Leaflet unpkg failed');var _lf2=document.createElement('script');_lf2.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js';_lf2.crossOrigin='anonymous';_lf2.async=false;document.head.appendChild(_lf2);};document.head.appendChild(_lf);"></script>
+<!-- Leaflet.Draw: after Leaflet; flag failure so initMap can hide draw controls gracefully -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" crossorigin="anonymous"
+  onerror="console.warn('Leaflet.Draw failed');window._leafletDrawFailed=true;"></script>
 <style>
 /* ===== DESIGN TOKENS ===== */
 :root {
@@ -376,7 +388,51 @@ tr:hover .row-actions{opacity:1;}
 .yield-bar-wrap{height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;}
 .yield-bar{height:100%;border-radius:4px;transition:width .5s,background .5s;}
 
-/* ===== TOAST ===== */
+/* ===== SAVE TABLE DROPDOWN ===== */
+.save-dropdown-wrap{position:relative;display:inline-flex;}
+.save-dropdown-menu{
+  display:none;position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--card2);border:1px solid var(--border2);border-radius:10px;
+  min-width:180px;z-index:500;box-shadow:var(--shadow-lg);overflow:hidden;
+  animation:fadeIn .15s ease;
+}
+.save-dropdown-menu.open{display:block;}
+.save-dropdown-item{
+  display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:12px;
+  font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;
+  border-bottom:1px solid var(--border);
+}
+.save-dropdown-item:last-child{border-bottom:none;}
+.save-dropdown-item:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.save-dropdown-item i{width:14px;text-align:center;font-size:11px;}
+/* ===== REPORT CHARTS ===== */
+.rpt-chart-grid{display:grid;gap:14px;grid-template-columns:1fr;}
+@media(min-width:700px){.rpt-chart-grid{grid-template-columns:1fr 1fr;}}
+.rpt-chart-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;}
+.rpt-chart-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text2);font-family:var(--font-mono);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+/* ===== REPORT PARAGRAPH BLOCK ===== */
+.rpt-narrative{
+  background:rgba(240,165,0,.04);border:1px solid rgba(240,165,0,.15);
+  border-left:3px solid var(--gold);border-radius:10px;padding:14px 16px;
+  margin-bottom:14px;font-size:13px;color:var(--text);line-height:1.75;
+}
+.rpt-narrative-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);font-family:var(--font-mono);margin-bottom:7px;}
+/* ===== REPORT PREVIEW CARD ===== */
+#report-preview .card{margin-bottom:14px;}
+#report-preview h2{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--gold);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+#report-preview table thead th{background:rgba(255,255,255,.04);font-size:10px;letter-spacing:.6px;text-transform:uppercase;font-family:var(--font-mono);}
+.rpt-header-block{background:linear-gradient(135deg,rgba(240,165,0,.07),rgba(59,130,246,.04));border:1px solid rgba(240,165,0,.2);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.rpt-header-title{font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--gold);margin-bottom:6px;}
+.rpt-meta-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+@media(min-width:560px){.rpt-meta-grid{grid-template-columns:repeat(4,1fr);}}
+.rpt-meta-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:8px 10px;}
+.rpt-meta-key{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);font-family:var(--font-mono);margin-bottom:3px;}
+.rpt-meta-val{font-size:13px;font-weight:700;color:var(--text);}
+.rpt-kpi-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
+@media(min-width:560px){.rpt-kpi-strip{grid-template-columns:repeat(4,1fr);}}
+.rpt-kpi{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;text-align:center;}
+.rpt-kpi-num{font-family:var(--font-display);font-size:22px;font-weight:800;line-height:1;}
+.rpt-kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;}
 #toast-stack{position:fixed;bottom:20px;right:16px;z-index:9000;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
 .toast{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500;pointer-events:all;animation:toastIn .3s var(--ease);max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,.5);}
 .toast.out{animation:toastOut .3s var(--ease) forwards;}
@@ -398,6 +454,38 @@ tr:hover .row-actions{opacity:1;}
 .sync-pill.offline .sync-pill-text{color:var(--red)!important;}
 /* ===== MOBILE TAP TARGETS ===== */
 @media(max-width:900px){.btn-icon{width:44px!important;height:44px!important;}.row-actions{gap:6px;}}
+/* ===== MOBILE UX ENHANCEMENTS ===== */
+@media(max-width:900px){
+  /* Larger touch targets for selects and inputs */
+  .form-control,.pest-select{min-height:44px;font-size:16px!important;} /* 16px prevents iOS zoom */
+  select.form-control,select.pest-select{font-size:16px!important;}
+  /* Pest cards: stacked layout on small screens */
+  .pest-row{flex-direction:column;gap:6px;}
+  .pest-row > div{width:100%;}
+  /* Toast bottom offset for mobile nav bar */
+  #toast-stack{bottom:72px;right:12px;left:12px;align-items:flex-end;}
+  .toast{max-width:100%;}
+  /* Modal: full-width on small screens */
+  .modal{border-radius:16px 16px 0 0!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;max-width:100%!important;width:100%!important;max-height:90vh;overflow-y:auto;}
+  .modal-overlay{align-items:flex-end!important;}
+  /* Section padding tighter on mobile */
+  .section{padding:12px 10px 80px!important;}
+  /* Table horizontal scroll */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  /* Bottom fab clearance */
+  #fab{bottom:70px!important;}
+  #fab-menu{bottom:120px!important;}
+}
+/* Swipe-to-dismiss toast indicator */
+.toast{touch-action:pan-y;cursor:pointer;}
+.toast:active{opacity:.7;transform:scale(.97);}
+/* Conflict modal special styling */
+#conflict-modal-overlay .modal{border:1px solid rgba(249,115,22,.3);}
+/* Others modal icon btn selected state */
+.others-icon-btn{transition:all .15s;border:1px solid transparent!important;}
+.others-icon-btn:hover{background:rgba(240,165,0,.1)!important;}
+/* Confirm dialog animation */
+@keyframes confirmIn{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
 /* ===== A11Y ===== */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0;}
 /* ===== CHANGE PASSWORD ===== */
@@ -445,11 +533,32 @@ tr:hover .row-actions{opacity:1;}
 .legend-sq{width:12px;height:8px;border-radius:2px;flex-shrink:0;}
 .zone-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
 @media(max-width:640px){.zone-stats-grid{grid-template-columns:repeat(2,1fr);}}
-.zone-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;transition:all .15px;text-align:center;}
-.zone-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.zone-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;transition:all .2s;text-align:center;position:relative;overflow:hidden;}
+.zone-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none;}
+.zone-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .zone-name{font-weight:800;font-size:13px;font-family:var(--font-display);}
-.zone-val{font-size:22px;font-weight:800;line-height:1;margin:3px 0;}
+.zone-val{font-size:24px;font-weight:800;line-height:1;margin:4px 0 2px;}
 .zone-sub{font-size:10px;color:var(--text2);}
+.zone-heat-bar{height:3px;border-radius:2px;margin-top:7px;transition:width .4s;}
+/* Map info bar */
+.map-info-bar{display:flex;flex-wrap:wrap;gap:8px;padding:9px 12px;background:rgba(11,15,24,.8);border:1px solid var(--border);border-radius:9px;margin-bottom:10px;font-size:11px;align-items:center;}
+.map-info-pill{display:flex;align-items:center;gap:5px;color:var(--text2);}
+.map-info-pill i{font-size:11px;}
+.map-info-pill strong{color:var(--text);font-weight:600;}
+.map-info-sep{color:var(--border2);}
+/* Observation templates */
+.obs-templates{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;}
+.obs-tpl{font-size:11px;padding:4px 9px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;line-height:1.3;}
+.obs-tpl:hover{background:var(--gold-dim);border-color:rgba(240,165,0,.3);color:var(--gold);}
+.obs-tpl:active{transform:scale(.96);}
+.obs-tpl-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+/* offline/sync status badge on topbar */
+.offline-pill{display:none;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:var(--orange-dim);border:1px solid rgba(249,115,22,.3);color:var(--orange);}
+.offline-pill.show{display:flex;}
+.offline-pill.synced{background:var(--green-dim);border-color:rgba(34,197,94,.3);color:var(--green);}
+/* IDB migration banner */
+.idb-banner{display:none;position:fixed;bottom:calc(70px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:8000;background:#0c2218;border:1px solid rgba(34,197,94,.4);color:var(--green);font-size:12px;font-weight:600;padding:9px 16px;border-radius:10px;box-shadow:var(--shadow-lg);white-space:nowrap;}
+.idb-banner.show{display:block;animation:slideUp .3s var(--ease);}
 .draw-shapes-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:10px;}
 .draw-shapes-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;min-height:24px;}
 .shape-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,.2);border-radius:7px;font-size:11px;font-weight:600;}
@@ -459,6 +568,7 @@ tr:hover .row-actions{opacity:1;}
 .chart-h240{height:240px;}
 .chart-h260{height:260px;}
 .chart-h280{height:280px;}
+.chart-h300{height:300px;}
 
 /* ===== CAMPAIGN TABLE ===== */
 .campaign-table-wrap{overflow-x:auto;}
@@ -559,7 +669,69 @@ tr:hover .row-actions{opacity:1;}
 @media(max-width:540px){.modal{max-height:96vh;border-radius:18px 18px 0 0;}.modal-overlay{align-items:flex-end;padding:0;}.form-row-2,.form-row-3{grid-template-columns:1fr;}table{min-width:400px;font-size:11px;}#map-container{height:340px;}.stats-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:899px){.form-control{font-size:16px !important;min-height:42px;}.select.form-control{min-height:42px;}.btn{min-height:42px;}.btn-sm{min-height:36px;}.btn-icon{min-height:36px;min-width:36px;}}
 
-/* ===== STEP ===== */
+/* ===== VOICE-TO-TEXT MIC BUTTON ===== */
+/* ===== VOICE-TO-TEXT — ENHANCED ===== */
+.mic-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);
+  background:rgba(255,255,255,.04);color:var(--text3);cursor:pointer;
+  font-size:14px;flex-shrink:0;transition:all .2s;
+}
+.mic-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim);}
+.mic-btn.recording{border-color:var(--red);color:var(--red);background:var(--red-dim);animation:micPulse .7s ease infinite;}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4);}50%{box-shadow:0 0 0 5px rgba(239,68,68,0);}}
+.mic-btn.unsupported{opacity:.35;cursor:not-allowed;}
+.textarea-mic-wrap{position:relative;display:flex;flex-direction:column;gap:4px;}
+.textarea-mic-row{display:flex;gap:6px;align-items:flex-start;}
+.textarea-mic-row .form-control{flex:1;}
+
+/* Interim transcript preview banner */
+.voice-interim{
+  display:none;font-size:11px;color:var(--text2);font-style:italic;
+  background:rgba(59,130,246,.07);border:1px dashed rgba(59,130,246,.25);
+  border-radius:6px;padding:5px 9px;line-height:1.4;margin-top:2px;
+  min-height:24px;word-break:break-word;
+}
+.voice-interim.visible{display:block;}
+.voice-interim::before{content:'🎙 ';font-style:normal;}
+
+/* Char counter row */
+.voice-meta-row{
+  display:flex;align-items:center;justify-content:space-between;
+  min-height:18px;
+}
+.char-counter{
+  font-size:10px;color:var(--text3);font-family:var(--font-mono);
+  transition:color .2s;
+}
+.char-counter.warn{color:var(--orange);}
+.char-counter.over{color:var(--red);font-weight:700;}
+
+/* Permission guide modal */
+#mic-perm-modal .modal{max-width:440px;}
+.perm-step{
+  display:flex;gap:11px;align-items:flex-start;padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.perm-step:last-child{border-bottom:none;}
+.perm-step-num{
+  width:24px;height:24px;border-radius:50%;background:var(--gold-dim);
+  border:1px solid rgba(240,165,0,.3);color:var(--gold);font-weight:700;
+  font-size:11px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+.perm-step-text{font-size:12.5px;line-height:1.55;color:var(--text2);}
+.perm-step-text strong{color:var(--text);font-weight:600;}
+.perm-browser-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.perm-tab{
+  font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  color:var(--text2);transition:all .15s;
+}
+.perm-tab.active{background:var(--gold-dim);border-color:rgba(240,165,0,.3);color:var(--gold);}
+.perm-browser-content > div{display:none;}
+.perm-browser-content > div.active{display:block;}
+
 .step-indicator{display:flex;gap:0;margin-bottom:18px;}
 .step{flex:1;text-align:center;font-size:10px;font-weight:700;padding:7px 4px;color:var(--text3);border-bottom:2px solid var(--border);transition:all .2s;font-family:var(--font-mono);}
 .step.active{color:var(--gold);border-color:var(--gold);}
@@ -862,7 +1034,243 @@ document.addEventListener('DOMContentLoaded',()=>{
   setupDrop('pl-photo-area', _plPhotos, 'pl-photo-input');
 });
 
-function openOthersModal(t){}
+// ============================================================
+//  CUSTOM PEST / DISEASE MANAGEMENT
+// ============================================================
+function openOthersModal(t) {
+  const isDisease = t === 'disease';
+  const color = isDisease ? 'var(--purple)' : 'var(--orange)';
+  const label = isDisease ? 'Disease / Condition' : 'Pest / Insect';
+  const list = isDisease ? (STATE.customDiseases || []) : (STATE.customPests || []);
+  const icons = ['🔬','🧫','🌱','🍃','🐝','🦗','🪲','🪳','❓','⚠️','🔴','🟡'];
+
+  const existingModal = document.getElementById('others-modal-overlay');
+  if (existingModal) existingModal.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'others-modal-overlay';
+  overlay.className = 'modal-overlay open';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.style.zIndex = '9999';
+
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:480px;width:92%;">
+      <div class="modal-header">
+        <div class="modal-title" style="color:${color};"><i class="fas fa-plus-circle"></i> Add Custom ${label}</div>
+        <button class="btn btn-ghost btn-icon" onclick="document.getElementById('others-modal-overlay').remove()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" style="padding:18px;">
+        <div style="margin-bottom:14px;">
+          <label class="form-label">Name <span style="color:var(--red)">*</span></label>
+          <input id="others-name-input" class="form-control" placeholder="e.g. Fusarium Wilt, Spider Mite…" maxlength="60" style="margin-bottom:10px;">
+          <label class="form-label">Icon</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="others-icon-picker">
+            ${icons.map(ic => `<button class="btn btn-ghost btn-sm others-icon-btn" data-icon="${ic}" onclick="selectOthersIcon(this)" style="font-size:18px;padding:4px 8px;border-radius:8px;">${ic}</button>`).join('')}
+          </div>
+          <input id="others-icon-selected" type="hidden" value="❓">
+          <button class="btn btn-gold" style="width:100%;" onclick="addCustomEntry('${t}')"><i class="fas fa-plus"></i> Add ${label}</button>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;">
+          <div class="form-label" style="margin-bottom:8px;">Current Custom ${label}s</div>
+          <div id="others-list-container" style="display:flex;flex-wrap:wrap;gap:6px;min-height:32px;">
+            ${list.length ? list.map(entry => `
+              <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:20px;padding:3px 10px;font-size:12px;">
+                ${entry.icon||'❓'} ${entry.name}
+                <button onclick="removeCustomEntry('${t}','${entry.name}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;padding:0 2px;line-height:1;" title="Remove"><i class="fas fa-times"></i></button>
+              </span>`).join('') : '<span style="color:var(--text3);font-size:12px;">None added yet</span>'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  setTimeout(() => document.getElementById('others-name-input')?.focus(), 60);
+}
+
+function selectOthersIcon(btn) {
+  document.querySelectorAll('.others-icon-btn').forEach(b => b.style.background = '');
+  btn.style.background = 'rgba(240,165,0,.2)';
+  btn.style.border = '1px solid var(--gold)';
+  document.getElementById('others-icon-selected').value = btn.dataset.icon;
+}
+
+function addCustomEntry(type) {
+  const nameEl = document.getElementById('others-name-input');
+  const name = (nameEl?.value || '').trim();
+  if (!name) { nameEl?.focus(); toast('Enter a name', 'error'); return; }
+
+  if (!STATE.customPests) STATE.customPests = [];
+  if (!STATE.customDiseases) STATE.customDiseases = [];
+
+  const list = type === 'disease' ? STATE.customDiseases : STATE.customPests;
+  if (list.some(e => e.name.toLowerCase() === name.toLowerCase())) {
+    toast('Already in the list', 'warning'); return;
+  }
+
+  const icon = document.getElementById('others-icon-selected')?.value || '❓';
+  list.push({ name, icon });
+  saveLocal();
+
+  // Sync runtime arrays & pest form
+  syncCustomArrays();
+  buildPestInputs();
+  renderCustomDisplays();
+  openOthersModal(type); // re-render modal with updated list
+  toast(`"${name}" added ✓`, 'success');
+}
+
+function removeCustomEntry(type, name) {
+  if (!STATE.customPests) STATE.customPests = [];
+  if (!STATE.customDiseases) STATE.customDiseases = [];
+  if (type === 'disease') {
+    STATE.customDiseases = STATE.customDiseases.filter(e => e.name !== name);
+  } else {
+    STATE.customPests = STATE.customPests.filter(e => e.name !== name);
+  }
+  saveLocal();
+  syncCustomArrays();
+  buildPestInputs();
+  renderCustomDisplays();
+  openOthersModal(type);
+  toast(`"${name}" removed`, 'info');
+}
+
+function syncCustomArrays() {
+  // Keep runtime CUSTOM_PESTS / CUSTOM_DISEASES in sync with STATE
+  CUSTOM_PESTS = (STATE.customPests || []).map(e => e.name);
+  CUSTOM_DISEASES = (STATE.customDiseases || []).map(e => e.name);
+  // Inject icons for newly added names
+  (STATE.customPests || []).forEach(e => { PEST_ICONS[e.name] = e.icon; });
+  (STATE.customDiseases || []).forEach(e => { PEST_ICONS[e.name] = e.icon; });
+}
+
+function renderCustomDisplays() {
+  const pd = document.getElementById('custom-pest-display');
+  const dd = document.getElementById('custom-disease-display');
+  if (pd) pd.innerHTML = (STATE.customPests || []).map(e =>
+    `<span style="background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);color:var(--orange);border-radius:12px;padding:2px 9px;font-size:11px;">${e.icon} ${e.name}</span>`
+  ).join('') || '';
+  if (dd) dd.innerHTML = (STATE.customDiseases || []).map(e =>
+    `<span style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3);color:var(--purple);border-radius:12px;padding:2px 9px;font-size:11px;">${e.icon} ${e.name}</span>`
+  ).join('') || '';
+}
+
+// ============================================================
+//  AI PEST PHOTO IDENTIFICATION
+// ============================================================
+let _pdPhoto = null;
+
+async function handlePdPhoto(input){
+  if(!input||!input.files||!input.files.length) return;
+  const f = input.files[0];
+  const valid = ['image/jpeg','image/png','image/heic','image/heif','image/webp'];
+  if(!valid.includes(f.type) && !f.name.match(/\.(jpg|jpeg|png|heic|heif|webp)$/i)){
+    toast('Unsupported image format','warning'); input.value=''; return;
+  }
+  let photo;
+  try{
+    photo = await _resizeImage(f, PHOTO_RESIZE, 0.82);
+  }catch(err){ toast('Could not read photo','error'); input.value=''; return; }
+  _pdPhoto = photo;
+
+  // Preview
+  const wrap = document.getElementById('pd-photo-preview');
+  if(wrap){
+    wrap.innerHTML='';
+    const div=document.createElement('div'); div.className='photo-thumb-wrap';
+    const img=document.createElement('img'); img.src=photo.dataUrl; img.alt=photo.name||'photo';
+    const btn=document.createElement('button'); btn.className='photo-thumb-remove'; btn.type='button';
+    btn.innerHTML='\u00d7'; btn.title='Remove photo';
+    btn.addEventListener('click',(e)=>{ e.stopPropagation(); clearPdPhoto(); });
+    div.appendChild(img); div.appendChild(btn);
+    wrap.appendChild(div);
+  }
+  input.value='';
+
+  identifyPestFromPhoto(photo);
+}
+
+function clearPdPhoto(){
+  _pdPhoto=null;
+  const wrap=document.getElementById('pd-photo-preview'); if(wrap) wrap.innerHTML='';
+  const res=document.getElementById('pd-ai-result'); if(res){ res.style.display='none'; res.innerHTML=''; }
+}
+
+async function identifyPestFromPhoto(photo){
+  const resEl=document.getElementById('pd-ai-result');
+  if(resEl){
+    resEl.style.display='block';
+    resEl.innerHTML='<i class="fas fa-spinner fa-spin" style="color:var(--gold);"></i> Identifying pest…';
+  }
+  const allLabels=[...DISEASES,...PESTS];
+  const base64 = photo.dataUrl.split(',')[1];
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
+            { type: "text", text: `You are an agricultural extension assistant helping identify potato pests and diseases from a field photo. Choose the single best-matching option from this exact list (use the exact spelling): ${JSON.stringify(allLabels)}. Also estimate a severity rating from this exact list: ["Low","Moderate","High"], and an estimated affected percentage (0-100, choose nearest of: 0,5,10,25,40,50,60,75,90,100). Respond with ONLY a JSON object, no preamble, no markdown fences, in this exact shape: {"match":"<one of the list above, or \\"Unknown\\" if nothing matches>","confidence":"<Low|Medium|High>","severity":"<Low|Moderate|High>","affectedPct":<number>,"reasoning":"<1-2 sentence explanation>"}` }
+          ]
+        }]
+      })
+    });
+    const data = await response.json();
+    const text = (data.content||[]).map(b=>b.text||'').join('').trim();
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+
+    if(!parsed.match || parsed.match==='Unknown' || !allLabels.includes(parsed.match)){
+      if(resEl){
+        resEl.innerHTML = `<i class="fas fa-circle-question" style="color:var(--text3);"></i> Could not confidently identify a pest/disease from this photo${parsed.reasoning?': '+parsed.reasoning:''}. Please select manually below.`;
+      }
+      return;
+    }
+
+    // Pre-fill severity / affected % on the matched pest card
+    const id = parsed.match.replace(/[\s\(\)\/]/g,'_');
+    const sevSel = document.getElementById('sev-'+id);
+    const pctSel = document.getElementById('pct-'+id);
+    const severity = ['Low','Moderate','High'].includes(parsed.severity) ? parsed.severity : 'Moderate';
+    let pct = Number(parsed.affectedPct);
+    if(isNaN(pct)) pct = 25;
+    const pctOptions=[0,5,10,25,40,50,60,75,90,100];
+    pct = pctOptions.reduce((a,b)=>Math.abs(b-pct)<Math.abs(a-pct)?b:a);
+
+    if(sevSel){ sevSel.value=severity; calcYieldImpact(); updatePestCardStyle(id); }
+    if(pctSel){ pctSel.value=String(pct); }
+
+    // Switch to the right tab (disease vs pest) so the user sees the filled card
+    const isPest = PESTS.includes(parsed.match);
+    const card = document.getElementById('pc-'+id);
+    if(card){ card.scrollIntoView({behavior:'smooth',block:'center'}); card.style.boxShadow='0 0 0 2px var(--gold)'; setTimeout(()=>{ card.style.boxShadow=''; },2000); }
+
+    if(resEl){
+      const confColor = {Low:'var(--text3)',Medium:'var(--orange)',High:'var(--green)'}[parsed.confidence]||'var(--text3)';
+      resEl.innerHTML = `<div style="display:flex;align-items:flex-start;gap:8px;">
+        <i class="fas fa-wand-magic-sparkles" style="color:var(--gold);margin-top:1px;"></i>
+        <div>
+          <div><strong>${PEST_ICONS[parsed.match]||''} ${parsed.match}</strong> — confidence: <span style="color:${confColor};font-weight:700;">${parsed.confidence||'—'}</span></div>
+          <div style="color:var(--text2);margin-top:3px;">Pre-filled severity: <strong>${severity}</strong> · affected: <strong>${pct}%</strong></div>
+          ${parsed.reasoning?`<div style="color:var(--text3);margin-top:4px;font-size:11px;">${parsed.reasoning}</div>`:''}
+          <div style="color:var(--text3);margin-top:4px;font-size:11px;">Review and adjust before saving.</div>
+        </div>
+      </div>`;
+    }
+    toast('Identified: '+parsed.match+' ✓');
+  }catch(err){
+    if(resEl){
+      resEl.innerHTML = '<i class="fas fa-triangle-exclamation" style="color:var(--red);"></i> Identification failed. Please select the pest/disease manually.';
+    }
+  }
+}
 </script>
 </head>
 <body>
@@ -1002,6 +1410,7 @@ function openOthersModal(t){}
       <div class="nav-item" id="nav-production" onclick="showSection('production')"><i class="fas fa-industry"></i> Production Forecast</div>
       <div class="nav-item" id="nav-comparative" onclick="showSection('comparative')"><i class="fas fa-balance-scale"></i> Comparative Analysis</div>
       <div class="nav-item" id="nav-campaign" onclick="showSection('campaign')"><i class="fas fa-table"></i> Campaign Table</div>
+      <div class="nav-item" id="nav-variety-perf" onclick="showSection('variety-perf')"><i class="fas fa-seedling"></i> Variety Performance</div>
       <div class="nav-item" id="nav-weekly-report" onclick="showSection('weekly-report')"><i class="fas fa-file-alt"></i> Weekly Report</div>
     </div>
     <div class="nav-section">
@@ -1209,12 +1618,23 @@ function openOthersModal(t){}
 <!-- ========== MAP ========== -->
 <section id="sec-map" class="section">
   <div class="zone-stats-grid" id="zone-stats"></div>
+  <div class="map-info-bar" id="map-info-bar">
+    <span class="map-info-pill"><i class="fas fa-users" style="color:var(--gold);"></i> <strong id="mib-growers">0</strong> growers</span>
+    <span class="map-info-sep">·</span>
+    <span class="map-info-pill"><i class="fas fa-seedling" style="color:var(--green);"></i> <strong id="mib-plots">0</strong> plots</span>
+    <span class="map-info-sep">·</span>
+    <span class="map-info-pill"><i class="fas fa-ruler-combined" style="color:var(--blue);"></i> <strong id="mib-area">0</strong> ha total</span>
+    <span class="map-info-sep">·</span>
+    <span class="map-info-pill"><i class="fas fa-bug" style="color:var(--red);"></i> <strong id="mib-pests">0</strong> pest records</span>
+    <span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--font-mono);" id="mib-updated"></span>
+  </div>
   <div class="map-controls">
     <div class="map-toggle on" id="toggle-growers" onclick="toggleLayer('growers')"><i class="fas fa-users"></i> Growers</div>
     <div class="map-toggle on" id="toggle-zones" onclick="toggleLayer('zones')"><i class="fas fa-draw-polygon"></i> Zones</div>
     <div class="map-toggle" id="toggle-plantations" onclick="toggleLayer('plantations')"><i class="fas fa-seedling"></i> Plantations</div>
     <div class="map-toggle" id="toggle-disease" onclick="toggleLayer('disease')" style="border-color:rgba(239,68,68,.25);"><i class="fas fa-biohazard"></i> Disease Heat</div>
-    <div style="margin-left:auto;font-size:11px;color:var(--text3);"><i class="fas fa-pencil-alt"></i> Use toolbar on map to draw</div>
+    <div class="map-toggle" id="toggle-cluster" onclick="toggleLayer('cluster')" style="border-color:rgba(59,130,246,.25);"><i class="fas fa-layer-group"></i> Cluster</div>
+    <div style="margin-left:auto;font-size:11px;color:var(--text3);"><i class="fas fa-pencil-alt"></i> Draw on map</div>
   </div>
   <div id="map-container"></div>
   <div class="draw-shapes-panel">
@@ -1293,7 +1713,7 @@ function openOthersModal(t){}
     <div class="card-title"><i class="fas fa-seedling"></i> Plantation Records <span class="badge badge-gold" id="plant-count-badge">0</span></div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Grower</th><th>Zone</th><th>Locality</th><th>Variety</th><th>Date Planted</th><th>Area (ha)</th><th>Est.Yield T/ha</th><th>Season</th><th>Fortnight</th><th></th></tr></thead>
+        <thead><tr><th>Grower</th><th>Zone</th><th>Locality</th><th>Variety</th><th>Date Planted</th><th>Area (ha)</th><th>Est.Yield T/ha</th><th>Season</th><th>Fortnight</th><th>Harvest</th><th></th></tr></thead>
         <tbody id="plantation-table"></tbody>
       </table>
     </div>
@@ -1315,6 +1735,16 @@ function openOthersModal(t){}
         <div class="visit-tab" data-visit="3" onclick="switchVisitTab(3)"><i class="fas fa-calendar-check"></i> Visit 3 <span class="badge badge-blue" id="v3-badge" style="display:none">New</span></div>
       </div>
       <div class="visit-panel active" id="visit-panel-1">
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-camera" style="color:var(--teal);margin-right:4px;"></i> Smart Pest Photo Identification</label>
+          <div class="photo-upload-area" id="pd-photo-area" onclick="document.getElementById('pd-photo-input').click()" style="padding:12px;">
+            <i class="fas fa-cloud-upload-alt" style="font-size:18px;color:var(--text3);margin-bottom:4px;"></i>
+            <div style="font-size:11px;color:var(--text2);">Click to snap / upload a photo for automatic identification</div>
+          </div>
+          <input type="file" id="pd-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePdPhoto(this)">
+          <div id="pd-photo-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+          <div id="pd-ai-result" style="display:none;margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--card2);font-size:12px;"></div>
+        </div>
         <div class="form-row-2">
           <div class="form-group"><label class="form-label">Grower *</label><select id="pd-grower" class="form-control" onchange="autofillPdLocality()"><option value="">Select grower…</option></select></div>
           <div class="form-group"><label class="form-label">Locality</label><input id="pd-locality" class="form-control" placeholder="Auto-filled from grower"></div>
@@ -1334,7 +1764,23 @@ function openOthersModal(t){}
         <label class="form-label" style="margin:11px 0 9px;"><i class="fas fa-bug" style="color:var(--orange);margin-right:4px;"></i> Pests</label>
         <div class="pest-grid" id="pest-inputs"></div>
         <div style="margin-top:6px;margin-bottom:10px;"><button class="btn btn-ghost btn-sm" onclick="openOthersModal('pest')"><i class="fas fa-plus-circle" style="color:var(--orange);"></i> Others (Please Specify)</button><div id="custom-pest-display" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;"></div></div>
-        <div class="form-group" style="margin-top:10px;"><label class="form-label">Officer Comments</label><textarea id="pd-comments" class="form-control" rows="2" placeholder="Observations…"></textarea></div>
+        <div class="form-group" style="margin-top:10px;">
+          <label class="form-label">Officer Comments</label>
+          <div class="obs-tpl-label">Quick phrases</div>
+          <div class="obs-templates" id="tpl-pd">
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Symptoms on lower leaves only</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Spread consistent with waterlogging</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Fungicide spray recommended within 48h</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Localised — no spread to adjacent plots</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Early stage, monitoring advised</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Nematicide soil treatment recommended</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Biological control applied</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Roguing of infected plants done</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Irrigation management required</span>
+            <span class="obs-tpl" onclick="injectTemplate('pd-comments',this.textContent)">Follow-up visit scheduled in 7 days</span>
+          </div>
+          <textarea id="pd-comments" class="form-control" rows="2" placeholder="Observations…"></textarea>
+        </div>
         <div style="display:flex;gap:8px;margin-top:4px;">
           <button class="btn btn-ghost btn-sm" onclick="addVisit()" style="flex:1;"><i class="fas fa-plus"></i> Add Visit 2/3</button>
           <button class="btn btn-gold" style="flex:2;" onclick="savePestRecord()"><i class="fas fa-save"></i> Save Record</button>
@@ -1420,7 +1866,20 @@ function openOthersModal(t){}
           <!-- T/acre removed -->
         </div>
       </div>
-      <div class="form-group" style="margin:0;"><label class="form-label">Comments</label><textarea id="ya-comments" class="form-control" rows="5" placeholder="Officer's notes…"></textarea></div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Comments</label>
+        <div class="obs-tpl-label">Quick phrases</div>
+        <div class="obs-templates" id="tpl-ya">
+          <span class="obs-tpl" onclick="injectTemplate('ya-comments',this.textContent)">Yield below seasonal average</span>
+          <span class="obs-tpl" onclick="injectTemplate('ya-comments',this.textContent)">Quality acceptable, minimal blemish</span>
+          <span class="obs-tpl" onclick="injectTemplate('ya-comments',this.textContent)">Pest pressure reduced yield by est. 20%</span>
+          <span class="obs-tpl" onclick="injectTemplate('ya-comments',this.textContent)">Waterlogging affected tuber size</span>
+          <span class="obs-tpl" onclick="injectTemplate('ya-comments',this.textContent)">Excellent crop — above target</span>
+          <span class="obs-tpl" onclick="injectTemplate('ya-comments',this.textContent)">Grower to delay harvest by 2 weeks</span>
+          <span class="obs-tpl" onclick="injectTemplate('ya-comments',this.textContent)">Storage conditions checked — satisfactory</span>
+        </div>
+        <textarea id="ya-comments" class="form-control" rows="5" placeholder="Officer's notes…"></textarea>
+      </div>
       <div class="form-group" style="margin-top:12px;">
         <label class="form-label"><i class="fas fa-camera" style="color:var(--teal);margin-right:4px;"></i> Field Photos</label>
         <div class="photo-upload-area" id="ya-photo-area" onclick="document.getElementById('ya-photo-input').click()">
@@ -1526,6 +1985,77 @@ function openOthersModal(t){}
   <div id="report-preview"></div>
 </section>
 
+<!-- ========== VARIETY PERFORMANCE DASHBOARD ========== -->
+<section id="sec-variety-perf" class="section">
+  <div class="card">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--green),var(--teal));"></div>
+    <div class="card-title">
+      <i class="fas fa-seedling" style="color:var(--green);"></i> Variety Performance Dashboard
+      <div class="card-title-actions" style="gap:6px;flex-wrap:wrap;">
+        <select class="form-control btn-sm" id="vp-season" onchange="renderVarietyPerf()" style="font-size:11px;min-width:110px;">
+          <option value="">All Seasons</option>
+          <option>Season 1</option>
+          <option>Season 2</option>
+        </select>
+        <select class="form-control btn-sm" id="vp-zone" onchange="renderVarietyPerf()" style="font-size:11px;min-width:90px;">
+          <option value="">All Zones</option>
+          <option>E1</option><option>E2</option><option>E3</option><option>E4</option>
+        </select>
+        <select class="form-control btn-sm" id="vp-year" onchange="renderVarietyPerf()" style="font-size:11px;min-width:90px;">
+          <option value="">All Years</option>
+          <option>2024</option><option>2025</option><option>2026</option>
+        </select>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:14px;">Average yield (T/ha), area planted (ha), and plot count ranked by variety — drawn from plantation and yield assessment records.</p>
+    <!-- KPI row -->
+    <div id="vp-kpi-row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;"></div>
+  </div>
+
+  <!-- Ranking bar chart + doughnut area share -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--green),var(--teal));"></div>
+      <div class="card-title"><i class="fas fa-trophy" style="color:var(--gold);"></i> Average Yield by Variety (T/ha)</div>
+      <div class="chart-wrap chart-h300"><canvas id="vp-yield-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--blue),var(--purple));"></div>
+      <div class="card-title"><i class="fas fa-chart-pie" style="color:var(--blue);"></i> Area Share by Variety (ha)</div>
+      <div class="chart-wrap chart-h300"><canvas id="vp-area-pie-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Area + plots bar chart -->
+  <div class="card">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--gold),var(--orange));"></div>
+    <div class="card-title"><i class="fas fa-chart-bar" style="color:var(--gold);"></i> Total Area &amp; Plots per Variety</div>
+    <div class="chart-wrap chart-h260"><canvas id="vp-area-chart"></canvas></div>
+  </div>
+
+  <!-- Season 1 vs Season 2 yield by variety -->
+  <div class="card">
+    <div class="card-accent" style="background:linear-gradient(90deg,var(--purple),var(--blue));"></div>
+    <div class="card-title"><i class="fas fa-layer-group" style="color:var(--purple);"></i> Season 1 vs Season 2 — Yield per Variety (T/ha)</div>
+    <div class="chart-wrap chart-h260"><canvas id="vp-s1s2-chart"></canvas></div>
+  </div>
+
+  <!-- Detailed ranking table -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-list-ol" style="color:var(--green);"></i> Full Variety Ranking Table</div>
+    <div id="vp-table"></div>
+  </div>
+
+  <!-- Variety x Pest cross-analysis heat table -->
+  <div class="card">
+    <div class="card-title"><i class="fas fa-bug" style="color:var(--red);"></i> Variety &times; Pest Susceptibility
+      <span style="margin-left:auto;font-size:10px;color:var(--text3);font-family:var(--font-mono);">Cell = avg severity score (Low=1 · Mod=2 · High=3)</span>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:12px;">Which varieties are most susceptible to which pests &amp; diseases — derived from pest/disease observations cross-referenced with plantation variety records.</p>
+    <div id="vp-heat-table"></div>
+  </div>
+</section>
+
 <!-- ========== COMPARATIVE ANALYSIS ========== -->
 <section id="sec-comparative" class="section">
   <div class="card">
@@ -1545,6 +2075,7 @@ function openOthersModal(t){}
           <option value="">All Zones</option>
           <option>E1</option><option>E2</option><option>E3</option><option>E4</option>
         </select>
+        <button class="btn btn-gold btn-sm" onclick="generateSeasonReportPDF()" title="Generate a print-ready PDF season report"><i class="fas fa-file-pdf"></i> <span class="hide-xs">Season Report</span></button>
       </div>
     </div>
     <p style="font-size:11px;color:var(--text3);margin-bottom:14px;">Season 1 vs Season 2 across 2024, 2025 and 2026 — drawn from recorded plantation, yield assessment, and pest data.</p>
@@ -1587,8 +2118,28 @@ function openOthersModal(t){}
   </div>
 
   <!-- Detailed comparison table -->
-  <div class="card">
-    <div class="card-title"><i class="fas fa-table"></i> Detailed Season Comparison Table</div>
+  <div class="card" id="comp-detail-card">
+    <div class="card-title">
+      <i class="fas fa-table"></i> Detailed Season Comparison Table
+      <div class="card-title-actions">
+        <!-- Primary: Save to Sheets -->
+        <button class="btn btn-green btn-sm" onclick="saveCompTableToSheets()" id="save-sheets-btn" title="Save all rows to Google Sheets">
+          <i class="fas fa-cloud-upload-alt"></i> <span class="hide-xs">Save to Sheets</span>
+        </button>
+        <!-- Secondary: local exports -->
+        <div class="save-dropdown-wrap" id="save-table-wrap">
+          <button class="btn btn-ghost btn-sm" onclick="toggleSaveDropdown()" id="save-table-btn" title="More export options">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          <div class="save-dropdown-menu" id="save-table-dropdown">
+            <div class="save-dropdown-item" onclick="saveTableAsCSV()"><i class="fas fa-file-csv" style="color:var(--green);"></i> Export as CSV</div>
+            <div class="save-dropdown-item" onclick="saveTableAsImage()"><i class="fas fa-image" style="color:var(--blue);"></i> Save as Image (PNG)</div>
+            <div class="save-dropdown-item" onclick="saveTableAsPDF()"><i class="fas fa-file-pdf" style="color:var(--red);"></i> Save as PDF</div>
+            <div class="save-dropdown-item" onclick="printCompTable()"><i class="fas fa-print" style="color:var(--text2);"></i> Print Table</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="comp-detail-table"></div>
   </div>
 </section>
@@ -1726,7 +2277,27 @@ function openOthersModal(t){}
         <input class="form-control" id="new-variety" placeholder="e.g. Mondial" onkeydown="if(event.key==='Enter')addVariety()">
         <button class="btn btn-gold" onclick="addVariety()"><i class="fas fa-plus"></i></button>
       </div>
-      <div id="variety-list" style="display:flex;flex-wrap:wrap;gap:7px;"></div>
+      <div id="variety-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fas fa-triangle-exclamation" style="color:var(--red);"></i> Outbreak Alert Sensitivity</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:14px;">Tune when the Early Pest Outbreak Alert fires — triggered when <strong id="ob-summary-growers">2+</strong> growers in the same zone record the same pest/disease above the thresholds below within the time window.</p>
+      <div class="form-group">
+        <label class="form-label">Severity threshold: <span id="ob-sev-val" style="color:var(--gold);font-weight:700;"></span></label>
+        <input type="range" min="1" max="3" step="1" id="ob-sev-slider" oninput="updateOutbreakSettingsPreview()" onchange="saveOutbreakSettings()">
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;"><span>Low+</span><span>Moderate+</span><span>High only</span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Affected area threshold: <span id="ob-pct-val" style="color:var(--gold);font-weight:700;"></span></label>
+        <input type="range" min="0" max="100" step="5" id="ob-pct-slider" oninput="updateOutbreakSettingsPreview()" onchange="saveOutbreakSettings()">
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;"><span>0%</span><span>50%</span><span>100%</span></div>
+      </div>
+      <div class="form-group" style="margin-bottom:4px;">
+        <label class="form-label">Detection window: <span id="ob-window-val" style="color:var(--gold);font-weight:700;"></span></label>
+        <input type="range" min="3" max="60" step="1" id="ob-window-slider" oninput="updateOutbreakSettingsPreview()" onchange="saveOutbreakSettings()">
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;"><span>3d</span><span>30d</span><span>60d</span></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);line-height:1.5;margin-top:8px;">A record matches if it meets <strong>either</strong> the severity <strong>or</strong> the affected-area threshold. An alert fires once when 2+ distinct growers in the same zone match the same pest/disease within the window.</div>
     </div>
     <div class="card">
       <div class="card-title"><i class="fas fa-link"></i> Google Sheets Integration</div>
@@ -1984,9 +2555,19 @@ function openOthersModal(t){}
 </nav>
 
 <div id="toast-stack"></div>
+<div class="idb-banner" id="idb-banner"><i class="fas fa-database" style="margin-right:6px;color:var(--green);"></i>Storage upgraded to IndexedDB ✓</div>
 
 <script>
 'use strict';
+// ── Global error boundary ────────────────────────────────────
+window.addEventListener('error', function(e){
+  // Suppress noisy "Script error." from cross-origin CDN failures
+  if(!e.message || e.message === 'Script error.') return;
+  console.error('PoTa error:', e.message, e.filename, e.lineno);
+});
+window.addEventListener('unhandledrejection', function(e){
+  console.error('PoTa unhandled promise rejection:', e.reason);
+});
 // ============================================================
 //  CONSTANTS
 // ============================================================
@@ -2182,6 +2763,18 @@ const LOCALITY_COORDS = {
   'E4:Trois Ilots': [-20.4069, 57.7658]
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Global date formatting helpers
+function fmtDate(d){
+  const dt = (d instanceof Date) ? d : new Date(d);
+  if(!d || isNaN(dt.getTime())) return '—';
+  return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+function fmtShort(d){
+  const dt = (d instanceof Date) ? d : new Date(d);
+  if(!d || isNaN(dt.getTime())) return '—';
+  return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
 const CHART_COLORS = ['#f0a500','#3b82f6','#22c55e','#a855f7','#ef4444','#14b8a6','#f97316','#ec4899'];
 
 // ── VIEWER TOKEN (cross-device) ──────────────────────────────
@@ -2340,6 +2933,8 @@ function undoDelete(msg, onUndo) {
 let SYNC_QUEUE = [];
 function loadSyncQueue() {
   try { SYNC_QUEUE = JSON.parse(localStorage.getItem('pota_sync_queue_v1') || '[]'); } catch(e) { SYNC_QUEUE = []; }
+  // IndexedDB migration (non-blocking)
+  if(typeof IDB !== 'undefined') IDB.migrate().catch(()=>{});
 }
 function saveSyncQueue() {
   try { localStorage.setItem('pota_sync_queue_v1', JSON.stringify(SYNC_QUEUE)); } catch(e) {}
@@ -2413,12 +3008,44 @@ async function syncToGAS(action, data, silent) {
 window.addEventListener('online', () => {
   toast('Back online — retrying queued records…', 'info');
   setTimeout(flushSyncQueue, 1000);
+  document.getElementById('_offline-banner')?.remove();
 });
 window.addEventListener('offline', () => {
   const pill = document.getElementById('sync-pill');
   if (pill) pill.classList.add('offline');
   toast('You are offline — changes saved locally', 'warning');
+  // Persistent offline banner
+  if (!document.getElementById('_offline-banner')) {
+    const banner = document.createElement('div');
+    banner.id = '_offline-banner';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:8999;background:rgba(249,115,22,.12);border-bottom:1px solid rgba(249,115,22,.35);color:var(--orange);font-size:11px;font-weight:600;padding:5px 16px;text-align:center;backdrop-filter:blur(8px);letter-spacing:.3px;';
+    banner.innerHTML = '<i class="fas fa-wifi-slash" style="margin-right:6px;"></i>Offline — all changes are saved locally and will sync when you reconnect';
+    document.body.appendChild(banner);
+  }
 });
+
+// ============================================================
+//  DATA INTEGRITY CHECK  —  warns on corrupt/empty records
+// ============================================================
+function runDataIntegrityCheck() {
+  const issues = [];
+  STATE.pestRecords.forEach((r,i) => {
+    if (!r.grower) issues.push(`Pest record #${i+1}: missing grower name`);
+    if (!r.visits || !r.visits.length) issues.push(`Pest record for "${r.grower||'?'}": no visit data`);
+  });
+  STATE.plantation.forEach((r,i) => {
+    if (!r.grower || !r.variety || !r.datePlanted) issues.push(`Plantation row #${i+1}: missing required fields`);
+  });
+  STATE.yieldAssessments.forEach((r,i) => {
+    if (!r.grower) issues.push(`Yield record #${i+1}: missing grower`);
+  });
+  if (issues.length) {
+    console.warn('[PoTaTo] Data integrity issues:', issues);
+    if (issues.length <= 3) issues.forEach(msg => toast('⚠ ' + msg, 'warning'));
+    else toast(`⚠ ${issues.length} data integrity issues found — check console`, 'warning');
+  }
+  return issues;
+}
 
 // ============================================================
 //  MODAL FOCUS TRAP
@@ -2455,8 +3082,10 @@ const DEFAULT_STATE = {
   growers:[],plantation:[],pestRecords:[],yieldAssessments:[],
   labSubmissions:[],
   varieties:['Delaware','Jelly','Mondial','Panamera','Spunta Imported','Spunta Local'],
+  varietyHarvestDays:{},
   campaignData:{},weeklyReports:[],
   harvestDays:90,
+  outbreakSettings:{windowDays:14, sevThreshold:'High', pctThreshold:50},
   defaultYield:12,
   users:[
     {username:'superadmin',fullName:'Super Administrator',role:'Administrator',zoneAccess:'All',password:'620eb8e0293efc0fe7cf90b4e3d0adffc0d3c2c355dba4e2ec1aba3cfa12a0d3',status:'Active'},
@@ -2487,19 +3116,127 @@ function loadLocal(){
     if(!STATE.campaignData) STATE.campaignData = {};
     if(!STATE.weeklyReports) STATE.weeklyReports = [];
     if(!STATE.harvestDays) STATE.harvestDays = 90;
+    if(!STATE.outbreakSettings) STATE.outbreakSettings = {...DEFAULT_STATE.outbreakSettings};
+    if(!STATE.outbreakSettings.windowDays) STATE.outbreakSettings.windowDays = 14;
+    if(!STATE.outbreakSettings.sevThreshold) STATE.outbreakSettings.sevThreshold = 'High';
+    if(STATE.outbreakSettings.pctThreshold == null) STATE.outbreakSettings.pctThreshold = 50;
+    if(!STATE.varietyHarvestDays) STATE.varietyHarvestDays = {};
     if(STATE.defaultYield == null) STATE.defaultYield = 12;
     if(!STATE.labSubmissions) STATE.labSubmissions = [];
+    if(!STATE.customPests) STATE.customPests = [];
+    if(!STATE.customDiseases) STATE.customDiseases = [];
     GAS_URL = localStorage.getItem('pota_gas_url_v3') || '';
     GAS_SECRET = localStorage.getItem('pota_gas_secret_v1') || '';
   } catch(e){ STATE = {...DEFAULT_STATE}; }
 }
 function saveLocal(){
   try{ localStorage.setItem('pota_state_v3', JSON.stringify(STATE)); } catch(e){}
+  // Also persist to IndexedDB (async, non-blocking)
+  if(typeof saveLocalAsync === 'function') saveLocalAsync().catch(()=>{});
 }
 
 // ============================================================
-//  LOGIN  —  FIX: timeout + finally guard prevents freeze
+//  CONFLICT RESOLUTION  — timestamp-based, with review UI
 // ============================================================
+let _conflictQueue = [];
+
+function queueConflict(type, key, local, remote) {
+  // Avoid duplicate conflict entries for the same record
+  if (_conflictQueue.find(c => c.type === type && c.key === key)) return;
+  _conflictQueue.push({ type, key, local, remote });
+}
+
+function showConflictModal() {
+  if (!_conflictQueue.length) return;
+  const existing = document.getElementById('conflict-modal-overlay');
+  if (existing) existing.remove();
+
+  const conflicts = [..._conflictQueue];
+  let idx = 0;
+
+  function renderConflict(i) {
+    const c = conflicts[i];
+    if (!c) { closeConflictModal(); return; }
+    const fmtTs = ts => ts ? new Date(ts).toLocaleString() : 'Unknown';
+    const localFields = Object.entries(c.local)
+      .filter(([k]) => !k.startsWith('_') && k !== 'id')
+      .map(([k,v]) => `<tr><td style="color:var(--text3);font-size:11px;padding:3px 8px 3px 0;white-space:nowrap;">${k}</td><td style="font-size:11px;color:var(--text);padding:3px 0;">${v??'—'}</td></tr>`).join('');
+    const remoteFields = Object.entries(c.remote)
+      .filter(([k]) => !k.startsWith('_') && k !== 'id')
+      .map(([k,v]) => `<tr><td style="color:var(--text3);font-size:11px;padding:3px 8px 3px 0;white-space:nowrap;">${k}</td><td style="font-size:11px;color:var(--text);padding:3px 0;">${v??'—'}</td></tr>`).join('');
+
+    document.getElementById('conflict-body').innerHTML = `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:4px;"><i class="fas fa-exclamation-triangle"></i> ${c.type}: <span style="color:var(--text);">${c.key}</span></div>
+        <div style="font-size:11px;color:var(--text3);">Both local and remote versions were modified. Choose which to keep.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:9px;padding:10px;">
+          <div style="font-size:10px;font-weight:700;color:var(--green);letter-spacing:.5px;margin-bottom:6px;">LOCAL VERSION</div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:8px;">Modified: ${fmtTs(c.local._lastModified)}</div>
+          <table style="width:100%;">${localFields}</table>
+        </div>
+        <div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:10px;">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.5px;margin-bottom:6px;">REMOTE VERSION</div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:8px;">Modified: ${fmtTs(c.remote._remoteTs)}</div>
+          <table style="width:100%;">${remoteFields}</table>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px;text-align:center;">Conflict ${i+1} of ${conflicts.length}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" style="flex:1;background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.3);" onclick="resolveConflict(${i},'local')"><i class="fas fa-laptop"></i> Keep Local</button>
+        <button class="btn" style="flex:1;background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.3);" onclick="resolveConflict(${i},'remote')"><i class="fas fa-cloud"></i> Keep Remote</button>
+      </div>`;
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'conflict-modal-overlay';
+  overlay.className = 'modal-overlay open';
+  overlay.style.zIndex = '9998';
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:520px;width:95%;">
+      <div class="modal-header">
+        <div class="modal-title" style="color:var(--orange);"><i class="fas fa-code-branch"></i> Sync Conflicts Found</div>
+      </div>
+      <div class="modal-body" style="padding:18px;" id="conflict-body"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  renderConflict(0);
+
+  window._renderConflictCard = renderConflict;
+}
+
+function resolveConflict(i, choice) {
+  const c = _conflictQueue[i];
+  if (!c) return;
+  const ts = Date.now();
+  if (choice === 'remote') {
+    if (c.type === 'Grower') {
+      const idx = STATE.growers.findIndex(g => g.name === c.local.name);
+      if (idx > -1) STATE.growers[idx] = {...c.remote, _lastModified: ts};
+    } else if (c.type === 'Plantation') {
+      const idx = STATE.plantation.findIndex(p => p.grower===c.local.grower&&p.datePlanted===c.local.datePlanted&&p.variety===c.local.variety);
+      if (idx > -1) STATE.plantation[idx] = {...c.remote, _lastModified: ts};
+    }
+  }
+  // 'local' choice: keep as is, just stamp it
+  _conflictQueue.splice(i, 1);
+  saveLocal();
+  const remaining = _conflictQueue.length;
+  if (remaining === 0) {
+    closeConflictModal();
+    toast('All conflicts resolved ✓', 'success');
+  } else {
+    window._renderConflictCard && window._renderConflictCard(0);
+  }
+}
+
+function closeConflictModal() {
+  const el = document.getElementById('conflict-modal-overlay');
+  if (el) el.remove();
+}
+
+
 function setLoginBusy(busy){
   const btn     = document.getElementById('login-btn-el');
   const spinner = document.getElementById('login-spinner');
@@ -2654,14 +3391,28 @@ async function initApp(){
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  renderDashboard();
-  updateAlertBadge();
-  buildPestInputs();
-  buildYieldFactors();
-  buildSampleInputs();
-  populateSelects();
-  renderVarietyList();
-  renderUsersList();
+  // Show brief loading state on main content area
+  const mainContent = document.getElementById('main-content') || document.querySelector('.main-content');
+  if (mainContent) { mainContent.style.opacity = '0'; mainContent.style.transition = 'opacity .35s'; }
+
+  safeRender(()=>renderDashboard(), 'Dashboard');
+  safeRender(()=>updateAlertBadge(), 'Alert Badge');
+  safeRender(()=>checkPestOutbreaks(), 'Outbreak Check');
+  safeRender(()=>buildPestInputs(), 'Pest Inputs');
+  safeRender(()=>syncCustomArrays(), 'Custom Arrays');
+  safeRender(()=>renderCustomDisplays(), 'Custom Displays');
+  safeRender(()=>buildYieldFactors(), 'Yield Factors');
+  safeRender(()=>buildSampleInputs(), 'Sample Inputs');
+  safeRender(()=>populateSelects(), 'Selects');
+  safeRender(()=>renderVarietyList(), 'Variety List');
+  safeRender(()=>renderUsersList(), 'Users List');
+
+  // Fade in after renders complete
+  requestAnimationFrame(()=>{ if(mainContent){ mainContent.style.opacity='1'; } });
+
+  // Run integrity check in background (non-blocking)
+  setTimeout(()=>safeRender(()=>runDataIntegrityCheck(),'Integrity Check'), 1200);
+
   const today = new Date().toISOString().split('T')[0];
   ['pd-date','ya-date','rpt-week'].forEach(id=>{ const el=document.getElementById(id); if(el && !el.value) el.value=today; });
   if(document.getElementById('gas-url-input')) document.getElementById('gas-url-input').value = GAS_URL;
@@ -2760,6 +3511,7 @@ function updateSyncStatus(status){
 // ============================================================
 const _charts = {};
 function mkChart(id, cfg){
+  if(typeof Chart === 'undefined'){ console.warn('Chart.js not loaded — skipping chart:', id); return; }
   const canvas = document.getElementById(id);
   if(!canvas) return;
   if(_charts[id]) try{ _charts[id].destroy(); }catch(e){}
@@ -2955,9 +3707,6 @@ function renderHarvestCountdown(){
   const TRACK_W = 600; // logical px for position calc
   const CLUSTER_PX = 28;
   const todayPct = Math.max(0, Math.min(1, (today.getTime()-minTime)/span));
-
-  const fmtDate  = d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  const fmtShort = d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 
   // Assign above/below alternating, avoid collision
   const posPx = rows.map(r=>Math.round(((r.harvestDate.getTime()-minTime)/span)*TRACK_W));
@@ -3296,6 +4045,73 @@ function updateAlertBadge(){
   if(badge){ badge.textContent=high; badge.style.display=high?'inline-flex':'none'; }
 }
 
+// ── Early pest outbreak alert ───────────────────────────────
+// Auto-detects when ≥2 growers in the same zone record the same pest
+// at or above the configured severity/percentage threshold within a
+// configurable rolling window (Settings → Outbreak Alert Sensitivity).
+function checkPestOutbreaks(){
+  const cfg = STATE.outbreakSettings || {windowDays:14, sevThreshold:'High', pctThreshold:50};
+  const WINDOW_DAYS = cfg.windowDays || 14;
+  const sevOrder = {Low:1, Moderate:2, High:3};
+  const SEV_MIN = sevOrder[cfg.sevThreshold] || 3;
+  const PCT_THRESHOLD = cfg.pctThreshold ?? 50;
+
+  // Flatten to {grower, zone, pest, date, sev, pct}
+  const obs = [];
+  STATE.pestRecords.forEach(r=>{
+    const zone = STATE.growers.find(g=>g.name===r.grower)?.zone || '';
+    (r.visits||[]).forEach(v=>{
+      if(!v.date) return;
+      Object.entries(v.pests||{}).forEach(([pest,pd])=>{
+        if((sevOrder[pd.sev]||0)>=SEV_MIN || (pd.pct||0)>=PCT_THRESHOLD){
+          obs.push({grower:r.grower, zone, pest, date:new Date(v.date)});
+        }
+      });
+    });
+  });
+  if(!obs.length) return;
+
+  // Group by zone+pest
+  const groups = {};
+  obs.forEach(o=>{
+    if(!o.zone) return;
+    const key = o.zone+'||'+o.pest;
+    (groups[key]=groups[key]||[]).push(o);
+  });
+
+  const outbreaks = [];
+  Object.entries(groups).forEach(([key,list])=>{
+    const [zone,pest] = key.split('||');
+    // Check if any 2+ distinct growers fall within a 14-day window
+    list.sort((a,b)=>a.date-b.date);
+    for(let i=0;i<list.length;i++){
+      const windowGrowers = new Set([list[i].grower]);
+      for(let j=i+1;j<list.length;j++){
+        const diffDays = (list[j].date - list[i].date)/864e5;
+        if(diffDays > WINDOW_DAYS) break;
+        windowGrowers.add(list[j].grower);
+      }
+      if(windowGrowers.size>=2){
+        outbreaks.push({zone, pest, growers:[...windowGrowers], date:list[i].date});
+        break; // one alert per zone+pest is enough
+      }
+    }
+  });
+
+  if(!outbreaks.length) return;
+
+  const seen = JSON.parse(localStorage.getItem('outbreakAlertsSeen')||'[]');
+  const sevLabelText = {1:'Low+',2:'Moderate+',3:'High'}[SEV_MIN] || 'High';
+  outbreaks.forEach(ob=>{
+    const sig = ob.zone+'|'+ob.pest+'|'+ob.growers.sort().join(',');
+    if(seen.includes(sig)) return;
+    seen.push(sig);
+    toast(`⚠️ Outbreak alert: ${ob.pest} reported at ${sevLabelText} severity (or ≥${PCT_THRESHOLD}% affected) by ${ob.growers.length} growers in Zone ${ob.zone} within ${WINDOW_DAYS} days`, 'error');
+  });
+  localStorage.setItem('outbreakAlertsSeen', JSON.stringify(seen.slice(-100)));
+}
+
+
 // ============================================================
 //  UI HELPERS
 // ============================================================
@@ -3313,6 +4129,7 @@ const PAGE_META = {
   'weekly-report':{title:'Weekly Report',sub:'Generate & export reports'},
   comparative:{title:'Comparative Analysis',sub:'Season 1 vs Season 2 · 2024–2026'},
   settings:{title:'Settings',sub:'Configuration & data management'},
+  'variety-perf':{title:'Variety Performance',sub:'Yield · Area · Plots ranked by variety'},
 };
 function showSection(id){
   // Viewer role: show Access Denied screen for restricted sections
@@ -3383,17 +4200,18 @@ function showSection(id){
   const m = PAGE_META[id]||{title:id,sub:''};
   document.getElementById('page-title').textContent = m.title;
   document.getElementById('page-sub').textContent   = m.sub;
-  if(id==='dashboard')    renderDashboard();
-  if(id==='map')          initMap();
-  if(id==='growers')      { renderGrowersTable(); populateFilterLocality(); }
-  if(id==='plantation')   renderPlantationTable();
-  if(id==='pests')        { populateSelects(); renderPestTable(); }
-  if(id==='yield-assess') { populateSelects(); renderYieldTable(); }
-  if(id==='trends')       renderTrends();
-  if(id==='production')   renderProduction();
-  if(id==='comparative') renderComparative();
-  if(id==='campaign')     renderCampaignTable();
-  if(id==='settings')     { renderSettings(); renderUsersList(); }
+  if(id==='dashboard')    safeRender(()=>renderDashboard(),'Dashboard');
+  if(id==='map')          safeRender(()=>initMap(),'Map');
+  if(id==='growers')      safeRender(()=>{ renderGrowersTable(); populateFilterLocality(); },'Growers');
+  if(id==='plantation')   safeRender(()=>renderPlantationTable(),'Plantation');
+  if(id==='pests')        safeRender(()=>{ populateSelects(); renderPestTable(); },'Pests');
+  if(id==='yield-assess') safeRender(()=>{ populateSelects(); renderYieldTable(); },'Yield');
+  if(id==='trends')       safeRender(()=>renderTrends(),'Trends');
+  if(id==='production')   safeRender(()=>renderProduction(),'Production');
+  if(id==='comparative')  safeRender(()=>renderComparative(),'Comparative');
+  if(id==='campaign')     safeRender(()=>renderCampaignTable(),'Campaign');
+  if(id==='variety-perf') safeRender(()=>renderVarietyPerf(),'Variety Perf');
+  if(id==='settings')     safeRender(()=>{ renderSettings(); renderUsersList(); },'Settings');
   if(window.innerWidth<900) document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0,0);
 }
@@ -3404,8 +4222,69 @@ function toast(msg, type='success'){
   el.className = 'toast '+type;
   el.innerHTML = `<i class="fas ${icons[type]||icons.info}"></i><span>${msg}</span>`;
   stack.appendChild(el);
-  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); },3500);
+  const timer = setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); },3500);
+  // Swipe-to-dismiss on mobile
+  let startX = 0;
+  el.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; }, {passive:true});
+  el.addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - startX;
+    if(Math.abs(dx) > 60){ clearTimeout(timer); el.classList.add('out'); setTimeout(()=>el.remove(),350); }
+  }, {passive:true});
+  // Click to dismiss too
+  el.addEventListener('click', ()=>{ clearTimeout(timer); el.classList.add('out'); setTimeout(()=>el.remove(),350); });
 }
+
+// ============================================================
+//  UX: ERROR BOUNDARY + SAFE RENDER + LOADING STATES
+// ============================================================
+function safeRender(fn, context) {
+  try {
+    fn();
+  } catch(e) {
+    console.error('[PoTaTo] Render error in ' + (context||'unknown') + ':', e);
+    toast('Display error in ' + (context||'a section') + ' — data is safe. Refresh if needed.', 'warning');
+  }
+}
+
+// Show/hide a subtle section-level loading shimmer
+function setSectionLoading(sectionId, on) {
+  const el = document.getElementById(sectionId);
+  if (!el) return;
+  if (on) {
+    let shimmer = el.querySelector('.section-loading-shimmer');
+    if (!shimmer) {
+      shimmer = document.createElement('div');
+      shimmer.className = 'section-loading-shimmer';
+      shimmer.style.cssText = 'position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,transparent 25%,rgba(255,255,255,.04) 50%,transparent 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;pointer-events:none;z-index:2;';
+      el.style.position = el.style.position || 'relative';
+      el.appendChild(shimmer);
+    }
+  } else {
+    el.querySelector('.section-loading-shimmer')?.remove();
+  }
+}
+
+// Confirm dialog (returns promise) — prevents accidental destructive actions
+function confirmAction(msg) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);';
+    overlay.innerHTML = `
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:22px 24px;max-width:340px;width:90%;box-shadow:var(--shadow-lg);">
+        <div style="font-size:14px;color:var(--text);margin-bottom:18px;line-height:1.5;">${msg}</div>
+        <div style="display:flex;gap:10px;">
+          <button id="_confirm-cancel" class="btn btn-ghost" style="flex:1;">Cancel</button>
+          <button id="_confirm-ok" class="btn btn-red" style="flex:1;">Confirm</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#_confirm-ok').onclick = () => { overlay.remove(); resolve(true); };
+    overlay.querySelector('#_confirm-cancel').onclick = () => { overlay.remove(); resolve(false); };
+    overlay.addEventListener('click', e => { if(e.target===overlay){ overlay.remove(); resolve(false); } });
+  });
+}
+
+
 function openModal(id){
   const _ovl=document.getElementById(id);
   _ovl.classList.add('open');
@@ -3614,7 +4493,7 @@ async function saveGrower(){
     toast('Grower updated ✓');
   } else {
     if(STATE.growers.find(g=>g.name.toLowerCase()===name.toLowerCase())){ toast('Grower already exists','warning'); return; }
-    STATE.growers.push({id:Date.now(),name,zone,locality,contact,registrationDate:regDate,status,totalArea,notes});
+    STATE.growers.push({id:Date.now(),name,zone,locality,contact,registrationDate:regDate,status,totalArea,notes,_lastModified:Date.now()});
     toast(`Grower "${name}" added`);
   }
   saveLocal(); closeModal('add-grower-modal'); renderGrowersTable(); renderDashboard(); updateAlertBadge(); resetGrowerForm();
@@ -3750,7 +4629,7 @@ async function savePlantation(){
     const estYield=parseFloat(row.querySelector('.plot-yield')?.value)||0;
     const planted=row.querySelector('.plot-date')?.value||'';
     const season=row.querySelector('.plot-season')?.value||'Season 1';
-    const rec={id:Date.now()+Math.random(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments};
+    const rec={id:Date.now()+Math.random(),grower,zone,locality,variety,datePlanted:planted,area,estYield,season,fortnight:getFortnight(planted),monthAbbr:getMonthAbbr(planted),comments,_lastModified:Date.now()};
     STATE.plantation.push(rec);
     saved.push(rec);
   });
@@ -3784,11 +4663,36 @@ function clearFilters(){
   ['filter-variety','filter-plant-locality','filter-season'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   renderPlantationTable();
 }
+function fmtDateShort(d){
+  const dt = (d instanceof Date) ? d : new Date(d);
+  if(isNaN(dt.getTime())) return '—';
+  return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+function getHarvestDays(variety){
+  const perVariety = STATE.varietyHarvestDays && STATE.varietyHarvestDays[variety];
+  return perVariety ? parseInt(perVariety) : (STATE.harvestDays || 90);
+}
+function harvestBadge(r){
+  if(!r.datePlanted) return '<span style="color:var(--text3);">—</span>';
+  const hd = getHarvestDays(r.variety);
+  const planted = new Date(r.datePlanted);
+  if(isNaN(planted.getTime())) return '<span style="color:var(--text3);">—</span>';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const harvestDate = new Date(planted.getTime() + hd*864e5);
+  const diff = Math.round((harvestDate - today)/864e5);
+  let col, label;
+  if(diff < 0){ col='#3e5070'; label='Harvested'; }
+  else if(diff===0){ col='#ef4444'; label='Today'; }
+  else if(diff <= 14){ col='#ef4444'; label=diff+'d'; }
+  else if(diff <= 30){ col='#f97316'; label=diff+'d'; }
+  else { col='#22c55e'; label=diff+'d'; }
+  return `<span title="Est. harvest ${fmtDate(harvestDate.toISOString().slice(0,10))}" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:${col};background:${col}1a;border:1px solid ${col}44;border-radius:20px;padding:2px 8px;font-family:var(--font-mono);"><i class="fas fa-clock" style="font-size:9px;"></i>${label}</span>`;
+}
 function renderPlantationTable(){
   const rows=filteredPlantation();
   const badge=document.getElementById('plant-count-badge'); if(badge) badge.textContent=rows.length;
   const tbody=document.getElementById('plantation-table');
-  if(!rows.length) tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records</div></div></td></tr>`;
+  if(!rows.length) tbody.innerHTML=`<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records</div></div></td></tr>`;
   else tbody.innerHTML=rows.map(r=>`<tr>
     <td><strong>${r.grower}</strong></td>
     <td><span style="color:${ZONE_COLORS[r.zone]||'#888'};font-weight:700;">${r.zone}</span></td>
@@ -3799,6 +4703,7 @@ function renderPlantationTable(){
     <td>${r.estYield||'—'}</td>
     <td><span class="badge ${r.season==='Season 1'?'badge-s1':'badge-s2'}">${r.season||'—'}</span></td>
     <td style="font-size:11px;">${r.fortnight||'—'}</td>
+    <td>${harvestBadge(r)}</td>
     <td><div class="row-actions">
       <button class="btn btn-ghost btn-icon btn-sm" onclick="editPlantation(${r.id})"><i class="fas fa-edit" style="color:var(--gold);"></i></button>
       <button class="btn btn-ghost btn-icon btn-sm" onclick="deletePlantation(${r.id})"><i class="fas fa-trash-alt" style="color:var(--red);"></i></button>
@@ -3848,8 +4753,10 @@ function buildPestInputs(){
   const dEl=document.getElementById('disease-inputs');
   const pEl=document.getElementById('pest-inputs');
   if(!dEl||!pEl) return;
-  dEl.innerHTML=DISEASES.map(f=>buildPestCard(f,'disease')).join('');
-  pEl.innerHTML=PESTS.map(f=>buildPestCard(f,'pest')).join('');
+  const allDiseases = [...DISEASES, ...(STATE.customDiseases||[]).map(e=>e.name)];
+  const allPests    = [...PESTS,    ...(STATE.customPests||[]).map(e=>e.name)];
+  dEl.innerHTML=allDiseases.map(f=>buildPestCard(f,'disease')).join('');
+  pEl.innerHTML=allPests.map(f=>buildPestCard(f,'pest')).join('');
 }
 function buildPestCard(name){
   const id=name.replace(/[\s\(\)\/]/g,'_');
@@ -3958,7 +4865,8 @@ function collectVisitData(n, suffix){
   const areaEl=n===1?document.getElementById('pd-affected-area'):document.getElementById('pd-area-v'+n);
   const comEl =n===1?document.getElementById('pd-comments'):document.getElementById('pd-comments-v'+n);
   const pests={};
-  [...DISEASES,...PESTS].forEach(f=>{
+  const _collectAll=[...DISEASES,...(STATE.customDiseases||[]).map(e=>e.name),...PESTS,...(STATE.customPests||[]).map(e=>e.name)];
+  _collectAll.forEach(f=>{
     const id=f.replace(/[\s\(\)\/]/g,'_')+(suffix||'');
     const se=document.getElementById('sev-'+id), pe=document.getElementById('pct-'+id);
     if(se?.value) pests[f]={sev:se.value,pct:parseFloat(pe?.value)||0};
@@ -3976,11 +4884,13 @@ async function savePestRecord(){
   if(p2&&p2.innerHTML.trim()) visits.push(collectVisitData(2,'_v2'));
   if(p3&&p3.innerHTML.trim()) visits.push(collectVisitData(3,'_v3'));
   if(!visits.some(v=>Object.keys(v.pests).length>0)){ toast('Record at least one pest/disease severity','error'); return; }
-  STATE.pestRecords.push({id:Date.now(),grower,locality,season,controlMeasure:control,visits,recordedBy:CURRENT_USER?.username||''});
+  STATE.pestRecords.push({id:Date.now(),grower,locality,season,controlMeasure:control,visits,recordedBy:CURRENT_USER?.username||'',_lastModified:Date.now()});
   saveLocal(); renderPestTable(); renderDashboard(); updateAlertBadge();
   toast('Pest record saved ('+visits.length+' visit'+( visits.length>1?'s':'')+') ✓');
+  checkPestOutbreaks();
   document.getElementById('pd-grower').value=''; document.getElementById('pd-locality').value='';
   document.querySelectorAll('.pest-select').forEach(s=>s.value=s.options[0].value);
+  clearPdPhoto();
   if(document.getElementById('pd-comments')) document.getElementById('pd-comments').value='';
   document.getElementById('visit-panel-2').innerHTML=''; document.getElementById('visit-panel-3').innerHTML='';
   ['v2-badge','v3-badge'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
@@ -4398,14 +5308,35 @@ function sevColor(sev){ return {high:'#ef4444',moderate:'#f97316',low:'#22c55e',
 function initMap(){
   const container=document.getElementById('map-container');
   if(!container) return;
+  // Guard: Leaflet may not have loaded (CDN blocked, offline, slow network)
+  if(typeof L === 'undefined'){
+    container.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:300px;gap:12px;color:var(--text2);">
+      <i class="fas fa-map-marked-alt" style="font-size:36px;color:var(--text3);"></i>
+      <div style="font-weight:600;font-size:14px;color:var(--text);">Map unavailable</div>
+      <div style="font-size:12px;color:var(--text3);text-align:center;max-width:260px;line-height:1.6;">The map library (Leaflet) could not be loaded. Check your internet connection and reload the page.</div>
+      <button class="btn btn-ghost btn-sm" onclick="location.reload()"><i class="fas fa-redo"></i> Reload</button>
+    </div>`;
+    return;
+  }
   if(map){ setTimeout(()=>map.invalidateSize(),100); renderMapLayers(); return; }
   map=L.map('map-container',{center:[-20.25,57.63],zoom:11});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(map);
   drawnItems=new L.FeatureGroup(); map.addLayer(drawnItems);
-  const dc=new L.Control.Draw({position:'topright',edit:{featureGroup:drawnItems,remove:true},draw:{polygon:{shapeOptions:{color:'#f0a500',fillColor:'#f0a500',fillOpacity:.15,weight:2},showArea:true},rectangle:{shapeOptions:{color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:.12,weight:2}},circle:{shapeOptions:{color:'#22c55e',fillColor:'#22c55e',fillOpacity:.12,weight:2}},marker:true,polyline:false,circlemarker:false}});
-  map.addControl(dc);
-  map.on(L.Draw.Event.CREATED,function(e){ drawnItems.addLayer(e.layer); updateDrawnShapesList(); toast(`${e.layerType} drawn ✓`); });
-  map.on(L.Draw.Event.DELETED,function(){ updateDrawnShapesList(); });
+  // Guard: Leaflet.Draw may have failed to load
+  if(!window._leafletDrawFailed && typeof L.Control !== 'undefined' && typeof L.Control.Draw !== 'undefined'){
+    try{
+      const dc=new L.Control.Draw({position:'topright',edit:{featureGroup:drawnItems,remove:true},draw:{polygon:{shapeOptions:{color:'#f0a500',fillColor:'#f0a500',fillOpacity:.15,weight:2},showArea:true},rectangle:{shapeOptions:{color:'#3b82f6',fillColor:'#3b82f6',fillOpacity:.12,weight:2}},circle:{shapeOptions:{color:'#22c55e',fillColor:'#22c55e',fillOpacity:.12,weight:2}},marker:true,polyline:false,circlemarker:false}});
+      map.addControl(dc);
+      map.on(L.Draw.Event.CREATED,function(e){ drawnItems.addLayer(e.layer); updateDrawnShapesList(); toast(`${e.layerType} drawn ✓`); });
+      map.on(L.Draw.Event.DELETED,function(){ updateDrawnShapesList(); });
+    }catch(err){ console.warn('Leaflet.Draw init failed:',err); window._leafletDrawFailed=true; }
+  } else {
+    // Hide draw controls UI when Leaflet.Draw is unavailable
+    const drawPanel=document.querySelector('.draw-shapes-panel');
+    if(drawPanel) drawPanel.style.display='none';
+    const drawHint=document.querySelector('.map-controls [style*="pencil"]');
+    if(drawHint) drawHint.style.display='none';
+  }
   renderMapLayers(); renderZoneStats(); renderMapSeverityBars(); renderDiseaseHeatLayer();
   setTimeout(()=>map.invalidateSize(),200);
 }
@@ -4413,21 +5344,24 @@ function updateDrawnShapesList(){
   const el=document.getElementById('drawn-shapes-list');
   const ce=document.getElementById('shapes-count');
   if(!el||!drawnItems) return;
+  if(typeof L==='undefined') return;
   const layers=drawnItems.getLayers();
   if(ce) ce.textContent=layers.length;
   if(!layers.length){ el.innerHTML='<span style="font-size:12px;color:var(--text3);">No shapes drawn yet.</span>'; return; }
   el.innerHTML=layers.map((l,i)=>{
     let type='Shape';
-    if(l instanceof L.Polygon&&!(l instanceof L.Rectangle)) type='Polygon';
-    else if(l instanceof L.Rectangle) type='Rectangle';
-    else if(l instanceof L.Circle) type='Circle';
-    else if(l instanceof L.Marker) type='Marker';
+    try{
+      if(L.Rectangle && l instanceof L.Rectangle) type='Rectangle';
+      else if(L.Polygon && l instanceof L.Polygon) type='Polygon';
+      else if(L.Circle && l instanceof L.Circle) type='Circle';
+      else if(L.Marker && l instanceof L.Marker) type='Marker';
+    }catch(e){}
     return `<span class="shape-chip">${type} ${i+1}</span>`;
   }).join('');
 }
 function clearDrawnShapes(){ if(!drawnItems||!drawnItems.getLayers().length){ toast('No shapes','info'); return; } const _layers=drawnItems.getLayers().slice(); drawnItems.clearLayers(); updateDrawnShapesList(); undoDelete('All drawn shapes cleared', ()=>{ _layers.forEach(l=>drawnItems.addLayer(l)); updateDrawnShapesList(); }); }
 function renderMapLayers(){
-  if(!map) return;
+  if(!map || typeof L==='undefined') return;
   Object.values(mapLayers).forEach(l=>{ if(l) try{ map.removeLayer(l); }catch(e){} });
   mapLayers={growers:null,zones:null,plantations:null,disease:null};
   if(layerState.zones){
@@ -4435,7 +5369,13 @@ function renderMapLayers(){
     Object.entries(ZONE_POLYGONS).forEach(([zone,coords])=>{
       const color=ZONE_COLORS[zone];
       const zDesc={E1:'Moka District (West)',E2:'Moka-Flacq Border',E3:'Flacq District (Central)',E4:'Flacq District (SE Coast)'};
-      L.polygon(coords,{color,weight:2,fillColor:color,fillOpacity:.1}).bindPopup(`<div class="pop-name" style="color:${color};">Zone ${zone}</div><div style="font-size:11px;color:#aaa;margin-bottom:4px;">${zDesc[zone]||''}</div><div class="pop-row">${STATE.growers.filter(g=>g.zone===zone).length} growers · ${STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div>`).addTo(zl);
+      const zoneGc=STATE.growers.filter(g=>g.zone===zone).length;
+      const zoneArea=STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2);
+      const zPoly=L.polygon(coords,{color,weight:2.5,fillColor:color,fillOpacity:.08,dashArray:'6 4'});
+      zPoly.on('mouseover',function(){this.setStyle({weight:3.5,fillOpacity:.15,dashArray:''});});
+      zPoly.on('mouseout',function(){this.setStyle({weight:2.5,fillOpacity:.08,dashArray:'6 4'});});
+      zPoly.bindPopup(`<div class="pop-name" style="color:${color};">Zone ${zone}</div><div style="font-size:11px;color:#aaa;margin-bottom:6px;">${zDesc[zone]||''}</div><div class="pop-row"><i class="fas fa-users" style="color:${color};"></i> ${zoneGc} growers</div><div class="pop-row"><i class="fas fa-ruler-combined" style="color:${color};"></i> ${zoneArea} ha planted</div><div style="margin-top:8px;"><button onclick="zoneCardClick('${zone}')" style="font-size:11px;padding:4px 10px;border-radius:6px;background:${color}22;border:1px solid ${color}44;color:${color};cursor:pointer;font-weight:600;">Zoom to zone</button></div>`);
+      zPoly.addTo(zl);
       const lats=coords.map(c=>c[0]),lngs=coords.map(c=>c[1]);
       L.marker([(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lngs)+Math.max(...lngs))/2],{icon:L.divIcon({className:'',html:`<div style="color:${color};font-weight:800;font-size:14px;text-shadow:0 1px 4px #000;pointer-events:none;">Zone ${zone}</div>`,iconAnchor:[28,10]})}).addTo(zl);
     });
@@ -4447,7 +5387,10 @@ function renderMapLayers(){
       const sev=getGrowerSeverity(g.name), color=sevColor(sev);
       const coords=getLocalityCoords(g.locality,g.zone);
       const plots=STATE.plantation.filter(p=>p.grower===g.name);
-      L.marker(coords,{icon:L.divIcon({className:'',html:`<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.6);"></div>`,iconAnchor:[7,7]})}).bindPopup(`<div class="pop-name">👤 ${g.name}</div><div class="pop-row"><i class="fas fa-map-marker-alt"></i> ${g.locality} (Zone ${g.zone})</div><div class="pop-row"><i class="fas fa-seedling"></i> ${plots.length} plots · ${plots.reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div><div><span class="pop-sev" style="background:${color}22;color:${color};">Risk: ${sev}</span></div>`).addTo(gl);
+      const isHigh = sev==='High';
+      const markerSize = isHigh ? 18 : 14;
+      const pulse = isHigh ? `animation:micPulse .9s ease infinite;` : '';
+      L.marker(coords,{icon:L.divIcon({className:'',html:`<div style="width:${markerSize}px;height:${markerSize}px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 12px ${color}80;${pulse}display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700;">${isHigh?'!':''}</div>`,iconAnchor:[markerSize/2,markerSize/2]})}).bindPopup(`<div class="pop-name">👤 ${g.name}</div><div class="pop-row"><i class="fas fa-map-marker-alt"></i> ${g.locality} (Zone ${g.zone})</div><div class="pop-row"><i class="fas fa-seedling"></i> ${plots.length} plots · ${plots.reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;"><span class="pop-sev" style="background:${color}22;color:${color};border:1px solid ${color}44;">Risk: ${sev}</span>${plots.length?`<span class="pop-sev" style="background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.3);">${plots.reduce((s,r)=>s+(r.area||0),0).toFixed(2)} ha</span>`:''}</div><div style="margin-top:8px;font-size:11px;"><button onclick="showSection('growers')" style="font-size:11px;padding:4px 10px;border-radius:6px;background:var(--gold-dim);border:1px solid rgba(240,165,0,.3);color:var(--gold);cursor:pointer;font-weight:600;">View Profile →</button></div>`).addTo(gl);
     });
     mapLayers.growers=gl; gl.addTo(map);
   }
@@ -4457,7 +5400,10 @@ function renderMapLayers(){
       const coords=getLocalityCoords(p.locality,p.zone);
       const j=[coords[0]+(Math.random()-.5)*.006,coords[1]+(Math.random()-.5)*.006];
       const color=p.season==='Season 1'?'#3b82f6':'#a855f7';
-      L.marker(j,{icon:L.divIcon({className:'',html:`<div style="width:9px;height:9px;border-radius:2px;background:${color};border:1px solid rgba(255,255,255,.7);"></div>`,iconAnchor:[4,4]})}).bindPopup(`<div class="pop-name">🌱 ${p.grower}</div><div class="pop-row">${p.variety||'Unknown'} · ${p.locality}</div><div class="pop-row">${p.datePlanted||'—'} · ${p.season}</div><div class="pop-row">${p.area} ha</div>`).addTo(pl);
+      const plotSz = Math.max(7, Math.min(16, 7 + Math.sqrt(p.area||0.1)*4));
+      const daysLeft = p.datePlanted ? Math.ceil(((new Date(p.datePlanted).getTime()+(STATE.harvestDays||90)*86400000)-Date.now())/86400000) : null;
+      const harvestBadge = daysLeft!=null ? (daysLeft<=0?'<span style="font-size:10px;color:var(--gold);font-weight:700;">🌾 Ready to harvest</span>':`<span style="font-size:10px;color:${daysLeft<14?'var(--orange)':'var(--text2)'};">${daysLeft}d to harvest</span>`) : '';
+      L.marker(j,{icon:L.divIcon({className:'',html:`<div style="width:${plotSz}px;height:${plotSz}px;border-radius:3px;background:${color};border:1.5px solid rgba(255,255,255,.8);box-shadow:0 1px 6px rgba(0,0,0,.5);"></div>`,iconAnchor:[plotSz/2,plotSz/2]})}).bindPopup(`<div class="pop-name">🌱 ${p.grower}</div><div class="pop-row">${p.variety||'Unknown'} · ${p.locality}</div><div class="pop-row">${p.datePlanted||'—'} · ${p.season}</div><div class="pop-row">${p.area} ha · ${harvestBadge}</div>`).addTo(pl);
     });
     mapLayers.plantations=pl; pl.addTo(map);
   }
@@ -4477,7 +5423,7 @@ function zoneHeatColor(t){
 }
 
 function renderDiseaseHeatLayer(){
-  if(!map) return;
+  if(!map || typeof L==='undefined') return;
   // Remove old layer
   if(mapLayers.disease){ try{ map.removeLayer(mapLayers.disease); }catch(e){} mapLayers.disease=null; }
   if(!layerState.disease) return;
@@ -4584,17 +5530,50 @@ function renderZoneStats(){
   const el=document.getElementById('zone-stats');
   if(!el) return;
   const zoneDistrict={E1:'Moka (West)',E2:'Moka/Flacq',E3:'Flacq (Central)',E4:'Flacq (SE Coast)'};
+  const sevScore={Low:1,Moderate:2,High:3};
   el.innerHTML=Object.keys(ZONE_LOCALITIES).map(zone=>{
     const gc=STATE.growers.filter(g=>g.zone===zone).length;
     const area=STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0);
+    const plots=STATE.plantation.filter(p=>p.zone===zone).length;
     const color=ZONE_COLORS[zone];
-    return `<div class="zone-card" onclick="if(map){map.fitBounds(${JSON.stringify(ZONE_POLYGONS[zone])});}" style="border-top:3px solid ${color};">
+    // Compute pest heat intensity for this zone
+    const zGrowers=STATE.growers.filter(g=>g.zone===zone).map(g=>g.name);
+    const zRecs=STATE.pestRecords.filter(r=>zGrowers.includes(r.grower));
+    let totalScore=0,totalEntries=0;
+    zRecs.forEach(r=>(r.visits||[]).forEach(v=>Object.values(v.pests||{}).forEach(p=>{
+      if(p.sev){totalScore+=(sevScore[p.sev]||0);totalEntries++;}
+    })));
+    const heatPct=totalEntries?Math.min(100,Math.round(totalScore/totalEntries/3*100)):0;
+    const heatColor=heatPct>60?'var(--red)':heatPct>30?'var(--orange)':'var(--green)';
+    return `<div class="zone-card" onclick="zoneCardClick('${zone}')" style="border-top:3px solid ${color};">
       <div class="zone-name" style="color:${color};">Zone ${zone}</div>
       <div style="font-size:9px;color:var(--text3);margin-bottom:3px;font-family:var(--font-mono);">${zoneDistrict[zone]||''}</div>
       <div class="zone-val" style="color:${color};">${gc}</div>
-      <div class="zone-sub">${gc===1?'grower':'growers'} · ${area.toFixed(1)} ha</div>
+      <div class="zone-sub">${gc===1?'grower':'growers'} · ${plots} plots · ${area.toFixed(1)} ha</div>
+      ${totalEntries?`<div style="margin-top:6px;"><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-bottom:2px;"><span>Pest pressure</span><span style="color:${heatColor};">${heatPct}%</span></div><div style="height:3px;border-radius:2px;background:var(--border);"><div style="height:100%;width:${heatPct}%;border-radius:2px;background:${heatColor};transition:width .5s;"></div></div></div>`:''}
     </div>`;
   }).join('');
+
+  // Update map info bar
+  const mibG=document.getElementById('mib-growers');
+  const mibP=document.getElementById('mib-plots');
+  const mibA=document.getElementById('mib-area');
+  const mibPests=document.getElementById('mib-pests');
+  const mibUpd=document.getElementById('mib-updated');
+  if(mibG) mibG.textContent=STATE.growers.length;
+  if(mibP) mibP.textContent=STATE.plantation.length;
+  if(mibA) mibA.textContent=STATE.plantation.reduce((s,r)=>s+(r.area||0),0).toFixed(1);
+  if(mibPests) mibPests.textContent=STATE.pestRecords.length;
+  if(mibUpd) mibUpd.textContent='Updated '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+function zoneCardClick(zone){
+  if(map && ZONE_POLYGONS[zone]){
+    map.fitBounds(ZONE_POLYGONS[zone],{padding:[20,20]});
+    // Pulse the zone
+    const zl=mapLayers.zones;
+    if(zl) zl.eachLayer(l=>{ if(l.setStyle) l.setStyle({weight:l.getBounds?3:2}); });
+  }
 }
 
 // ── Map: Pest/Disease Severity Bars — with Incidence & Evolution ─────────────
@@ -5343,8 +6322,486 @@ async function saveCampaignToSheets(){
 }
 
 // ============================================================
-//  WEEKLY REPORT
+//  COMPARISON TABLE — SAVE / EXPORT FUNCTIONS
 // ============================================================
+function toggleSaveDropdown(){
+  const menu=document.getElementById('save-table-dropdown');
+  if(!menu) return;
+  menu.classList.toggle('open');
+  // Close on outside click
+  if(menu.classList.contains('open')){
+    setTimeout(()=>{
+      document.addEventListener('click', function _c(e){
+        if(!document.getElementById('save-table-wrap')?.contains(e.target)){
+          menu.classList.remove('open');
+          document.removeEventListener('click',_c);
+        }
+      });
+    },10);
+  }
+}
+
+function saveTableAsCSV(){
+  document.getElementById('save-table-dropdown')?.classList.remove('open');
+  const yearFilter=document.getElementById('comp-year')?.value||'all';
+  const years=yearFilter==='all'?['2024','2025','2026']:[yearFilter];
+  const rows=[['Year','Season','Plots','Area (ha)','Est. Prod (T)','Avg Yield T/ha','Pest Severity']];
+
+  function getYear(d){ return d?new Date(d).getFullYear().toString():null; }
+  function computeMetricsCSV(year,season){
+    const zoneFilter=document.getElementById('comp-zone')?.value||'';
+    const p=STATE.plantation.filter(r=>getYear(r.datePlanted)===year&&r.season===season&&(!zoneFilter||r.zone===zoneFilter));
+    let area=p.reduce((s,r)=>s+(r.area||0),0);
+    let prod=p.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0);
+    const ya=STATE.yieldAssessments.filter(r=>getYear(r.date)===year&&r.season===season);
+    const avgYield=ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0;
+    const sum=(STATE.seasonSummaries||{})[`${year}|${season}`];
+    const plots=p.length>0?p.length:(sum?.plots||0);
+    const finalArea=area>0?area:(sum?.area||0);
+    const finalProd=prod>0?prod:(sum?.prod||0);
+    const finalYield=avgYield>0?avgYield:(sum?.yield||0);
+    const sev=computeAvgSev(year,season,zoneFilter);
+    const sevLabel=sev>=2.5?'High':sev>=1.5?'Moderate':sev>=0.5?'Low':'—';
+    return{plots,area:finalArea,prod:finalProd,yield:finalYield,sev:sevLabel};
+  }
+  years.forEach(y=>{
+    ['Season 1','Season 2'].forEach(s=>{
+      const m=computeMetricsCSV(y,s);
+      rows.push([y,s,m.plots||'—',m.area?m.area.toFixed(2):'—',m.prod?Math.round(m.prod):'—',m.yield?m.yield.toFixed(2):'—',m.sev]);
+    });
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`season-comparison-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('CSV exported ✓');
+}
+
+function computeAvgSev(year,season,zoneFilter){
+  const pestFiltered=STATE.pestRecords.filter(r=>{
+    const v=r.visits?.[0];
+    if(!v) return false;
+    const y=new Date(v.date).getFullYear().toString();
+    if(y!==year||r.season!==season) return false;
+    const gz=STATE.growers.find(g=>g.name===r.grower)?.zone||'';
+    if(zoneFilter&&gz!==zoneFilter) return false;
+    return true;
+  });
+  const sevScore={High:3,Moderate:2,Low:1};
+  let sevSum=0,sevCnt=0;
+  pestFiltered.forEach(r=>(r.visits||[]).forEach(v=>Object.values(v.pests||{}).forEach(p=>{if(p.sev){sevSum+=sevScore[p.sev]||0;sevCnt++;}})));
+  return sevCnt?sevSum/sevCnt:0;
+}
+
+function saveTableAsImage(){
+  document.getElementById('save-table-dropdown')?.classList.remove('open');
+  const card=document.getElementById('comp-detail-card');
+  if(!card){ toast('Table not found','error'); return; }
+  if(typeof html2canvas==='undefined'){ toast('Image export not available','error'); return; }
+  toast('Capturing table…','info');
+  html2canvas(card,{
+    backgroundColor:'#0f1520',
+    scale:2,
+    useCORS:true,
+    logging:false
+  }).then(canvas=>{
+    const link=document.createElement('a');
+    link.download=`season-comparison-${new Date().toISOString().split('T')[0]}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    toast('Image saved ✓');
+  }).catch(()=>toast('Image export failed','error'));
+}
+
+function saveTableAsPDF(){
+  document.getElementById('save-table-dropdown')?.classList.remove('open');
+  // Build a printable version and trigger browser print-to-PDF
+  const tableEl=document.getElementById('comp-detail-table');
+  if(!tableEl){ toast('Table not found','error'); return; }
+  const yearFilter=document.getElementById('comp-year')?.value||'All Years';
+  const zoneFilter=document.getElementById('comp-zone')?.value||'All Zones';
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Season Comparison Table</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:24px;background:#fff;}
+    h1{font-size:18px;color:#c49040;margin-bottom:4px;}
+    .meta{font-size:11px;color:#666;margin-bottom:16px;}
+    table{border-collapse:collapse;width:100%;margin-bottom:16px;}
+    th{background:#f0f0f0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:8px 10px;border:1px solid #ddd;text-align:left;}
+    td{padding:8px 10px;border:1px solid #eee;font-size:12px;}
+    tr:nth-child(even) td{background:#fafafa;}
+    .footer{font-size:10px;color:#aaa;margin-top:20px;border-top:1px solid #eee;padding-top:8px;}
+    @media print{@page{margin:1.5cm;}}
+  </style></head><body>
+  <h1>🥔 PoTa Tracker — Season Comparison Table</h1>
+  <div class="meta">Filter: ${yearFilter} · ${zoneFilter} &nbsp;|&nbsp; Generated: ${new Date().toLocaleString()}</div>
+  ${tableEl.outerHTML}
+  <div class="footer">PoTa Tracker v4.0 — MAUFP</div>
+  </body></html>`);
+  w.document.close();
+  setTimeout(()=>{ w.print(); },400);
+  toast('PDF print dialog opened ✓');
+}
+
+function printCompTable(){
+  document.getElementById('save-table-dropdown')?.classList.remove('open');
+  saveTableAsPDF();
+}
+
+// ============================================================
+//  SEASON REPORT — PRINT-READY PDF (charts + tables + narrative)
+// ============================================================
+// ── Print-friendly Variety x Pest heat table for the season report ──
+function buildPrintVarietyPestHeat(yearFilter, zoneFilter){
+  function getYear(d){ return d ? new Date(d).getFullYear().toString() : null; }
+  const years = yearFilter==='all' ? ['2024','2025','2026'] : [yearFilter];
+
+  // Map grower -> varieties planted, within filter
+  const plants = STATE.plantation.filter(r=>{
+    const y=getYear(r.datePlanted);
+    if(!y||!years.includes(y)) return false;
+    if(zoneFilter && r.zone!==zoneFilter) return false;
+    return true;
+  });
+  const growerVarieties = {};
+  plants.forEach(r=>{
+    const v = r.variety || 'Unknown';
+    (growerVarieties[r.grower] = growerVarieties[r.grower] || new Set()).add(v);
+  });
+
+  const pestRecs = STATE.pestRecords.filter(r=>{
+    const gz = STATE.growers.find(g=>g.name===r.grower)?.zone || '';
+    if(zoneFilter && gz!==zoneFilter) return false;
+    const v0=r.visits?.[0];
+    if(!v0?.date) return false;
+    return years.includes(getYear(v0.date));
+  });
+
+  const sevScore = {Low:1, Moderate:2, High:3};
+  const matrix = {};
+  const pestsSeen = new Set();
+  const varietiesSeen = new Set(Object.values(growerVarieties).flatMap(s=>[...s]));
+
+  pestRecs.forEach(r=>{
+    const varieties = growerVarieties[r.grower];
+    if(!varieties || !varieties.size) return;
+    (r.visits||[]).forEach(v=>{
+      Object.entries(v.pests||{}).forEach(([pest,pd])=>{
+        if(!pd.sev || !sevScore[pd.sev]) return;
+        pestsSeen.add(pest);
+        varieties.forEach(variety=>{
+          matrix[variety] = matrix[variety] || {};
+          matrix[variety][pest] = matrix[variety][pest] || {sum:0,count:0};
+          matrix[variety][pest].sum += sevScore[pd.sev];
+          matrix[variety][pest].count += 1;
+        });
+      });
+    });
+  });
+
+  const varieties = [...varietiesSeen].sort();
+  const allOrder=[...DISEASES,...PESTS];
+  const pests = [...pestsSeen].sort((a,b)=>allOrder.indexOf(a)-allOrder.indexOf(b));
+
+  if(!varieties.length || !pests.length){
+    return '<p>No pest/disease data available to cross-analyse for this filter.</p>';
+  }
+
+  function cellColor(score){
+    if(score===null) return '#fafafa';
+    if(score>=2.5) return '#f3a3a3';
+    if(score>=2)   return '#f8d0d0';
+    if(score>=1.5) return '#fbe0c4';
+    if(score>=1)   return '#d7f0dd';
+    return '#fafafa';
+  }
+
+  let header = `<th>Variety</th>` + pests.map(p=>`<th title="${p}">${p.length>14?p.slice(0,12)+'…':p}</th>`).join('') + `<th>Most Susceptible To</th>`;
+  let rows = varieties.map(variety=>{
+    let topPest=null, topScore=-1;
+    let cells = pests.map(pest=>{
+      const cell = matrix[variety]?.[pest];
+      const score = cell ? cell.sum/cell.count : null;
+      if(score!==null && score>topScore){ topScore=score; topPest=pest; }
+      const label = score!==null ? score.toFixed(1) : '—';
+      return `<td style="background:${cellColor(score)};font-weight:700;">${label}</td>`;
+    }).join('');
+    const summary = topPest ? `${topPest} (${topScore.toFixed(1)})` : '—';
+    return `<tr><td style="font-weight:700;">${variety}</td>${cells}<td style="text-align:left;font-size:11px;">${summary}</td></tr>`;
+  }).join('');
+
+  return `<table class="heat-table"><thead><tr>${header}</tr></thead><tbody>${rows}</tbody></table>
+  <div class="heat-legend">
+    <span><i style="background:#d7f0dd;"></i> Low (1.0–1.4)</span>
+    <span><i style="background:#fbe0c4;"></i> Moderate (1.5–1.9)</span>
+    <span><i style="background:#f8d0d0;"></i> High (2.0–2.4)</span>
+    <span><i style="background:#f3a3a3;"></i> Severe (2.5–3.0)</span>
+    <span><i style="background:#fafafa;"></i> No data</span>
+  </div>
+  <p style="font-size:11px;color:#666;">Cell value = average severity score across recorded observations (Low=1, Moderate=2, High=3).</p>`;
+}
+
+async function generateSeasonReportPDF(){
+  toast('Building season report…','info');
+
+  const yearFilter=document.getElementById('comp-year')?.value||'all';
+  const zoneFilter=document.getElementById('comp-zone')?.value||'';
+  const yearLabel=yearFilter==='all'?'All Years':yearFilter;
+  const zoneLabel=zoneFilter||'All Zones';
+  const YEARS=['2024','2025','2026'];
+  const years=yearFilter==='all'?YEARS:[yearFilter];
+  function getYear(d){ return d?new Date(d).getFullYear().toString():null; }
+
+  // ── Recompute headline metrics (mirrors renderComparative.computeMetrics) ──
+  function computeMetrics(year,season){
+    const p=STATE.plantation.filter(r=>getYear(r.datePlanted)===year&&r.season===season&&(!zoneFilter||r.zone===zoneFilter));
+    let area=p.reduce((s,r)=>s+(r.area||0),0);
+    let prod=p.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield||20),0);
+    const ya=STATE.yieldAssessments.filter(r=>getYear(r.date)===year&&r.season===season&&(!zoneFilter||r.zone===zoneFilter));
+    const avgYield=ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0;
+    const pe=STATE.pestRecords.filter(r=>{
+      const v=r.visits?.[0]; if(!v) return false;
+      if(getYear(v.date)!==year||r.season!==season) return false;
+      const gz=STATE.growers.find(g=>g.name===r.grower)?.zone||'';
+      return !zoneFilter||gz===zoneFilter;
+    });
+    const sevScore={High:3,Moderate:2,Low:1};
+    let sevSum=0,sevCnt=0;
+    pe.forEach(r=>(r.visits||[]).forEach(v=>Object.values(v.pests||{}).forEach(pd=>{if(pd.sev){sevSum+=sevScore[pd.sev]||0;sevCnt++;}})));
+    const sum=(STATE.seasonSummaries||{})[`${year}|${season}`];
+    let sumPlots=p.length, sumArea=area, sumProd=prod, sumAvgYield=avgYield, sumAvgSev=sevCnt?sevSum/sevCnt:0;
+    if(sum){
+      sumPlots = p.length>0?p.length:(sum.plots||0);
+      sumArea  = area>0?area:(sum.area||0);
+      sumProd  = prod>0?prod:(sum.prod||0);
+      sumAvgYield = avgYield>0?avgYield:(sum.yield||0);
+      sumAvgSev = sevCnt?sevSum/sevCnt:(sum.pest?parseFloat(sum.pest):0);
+    }
+    return {area:sumArea,prod:sumProd,avgYield:sumAvgYield,avgSev:sumAvgSev,plots:sumPlots,pestRecs:pe.length};
+  }
+
+  let s1Tot={area:0,prod:0,plots:0}, s2Tot={area:0,prod:0,plots:0};
+  let s1YieldVals=[], s2YieldVals=[], s1SevVals=[], s2SevVals=[];
+  years.forEach(y=>{
+    const s1=computeMetrics(y,'Season 1'), s2=computeMetrics(y,'Season 2');
+    s1Tot.area+=s1.area; s1Tot.prod+=s1.prod; s1Tot.plots+=s1.plots;
+    s2Tot.area+=s2.area; s2Tot.prod+=s2.prod; s2Tot.plots+=s2.plots;
+    if(s1.avgYield) s1YieldVals.push(s1.avgYield);
+    if(s2.avgYield) s2YieldVals.push(s2.avgYield);
+    if(s1.avgSev) s1SevVals.push(s1.avgSev);
+    if(s2.avgSev) s2SevVals.push(s2.avgSev);
+  });
+  const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;
+  const s1AvgYield=avg(s1YieldVals), s2AvgYield=avg(s2YieldVals);
+  const s1AvgSev=avg(s1SevVals), s2AvgSev=avg(s2SevVals);
+  const sevLabel=v=>v>=2.5?'High':v>=1.5?'Moderate':v>0?'Low':'Negligible';
+
+  // ── Variety x Pest exposure (for narrative highlight) ──
+  const varietyPestCounts={};
+  STATE.pestRecords.forEach(r=>{
+    const p=STATE.plantation.find(pl=>pl.grower===r.grower);
+    const variety=p?.variety||'Unknown';
+    (r.visits||[]).forEach(v=>Object.entries(v.pests||{}).forEach(([pest,pd])=>{
+      if(!pd.sev) return;
+      const key=variety+'||'+pest;
+      varietyPestCounts[key]=(varietyPestCounts[key]||0)+1;
+    }));
+  });
+  let topVarietyPest=null, topCount=0;
+  Object.entries(varietyPestCounts).forEach(([k,c])=>{ if(c>topCount){topCount=c;topVarietyPest=k;} });
+
+  // ── Capture charts as images ──
+  const chartIds=['comp-area-chart','comp-prod-chart','comp-yield-chart','comp-pest-chart','comp-yoy-chart'];
+  const chartTitles={
+    'comp-area-chart':'Area Planted — Season 1 vs Season 2',
+    'comp-prod-chart':'Estimated Production (T) — S1 vs S2',
+    'comp-yield-chart':'Avg Yield (T/ha) — S1 vs S2 by Year',
+    'comp-pest-chart':'Pest & Disease Severity — S1 vs S2',
+    'comp-yoy-chart':'Year-over-Year Production Trend'
+  };
+  let chartImages=[];
+  if(typeof html2canvas!=='undefined'){
+    for(const id of chartIds){
+      const el=document.getElementById(id);
+      if(!el) continue;
+      try{
+        const canvas=await html2canvas(el,{backgroundColor:'#0f1520',scale:2,logging:false});
+        chartImages.push({id,title:chartTitles[id]||id,dataUrl:canvas.toDataURL('image/png')});
+      }catch(e){ /* skip chart on failure */ }
+    }
+  }
+
+  // ── Detailed comparison table ──
+  const tableEl=document.getElementById('comp-detail-table');
+  const tableHtml=tableEl?tableEl.innerHTML:'<p>No detailed table available.</p>';
+
+  // ── Variety x Pest susceptibility heat table (print version) ──
+  const heatTableHtml = buildPrintVarietyPestHeat(yearFilter, zoneFilter);
+
+  // ── Narrative ──
+  const narrativeParts=[];
+  narrativeParts.push(`This report summarises potato cultivation activity for <strong>${yearLabel}</strong> (Zone filter: <strong>${zoneLabel}</strong>).`);
+  narrativeParts.push(`Season 1 recorded <strong>${s1Tot.plots}</strong> plot${s1Tot.plots===1?'':'s'} across <strong>${s1Tot.area.toFixed(1)} ha</strong>, with an estimated production of <strong>${Math.round(s1Tot.prod)} T</strong>${s1AvgYield?` and an average yield of <strong>${s1AvgYield.toFixed(1)} T/ha</strong>`:''}.`);
+  narrativeParts.push(`Season 2 recorded <strong>${s2Tot.plots}</strong> plot${s2Tot.plots===1?'':'s'} across <strong>${s2Tot.area.toFixed(1)} ha</strong>, with an estimated production of <strong>${Math.round(s2Tot.prod)} T</strong>${s2AvgYield?` and an average yield of <strong>${s2AvgYield.toFixed(1)} T/ha</strong>`:''}.`);
+  if(s1AvgYield&&s2AvgYield){
+    const diff=s2AvgYield-s1AvgYield;
+    narrativeParts.push(`Average yield ${diff>=0?'increased':'decreased'} by <strong>${Math.abs(diff).toFixed(1)} T/ha</strong> from Season 1 to Season 2.`);
+  }
+  narrativeParts.push(`Pest and disease pressure was rated <strong>${sevLabel(s1AvgSev)}</strong> in Season 1 and <strong>${sevLabel(s2AvgSev)}</strong> in Season 2 (severity score: Low=1, Moderate=2, High=3).`);
+  if(topVarietyPest){
+    const [variety,pest]=topVarietyPest.split('||');
+    narrativeParts.push(`The most frequently reported pest/disease and variety combination this period was <strong>${pest}</strong> on <strong>${variety}</strong>, recorded in ${topCount} observation${topCount===1?'':'s'}.`);
+  }
+  const outbreakNote = (function(){
+    // quick re-derivation of any zone with 2+ growers reporting high severity
+    const zonesAffected=new Set();
+    STATE.pestRecords.forEach(r=>{
+      const zone=STATE.growers.find(g=>g.name===r.grower)?.zone;
+      (r.visits||[]).forEach(v=>Object.values(v.pests||{}).forEach(pd=>{ if(pd.sev==='High'&&zone) zonesAffected.add(zone); }));
+    });
+    return zonesAffected.size?`High-severity pest pressure was observed in zone${zonesAffected.size>1?'s':''} <strong>${[...zonesAffected].join(', ')}</strong> during this period; growers in these zones should be prioritised for follow-up extension visits.`:`No high-severity outbreak conditions were observed during this period.`;
+  })();
+  narrativeParts.push(outbreakNote);
+
+  // ── Build print window ──
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Season Report — ${yearLabel}</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:28px;background:#fff;}
+    h1{font-size:22px;color:#c49040;margin-bottom:2px;}
+    h2{font-size:15px;color:#333;margin:22px 0 8px;border-bottom:2px solid #f0a500;padding-bottom:4px;}
+    .meta{font-size:11px;color:#666;margin-bottom:18px;}
+    p{line-height:1.6;margin-bottom:8px;}
+    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px;}
+    .chart-card{border:1px solid #eee;border-radius:8px;padding:10px;}
+    .chart-card.full{grid-column:1 / -1;}
+    .chart-card img{width:100%;display:block;}
+    .chart-card .ct{font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+    table{border-collapse:collapse;width:100%;margin-bottom:16px;}
+    th{background:#f0f0f0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:8px 10px;border:1px solid #ddd;text-align:left;}
+    td{padding:8px 10px;border:1px solid #eee;font-size:12px;}
+    tr:nth-child(even) td{background:#fafafa;}
+    .heat-table th, .heat-table td{text-align:center;white-space:nowrap;}
+    .heat-table th:first-child, .heat-table td:first-child{text-align:left;}
+    .heat-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:#666;margin:-4px 0 16px;}
+    .heat-legend span{display:inline-flex;align-items:center;gap:5px;}
+    .heat-legend i{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid #ddd;}
+    .footer{font-size:10px;color:#aaa;margin-top:24px;border-top:1px solid #eee;padding-top:8px;}
+    @media print{ @page{margin:1.5cm;} .chart-grid{grid-template-columns:1fr 1fr;} }
+  </style></head><body>
+  <h1>🥔 PoTa Tracker — Season Summary Report</h1>
+  <div class="meta">Period: ${yearLabel} &nbsp;|&nbsp; Zone: ${zoneLabel} &nbsp;|&nbsp; Generated: ${new Date().toLocaleString()} &nbsp;|&nbsp; By: ${CURRENT_USER?.fullName||CURRENT_USER?.username||'—'}</div>
+
+  <h2>Narrative Summary</h2>
+  ${narrativeParts.map(p=>`<p>${p}</p>`).join('')}
+
+  <h2>Season Charts</h2>
+  <div class="chart-grid">
+    ${chartImages.map(c=>`<div class="chart-card${c.id==='comp-yoy-chart'?' full':''}"><div class="ct">${c.title}</div><img src="${c.dataUrl}" /></div>`).join('') || '<p>No charts available for this filter.</p>'}
+  </div>
+
+  <h2>Pest Susceptibility — Variety &times; Pest/Disease</h2>
+  ${heatTableHtml}
+
+  <h2>Detailed Comparison Table</h2>
+  ${tableHtml}
+
+  <div class="footer">PoTa Tracker v4.0 — Ministry of Agro Industry &amp; Food Security · Generated automatically</div>
+  </body></html>`);
+  w.document.close();
+  setTimeout(()=>{ w.print(); },600);
+  toast('Season report ready ✓');
+}
+
+
+// ============================================================
+//  COMPARISON TABLE — SAVE TO GOOGLE SHEETS
+// ============================================================
+async function saveCompTableToSheets(){
+  if(!GAS_URL){ toast('Set GAS URL in Settings first','error'); return; }
+
+  const btn = document.getElementById('save-sheets-btn');
+  if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…'; }
+
+  const yearFilter = document.getElementById('comp-year')?.value  || 'all';
+  const zoneFilter = document.getElementById('comp-zone')?.value  || '';
+  const years      = yearFilter === 'all' ? ['2024','2025','2026'] : [yearFilter];
+
+  function getYear(d){ return d ? new Date(d).getFullYear().toString() : null; }
+
+  function buildRow(year, season){
+    const p  = STATE.plantation.filter(r =>
+      getYear(r.datePlanted) === year && r.season === season &&
+      (!zoneFilter || r.zone === zoneFilter));
+    let area = p.reduce((s,r) => s + (r.area||0), 0);
+    let prod = p.reduce((s,r) => s + (r.area||0) * (r.estYield || STATE.defaultYield || 20), 0);
+    const ya = STATE.yieldAssessments.filter(r =>
+      getYear(r.date) === year && r.season === season &&
+      (!zoneFilter || r.zone === zoneFilter));
+    const avgYield = ya.length
+      ? ya.reduce((s,r) => s + parseFloat(r.yieldHa||0), 0) / ya.length : 0;
+
+    // Merge season-level summaries for historical years
+    const sum = (STATE.seasonSummaries||{})[`${year}|${season}`];
+    const plots     = p.length   > 0 ? p.length      : (sum?.plots  || 0);
+    const finalArea = area        > 0 ? area           : (sum?.area   || 0);
+    const finalProd = prod        > 0 ? prod           : (sum?.prod   || 0);
+    const finalYield= avgYield    > 0 ? avgYield       : (sum?.yield  || 0);
+    const sev       = computeAvgSev(year, season, zoneFilter);
+    const sevLabel  = sev >= 2.5 ? 'High' : sev >= 1.5 ? 'Moderate' : sev >= 0.5 ? 'Low' : '';
+    const notes     = sum?.notes || '';
+
+    return {
+      Year:               year,
+      Season:             season,
+      Zone_Filter:        zoneFilter || 'All',
+      Plots:              plots,
+      Area_Ha:            finalArea  ? +finalArea.toFixed(2)  : 0,
+      Est_Production_T:   finalProd  ? Math.round(finalProd)  : 0,
+      Avg_Yield_T_Ha:     finalYield ? +finalYield.toFixed(2) : 0,
+      Pest_Severity:      sevLabel,
+      Notes:              notes,
+      Saved_By:           CURRENT_USER?.username || '',
+      Saved_At:           new Date().toISOString()
+    };
+  }
+
+  // Build all rows then send one-by-one (same pattern as saveCampaignToSheets)
+  const rows = [];
+  years.forEach(y => {
+    ['Season 1','Season 2'].forEach(s => rows.push(buildRow(y, s)));
+  });
+
+  let ok = 0, fail = 0;
+  for(const row of rows){
+    const r = await callGAS('saveComparisonTable', row);
+    r.success ? ok++ : fail++;
+  }
+
+  if(btn){
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> <span class="hide-xs">Save to Sheets</span>';
+  }
+
+  if(fail === 0){
+    toast(`Comparison table saved — ${ok} row${ok!==1?'s':''} synced to Sheets ✓`, 'success');
+  } else if(ok > 0){
+    toast(`Partial sync: ${ok} ok, ${fail} failed. Check GAS logs.`, 'warning');
+  } else {
+    toast('Sync failed — check GAS URL and deployment settings', 'error');
+  }
+}
+
+// ============================================================
+//  WEEKLY REPORT — ENHANCED WITH CHARTS + PARAGRAPH
+// ============================================================
+// Chart instances stored for cleanup
+const _rptCharts={};
+function _destroyRptChart(id){
+  if(_rptCharts[id]){ try{_rptCharts[id].destroy();}catch(e){} delete _rptCharts[id]; }
+}
+
 function generateReport(){
   const week=document.getElementById('rpt-week').value;
   const season=document.getElementById('rpt-season').value;
@@ -5352,40 +6809,341 @@ function generateReport(){
   const zone=document.getElementById('rpt-zone').value;
   const comments=document.getElementById('rpt-comments').value;
   if(!week){ toast('Select a week start date','error'); return; }
+
   const weekEnd=new Date(week); weekEnd.setDate(weekEnd.getDate()+6);
-  const wP=STATE.plantation.filter(r=>{ if(!r.datePlanted) return false; const d=new Date(r.datePlanted); return d>=new Date(week)&&d<=weekEnd&&(!zone||r.zone===zone); });
-  const wPe=STATE.pestRecords.filter(r=>{ if(!r.visits||!r.visits[0]?.date) return false; const d=new Date(r.visits[0].date); return d>=new Date(week)&&d<=weekEnd&&(!zone||STATE.growers.find(g=>g.name===r.grower)?.zone===zone); });
+  const weekStart=new Date(week);
+
+  // Filter records for the week
+  const wP=STATE.plantation.filter(r=>{
+    if(!r.datePlanted) return false;
+    const d=new Date(r.datePlanted);
+    return d>=weekStart&&d<=weekEnd&&(!zone||r.zone===zone)&&(!season||r.season===season);
+  });
+  const wPe=STATE.pestRecords.filter(r=>{
+    if(!r.visits||!r.visits[0]?.date) return false;
+    const d=new Date(r.visits[0].date);
+    return d>=weekStart&&d<=weekEnd&&(!zone||STATE.growers.find(g=>g.name===r.grower)?.zone===zone);
+  });
+
   const totalArea=wP.reduce((s,r)=>s+(r.area||0),0);
   const highAlerts=wPe.filter(r=>r.visits&&r.visits.some(v=>Object.values(v.pests||{}).some(p=>p.sev==='High'))).length;
+  const avgYield=wP.length?wP.reduce((s,r)=>s+(r.estYield||STATE.defaultYield||20),0)/wP.length:0;
+  const estProd=totalArea*avgYield;
+
+  // ── Zone breakdown for chart ──
+  const ZONES=['E1','E2','E3','E4'];
+  const zoneAreas=ZONES.map(z=>wP.filter(r=>r.zone===z).reduce((s,r)=>s+(r.area||0),0));
+  const hasZoneData=zoneAreas.some(v=>v>0);
+
+  // ── Fortnightly planting for bar chart (use all plantation this season) ──
+  const seasonPlant=STATE.plantation.filter(r=>r.season===season&&(!zone||r.zone===zone));
+  const ftLabels=['F1 Mar','F2 Mar','F1 Apr','F2 Apr','F1 May','F2 May','F1 Jun','F2 Jun'];
+  const ftMap={'Fortnight 1':0,'Fortnight 2':1,'Fortnight 3':2,'Fortnight 4':3,'Fortnight 5':4,'Fortnight 6':5};
+  const ftData=new Array(8).fill(0);
+  seasonPlant.forEach(r=>{
+    const idx=ftMap[r.fortnight];
+    if(idx!==undefined) ftData[idx]=(ftData[idx]||0)+(r.area||0);
+  });
+
+  // ── S1 vs S2 multi-year area for trend chart ──
+  const YEARS=['2024','2025','2026'];
+  function getYr(d){return d?new Date(d).getFullYear().toString():null;}
+  const trendS1=YEARS.map(y=>+STATE.plantation.filter(r=>getYr(r.datePlanted)===y&&r.season==='Season 1').reduce((s,r)=>s+(r.area||0),0).toFixed(2));
+  const trendS2=YEARS.map(y=>+STATE.plantation.filter(r=>getYr(r.datePlanted)===y&&r.season==='Season 2').reduce((s,r)=>s+(r.area||0),0).toFixed(2));
+  // Merge season summaries
+  YEARS.forEach((y,i)=>{
+    const s1sum=(STATE.seasonSummaries||{})[`${y}|Season 1`];
+    const s2sum=(STATE.seasonSummaries||{})[`${y}|Season 2`];
+    if(!trendS1[i]&&s1sum?.area) trendS1[i]=s1sum.area;
+    if(!trendS2[i]&&s2sum?.area) trendS2[i]=s2sum.area;
+  });
+
+  // ── Narrative paragraph ──
+  const narrative=buildNarrativeParagraph({week,weekEnd,season,zone,officer,wP,totalArea,highAlerts,estProd,avgYield,wPe,comments});
+
+  // ── Render preview ──
   const preview=document.getElementById('report-preview');
   preview.style.display='block';
   preview.innerHTML=`
-    <h1>🥔 PoTa Tracker — Weekly Field Report</h1>
-    <div class="rpt-meta">
-      <strong>Week:</strong> ${week} to ${weekEnd.toISOString().split('T')[0]}<br>
-      <strong>Season:</strong> ${season}${zone?' · Zone '+zone:''}<br>
-      <strong>Prepared by:</strong> ${officer||'—'}<br>
-      <strong>Generated:</strong> ${new Date().toLocaleString()}
-    </div>
-    <h2>📋 Summary</h2>
-    <table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
-      <tr><td>Plantations this week</td><td><strong>${wP.length}</strong></td></tr>
-      <tr><td>Area planted (ha)</td><td><strong>${totalArea.toFixed(2)}</strong></td></tr>
-      <tr><td>Pest/disease records</td><td><strong>${wPe.length}</strong></td></tr>
-      <tr><td>High severity alerts</td><td style="color:${highAlerts?'#ef4444':'#22c55e'};"><strong>${highAlerts}</strong></td></tr>
-    </tbody></table>
-    ${wP.length?`<h2>🌱 Plantation Activity</h2><table><thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Area (ha)</th><th>Season</th><th>Fortnight</th></tr></thead><tbody>${wP.map(r=>`<tr><td>${r.grower}</td><td>${r.locality||'—'}</td><td>${r.variety||'—'}</td><td>${(r.area||0).toFixed(2)}</td><td>${r.season}</td><td>${r.fortnight||'—'}</td></tr>`).join('')}</tbody></table>`:''}
-    ${wPe.length?`<h2>🐛 Pest & Disease Incidents</h2><table><thead><tr><th>Grower</th><th>Date</th><th>High Alerts</th><th>Control</th></tr></thead><tbody>${wPe.map(r=>`<tr><td>${r.grower}</td><td>${r.visits?.[0]?.date||'—'}</td><td>${r.visits?.reduce((s,v)=>s+Object.values(v.pests||{}).filter(p=>p.sev==='High').length,0)||0}</td><td>${r.controlMeasure||'None'}</td></tr>`).join('')}</tbody></table>`:''}
-    ${comments?`<h2>💬 Officer Notes</h2><p style="font-size:13px;line-height:1.6;">${comments}</p>`:''}
-    <div style="margin-top:16px;font-size:11px;color:var(--text3);">PoTa Tracker v3.0 — MAUFP — Generated ${new Date().toLocaleString()}</div>`;
+<!-- HEADER BLOCK -->
+<div class="card rpt-header-block">
+  <div class="rpt-header-title">🥔 PoTa Tracker — Weekly Field Report</div>
+  <div class="rpt-meta-grid">
+    <div class="rpt-meta-item"><div class="rpt-meta-key">Week</div><div class="rpt-meta-val">${week} → ${weekEnd.toISOString().split('T')[0]}</div></div>
+    <div class="rpt-meta-item"><div class="rpt-meta-key">Season</div><div class="rpt-meta-val">${season}${zone?' · Zone '+zone:''}</div></div>
+    <div class="rpt-meta-item"><div class="rpt-meta-key">Prepared By</div><div class="rpt-meta-val">${officer||'—'}</div></div>
+    <div class="rpt-meta-item"><div class="rpt-meta-key">Generated</div><div class="rpt-meta-val">${new Date().toLocaleDateString()}</div></div>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="rpt-kpi-strip">
+  <div class="rpt-kpi"><div class="rpt-kpi-num" style="color:var(--blue);">${wP.length}</div><div class="rpt-kpi-lbl">Plantations</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-num" style="color:var(--gold);">${totalArea.toFixed(2)}</div><div class="rpt-kpi-lbl">Area (ha)</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-num" style="color:var(--green);">${wPe.length}</div><div class="rpt-kpi-lbl">Pest Records</div></div>
+  <div class="rpt-kpi"><div class="rpt-kpi-num" style="color:${highAlerts?'var(--red)':'var(--teal)'};">${highAlerts}</div><div class="rpt-kpi-lbl">High Alerts</div></div>
+</div>
+
+<!-- NARRATIVE PARAGRAPH -->
+<div class="rpt-narrative">
+  <div class="rpt-narrative-label"><i class="fas fa-align-left"></i> Season Production Summary</div>
+  ${narrative}
+</div>
+
+<!-- CHARTS -->
+<div class="card">
+  <div class="card-title"><i class="fas fa-chart-bar" style="color:var(--blue);"></i> Cultivated Area by Fortnight — ${season}</div>
+  <div class="chart-wrap" style="height:220px;"><canvas id="rpt-ft-chart"></canvas></div>
+</div>
+
+<div class="rpt-chart-grid">
+  ${hasZoneData?`
+  <div class="card">
+    <div class="card-title"><i class="fas fa-map-marker-alt" style="color:var(--purple);"></i> Area by Zone This Week</div>
+    <div class="chart-wrap" style="height:200px;"><canvas id="rpt-zone-chart"></canvas></div>
+  </div>`:''}
+  <div class="card">
+    <div class="card-title"><i class="fas fa-chart-line" style="color:var(--gold);"></i> Season 1 vs Season 2 — Area Trend (ha)</div>
+    <div class="chart-wrap" style="height:200px;"><canvas id="rpt-trend-chart"></canvas></div>
+  </div>
+</div>
+
+<!-- PLANTATION TABLE -->
+${wP.length?`
+<div class="card">
+  <div class="card-title"><i class="fas fa-seedling" style="color:var(--green);"></i> 🌱 Plantation Activity This Week</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Grower</th><th>Locality</th><th>Variety</th><th>Area (ha)</th><th>Season</th><th>Fortnight</th></tr></thead>
+      <tbody>${wP.map(r=>`<tr>
+        <td style="font-weight:600;">${r.grower}</td>
+        <td>${r.locality||'—'}</td><td>${r.variety||'—'}</td>
+        <td><strong>${(r.area||0).toFixed(2)}</strong></td>
+        <td><span class="badge badge-${r.season==='Season 1'?'blue':'purple'}">${r.season}</span></td>
+        <td style="font-family:var(--font-mono);font-size:11px;">${r.fortnight||'—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>
+</div>`:''}
+
+<!-- PEST TABLE -->
+${wPe.length?`
+<div class="card">
+  <div class="card-title"><i class="fas fa-bug" style="color:var(--red);"></i> 🐛 Pest & Disease Incidents</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Grower</th><th>Date</th><th>High Alerts</th><th>Control Measure</th></tr></thead>
+      <tbody>${wPe.map(r=>`<tr>
+        <td style="font-weight:600;">${r.grower}</td>
+        <td style="font-family:var(--font-mono);font-size:11px;">${r.visits?.[0]?.date||'—'}</td>
+        <td>${r.visits?.reduce((s,v)=>s+Object.values(v.pests||{}).filter(p=>p.sev==='High').length,0)||0}</td>
+        <td>${r.controlMeasure||'None recorded'}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>
+</div>`:''}
+
+<!-- OFFICER NOTES -->
+${comments?`
+<div class="card">
+  <div class="card-title"><i class="fas fa-comment-alt" style="color:var(--teal);"></i> 💬 Officer Notes</div>
+  <p style="font-size:13px;line-height:1.75;color:var(--text);">${comments}</p>
+</div>`:''}
+
+<div style="margin-top:4px;font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right;">PoTa Tracker v4.0 — MAUFP — ${new Date().toLocaleString()}</div>
+  `;
+
+  // ── Draw charts ──
+  requestAnimationFrame(()=>{
+    // Fortnight bar chart
+    _destroyRptChart('rpt-ft-chart');
+    const ftCtx=document.getElementById('rpt-ft-chart');
+    if(ftCtx){
+      _rptCharts['rpt-ft-chart']=new Chart(ftCtx,{
+        type:'bar',
+        data:{
+          labels:ftLabels,
+          datasets:[{
+            label:'Area (ha)',
+            data:ftData,
+            backgroundColor:ftData.map((_,i)=>{
+              // Highlight week's fortnights
+              return 'rgba(59,130,246,0.75)';
+            }),
+            borderRadius:5,
+          }]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},
+            tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y.toFixed(2)} ha`}}},
+          scales:{
+            x:{ticks:{color:'#7a8daa',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},
+            y:{title:{display:true,text:'Area (ha)',color:'#7a8daa'},ticks:{color:'#7a8daa'},grid:{color:'rgba(255,255,255,.06)'}}
+          }
+        }
+      });
+    }
+
+    // Zone doughnut
+    if(hasZoneData){
+      _destroyRptChart('rpt-zone-chart');
+      const zCtx=document.getElementById('rpt-zone-chart');
+      if(zCtx){
+        _rptCharts['rpt-zone-chart']=new Chart(zCtx,{
+          type:'doughnut',
+          data:{
+            labels:ZONES,
+            datasets:[{
+              data:zoneAreas,
+              backgroundColor:['rgba(59,130,246,.8)','rgba(168,85,247,.8)','rgba(240,165,0,.8)','rgba(34,197,94,.8)'],
+              borderWidth:0,
+            }]
+          },
+          options:{
+            responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{position:'right',labels:{color:'#7a8daa',font:{size:11},padding:10}},
+              tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed.toFixed(2)} ha`}}}
+          }
+        });
+      }
+    }
+
+    // S1 vs S2 trend line
+    _destroyRptChart('rpt-trend-chart');
+    const tCtx=document.getElementById('rpt-trend-chart');
+    if(tCtx){
+      _rptCharts['rpt-trend-chart']=new Chart(tCtx,{
+        type:'line',
+        data:{
+          labels:YEARS,
+          datasets:[
+            {label:'Season 1',data:trendS1,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.35,pointRadius:5,pointBackgroundColor:'#3b82f6'},
+            {label:'Season 2',data:trendS2,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.08)',fill:true,tension:.35,pointRadius:5,pointBackgroundColor:'#a855f7'}
+          ]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{labels:{color:'#7a8daa',font:{size:11}}}},
+          scales:{
+            x:{ticks:{color:'#7a8daa'},grid:{color:'rgba(255,255,255,.04)'}},
+            y:{title:{display:true,text:'Area (ha)',color:'#7a8daa'},ticks:{color:'#7a8daa'},grid:{color:'rgba(255,255,255,.06)'}}
+          }
+        }
+      });
+    }
+  });
+
   toast('Report generated ✓');
 }
-function printReport(){
-  const content=document.getElementById('report-preview').innerHTML;
-  if(!content){ toast('Generate report first','warning'); return; }
+
+function buildNarrativeParagraph({week,weekEnd,season,zone,officer,wP,totalArea,highAlerts,estProd,avgYield,wPe,comments}){
+  const yr=new Date(week).getFullYear();
+  const zoneStr=zone?`Zone ${zone}`:'all zones';
+  const seasonNum=season==='Season 1'?'1st':'2nd';
+  const YEARS=['2024','2025','2026'];
+  function getYr(d){return d?new Date(d).getFullYear().toString():null;}
+  // Prior year same season area
+  const priorYr=String(yr-1);
+  const priorArea=STATE.plantation.filter(r=>getYr(r.datePlanted)===priorYr&&r.season===season).reduce((s,r)=>s+(r.area||0),0);
+  const priorSum=(STATE.seasonSummaries||{})[`${priorYr}|${season}`];
+  const priorFinalArea=priorArea>0?priorArea:(priorSum?.area||0);
+
+  // Season total so far
+  const seasonTotal=STATE.plantation.filter(r=>getYr(r.datePlanted)===String(yr)&&r.season===season&&(!zone||r.zone===zone)).reduce((s,r)=>s+(r.area||0),0);
+  const seasonSumEntry=(STATE.seasonSummaries||{})[`${yr}|${season}`];
+  const finalSeasonTotal=seasonTotal>0?seasonTotal:(seasonSumEntry?.area||0);
+
+  const change=priorFinalArea>0?((finalSeasonTotal-priorFinalArea)/priorFinalArea*100):null;
+  const changeStr=change!==null?` This represents a ${change>=0?'positive increase':'decrease'} of <strong>${Math.abs(change).toFixed(1)}%</strong> compared to the ${priorYr} ${season.toLowerCase()} (${priorFinalArea.toFixed(2)} ha).`:'';
+
+  // Peak fortnight
+  const ftMap={'Fortnight 1':'mid-March','Fortnight 2':'late March','Fortnight 3':'early April','Fortnight 4':'mid-April','Fortnight 5':'early May','Fortnight 6':'late May'};
+  const ftCounts={};
+  STATE.plantation.filter(r=>getYr(r.datePlanted)===String(yr)&&r.season===season).forEach(r=>{ftCounts[r.fortnight]=(ftCounts[r.fortnight]||0)+(r.area||0);});
+  const peakFt=Object.entries(ftCounts).sort((a,b)=>b[1]-a[1])[0];
+  const peakStr=peakFt?` Planting peaked during <strong>${ftMap[peakFt[0]]||peakFt[0]}</strong>, with a cumulative area of <strong>${peakFt[1].toFixed(2)} ha</strong> recorded during that fortnight.`:'';
+
+  // Varieties mentioned
+  const varieties=[...new Set(wP.map(r=>r.variety).filter(Boolean))];
+  const varStr=varieties.length?` Varieties planted this week include: <strong>${varieties.join(', ')}</strong>.`:'';
+
+  // Pest mention
+  const pestStr=highAlerts>0?` <span style="color:var(--red);font-weight:600;">${highAlerts} high-severity pest alert${highAlerts>1?'s were':'was'} recorded</span>, requiring immediate field intervention.`:wPe.length>0?' Pest pressure remains at low to moderate levels across monitored plots.':' No significant pest incidents were recorded this week.';
+
+  return `<span style="font-size:13px;">
+    ${season} acreage in <strong>${yr}</strong> for ${zoneStr} has reached a cumulative total of <strong>${finalSeasonTotal.toFixed(2)} ha</strong> across <strong>${wP.length||'—'}</strong> grower plot${wP.length!==1?'s':''} recorded this week (${week} to ${weekEnd.toISOString().split('T')[0]}).${changeStr} Planting began in mid-March and is currently ${season==='Season 1'?'progressing through the primary season':'ongoing in the second season'} with maximum production activity observed during the month of ${season==='Season 1'?'May':'October'}.${peakStr}${varStr}${pestStr}
+  </span>`;
+}
+async function printReport(){
+  const preview=document.getElementById('report-preview');
+  if(!preview||!preview.innerHTML.trim()){ toast('Generate report first','warning'); return; }
+
+  toast('Preparing print — rasterising charts…','info');
+
+  // Rasterise every canvas in the preview to a <img> data URL via html2canvas
+  const clone = preview.cloneNode(true);
+  const liveCanvases = Array.from(preview.querySelectorAll('canvas'));
+  const cloneCanvases = Array.from(clone.querySelectorAll('canvas'));
+
+  if(typeof html2canvas !== 'undefined' && liveCanvases.length){
+    for(let i=0;i<liveCanvases.length;i++){
+      try{
+        const capturedCanvas = await html2canvas(liveCanvases[i],{
+          backgroundColor:'#ffffff',
+          scale:2,
+          useCORS:true,
+          logging:false
+        });
+        const img = document.createElement('img');
+        img.src = capturedCanvas.toDataURL('image/png');
+        img.style.cssText='max-width:100%;height:auto;border-radius:6px;display:block;margin:4px 0;';
+        if(cloneCanvases[i] && cloneCanvases[i].parentNode){
+          cloneCanvases[i].parentNode.replaceChild(img, cloneCanvases[i]);
+        }
+      } catch(e){
+        // fallback: replace with italic placeholder
+        const p=document.createElement('p');
+        p.style.cssText='font-size:11px;color:#888;font-style:italic;padding:6px 0;';
+        p.textContent='[Chart — view in app]';
+        if(cloneCanvases[i] && cloneCanvases[i].parentNode){
+          cloneCanvases[i].parentNode.replaceChild(p, cloneCanvases[i]);
+        }
+      }
+    }
+  } else {
+    // html2canvas not available or no charts — use placeholders
+    cloneCanvases.forEach(c=>{
+      const p=document.createElement('p');
+      p.style.cssText='font-size:11px;color:#888;font-style:italic;padding:6px 0;';
+      p.textContent='[Chart — view in app]';
+      if(c.parentNode) c.parentNode.replaceChild(p,c);
+    });
+  }
+
   const w=window.open('','_blank');
-  w.document.write(`<html><head><title>PoTa Weekly Report</title><style>body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:24px;}table{border-collapse:collapse;width:100%;margin-bottom:16px;}th,td{border:1px solid #ccc;padding:6px 10px;}th{background:#f5f5f5;font-weight:700;}h1{color:#c49040;}h2{border-bottom:1px solid #ddd;padding-bottom:4px;margin:16px 0 8px;}</style></head><body>${content}</body></html>`);
-  w.document.close(); w.print();
+  w.document.write(`<!DOCTYPE html><html><head><title>PoTa Weekly Report</title>
+  <style>
+    body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:24px;background:#fff;}
+    table{border-collapse:collapse;width:100%;margin-bottom:16px;}
+    th,td{border:1px solid #ccc;padding:6px 10px;}
+    th{background:#f5f5f5;font-weight:700;}
+    h1{color:#c49040;font-size:20px;margin-bottom:6px;}
+    h2{border-bottom:1px solid #ddd;padding-bottom:4px;margin:16px 0 8px;font-size:14px;}
+    .rpt-header-title{font-size:20px;font-weight:800;color:#c49040;margin-bottom:8px;}
+    .rpt-meta-grid,.rpt-kpi-strip{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+    .rpt-meta-item,.rpt-kpi{border:1px solid #ddd;border-radius:6px;padding:7px 10px;min-width:120px;}
+    .rpt-meta-key,.rpt-kpi-lbl{font-size:9px;text-transform:uppercase;color:#888;font-weight:700;margin-bottom:2px;}
+    .rpt-meta-val,.rpt-kpi-num{font-size:13px;font-weight:700;}
+    .rpt-narrative{border-left:3px solid #c49040;padding:10px 14px;background:#fffbf0;margin-bottom:14px;font-size:13px;line-height:1.75;}
+    .rpt-narrative-label{font-size:9px;text-transform:uppercase;color:#c49040;font-weight:700;margin-bottom:5px;}
+    .card{margin-bottom:12px;}
+    .card-title{font-size:13px;font-weight:700;margin-bottom:8px;}
+    img{max-width:100%;height:auto;page-break-inside:avoid;}
+    @media print{@page{margin:1.5cm;}img{page-break-inside:avoid;}}
+  </style></head><body>${clone.innerHTML}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
 }
 function exportReportCsv(){
   const report=document.getElementById('report-preview');
@@ -5411,12 +7169,447 @@ async function saveReportToSheets(){
 }
 
 // ============================================================
+//  VARIETY PERFORMANCE DASHBOARD
+// ============================================================
+function renderVarietyPerf(){
+  const seasonF = document.getElementById('vp-season')?.value || '';
+  const zoneF   = document.getElementById('vp-zone')?.value   || '';
+  const yearF   = document.getElementById('vp-year')?.value   || '';
+
+  // ── Filter plantation records ──
+  function getYear(d){ return d ? new Date(d).getFullYear().toString() : null; }
+  const plants = STATE.plantation.filter(r=>{
+    if(seasonF && r.season !== seasonF) return false;
+    if(zoneF   && r.zone   !== zoneF)   return false;
+    if(yearF   && getYear(r.datePlanted) !== yearF) return false;
+    return true;
+  });
+
+  // ── Filter yield assessments ──
+  const yields = STATE.yieldAssessments.filter(r=>{
+    if(seasonF && r.season !== seasonF) return false;
+    if(zoneF   && r.zone   !== zoneF)   return false;
+    if(yearF   && getYear(r.date) !== yearF) return false;
+    return true;
+  });
+
+  // ── Build per-variety stats ──
+  const stats = {};
+
+  plants.forEach(r=>{
+    const v = r.variety || 'Unknown';
+    if(!stats[v]) stats[v]={ area:0, plots:0, yieldSamples:[], s1Area:0, s2Area:0 };
+    stats[v].area  += (r.area||0);
+    stats[v].plots += 1;
+    if(r.season==='Season 1') stats[v].s1Area += (r.area||0);
+    else                       stats[v].s2Area += (r.area||0);
+  });
+
+  yields.forEach(r=>{
+    const v = r.variety || 'Unknown';
+    if(!stats[v]) stats[v]={ area:0, plots:0, yieldSamples:[], s1Area:0, s2Area:0 };
+    if(parseFloat(r.yieldHa)) stats[v].yieldSamples.push(parseFloat(r.yieldHa));
+  });
+
+  const varieties = Object.keys(stats).sort((a,b)=>{
+    const yA = stats[a].yieldSamples.length ? stats[a].yieldSamples.reduce((s,v)=>s+v,0)/stats[a].yieldSamples.length : 0;
+    const yB = stats[b].yieldSamples.length ? stats[b].yieldSamples.reduce((s,v)=>s+v,0)/stats[b].yieldSamples.length : 0;
+    return yB - yA; // descending by avg yield
+  });
+
+  const totalArea   = Object.values(stats).reduce((s,v)=>s+(v.area||0),0);
+  const totalPlots  = Object.values(stats).reduce((s,v)=>s+(v.plots||0),0);
+  const bestYieldV  = varieties.find(v=>stats[v].yieldSamples.length);
+  const bestYield   = bestYieldV ? (stats[bestYieldV].yieldSamples.reduce((s,v)=>s+v,0)/stats[bestYieldV].yieldSamples.length) : 0;
+
+  // ── KPI row ──
+  const kpiEl = document.getElementById('vp-kpi-row');
+  if(kpiEl){
+    kpiEl.innerHTML = [
+      {label:'Varieties Tracked', val:varieties.length, color:'var(--gold)',icon:'fa-leaf'},
+      {label:'Total Plots',        val:totalPlots,       color:'var(--blue)',icon:'fa-seedling'},
+      {label:'Total Area (ha)',    val:totalArea.toFixed(2), color:'var(--green)',icon:'fa-map'},
+      {label:'Best Avg Yield (T/ha)', val:bestYield?bestYield.toFixed(1):'—', color:'var(--teal)',icon:'fa-trophy'},
+    ].map(k=>`
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:9px;background:${k.color}22;display:flex;align-items:center;justify-content:center;font-size:14px;color:${k.color};flex-shrink:0;"><i class="fas ${k.icon}"></i></div>
+        <div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);font-family:var(--font-mono);margin-bottom:2px;">${k.label}</div>
+          <div style="font-size:22px;font-weight:800;line-height:1;color:var(--text);font-family:var(--font-display);">${k.val}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  const colors = CHART_COLORS;
+
+  // ── Chart 1: Average Yield bar ──
+  const yieldData = varieties.map(v=>{
+    const s = stats[v];
+    return s.yieldSamples.length ? +(s.yieldSamples.reduce((a,b)=>a+b,0)/s.yieldSamples.length).toFixed(2) : null;
+  });
+  mkChart('vp-yield-chart',{
+    type:'bar',
+    data:{
+      labels:varieties,
+      datasets:[{
+        label:'Avg Yield (T/ha)',
+        data:yieldData,
+        backgroundColor:varieties.map((_,i)=>colors[i%colors.length]+'cc'),
+        borderColor:varieties.map((_,i)=>colors[i%colors.length]),
+        borderWidth:1.5,
+        borderRadius:6,
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw!==null?ctx.raw+' T/ha':'No yield data'}}},
+      scales:{
+        x:{title:{display:true,text:'T/ha',color:'#7a8daa'},beginAtZero:true},
+        y:{ticks:{font:{size:11}}}
+      }
+    }
+  });
+
+  // ── Chart 2: Area share doughnut ──
+  mkChart('vp-area-pie-chart',{
+    type:'doughnut',
+    data:{
+      labels:varieties,
+      datasets:[{
+        data:varieties.map(v=>+stats[v].area.toFixed(2)),
+        backgroundColor:varieties.map((_,i)=>colors[i%colors.length]+'cc'),
+        borderColor:varieties.map((_,i)=>colors[i%colors.length]),
+        borderWidth:1.5,
+      }]
+    },
+    options:{
+      plugins:{
+        legend:{position:'right',labels:{color:'#7a8daa',font:{size:11},padding:10}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} ha (${totalArea>0?((ctx.raw/totalArea)*100).toFixed(1):0}%)`}}
+      }
+    }
+  });
+
+  // ── Chart 3: Area + Plots grouped bar ──
+  mkChart('vp-area-chart',{
+    type:'bar',
+    data:{
+      labels:varieties,
+      datasets:[
+        {label:'Area (ha)', data:varieties.map(v=>+stats[v].area.toFixed(2)), backgroundColor:'rgba(240,165,0,.75)', borderColor:'#f0a500', borderWidth:1.5, borderRadius:5, yAxisID:'y'},
+        {label:'Plots',     data:varieties.map(v=>stats[v].plots), backgroundColor:'rgba(59,130,246,.6)',  borderColor:'#3b82f6', borderWidth:1.5, borderRadius:5, yAxisID:'y1'},
+      ]
+    },
+    options:{
+      plugins:{tooltip:{mode:'index',intersect:false}},
+      scales:{
+        y:{title:{display:true,text:'Area (ha)',color:'#7a8daa'},position:'left',beginAtZero:true},
+        y1:{title:{display:true,text:'Plots',color:'#3b82f6'},position:'right',beginAtZero:true,grid:{drawOnChartArea:false}}
+      }
+    }
+  });
+
+  // ── Chart 4: S1 vs S2 yield grouped bar ──
+  const s1Yields = varieties.map(v=>{
+    const ys = yields.filter(r=>(r.variety||'Unknown')===v && r.season==='Season 1').map(r=>parseFloat(r.yieldHa||0)).filter(Boolean);
+    return ys.length ? +(ys.reduce((a,b)=>a+b,0)/ys.length).toFixed(2) : null;
+  });
+  const s2Yields = varieties.map(v=>{
+    const ys = yields.filter(r=>(r.variety||'Unknown')===v && r.season==='Season 2').map(r=>parseFloat(r.yieldHa||0)).filter(Boolean);
+    return ys.length ? +(ys.reduce((a,b)=>a+b,0)/ys.length).toFixed(2) : null;
+  });
+  mkChart('vp-s1s2-chart',{
+    type:'bar',
+    data:{
+      labels:varieties,
+      datasets:[
+        {label:'Season 1',data:s1Yields,backgroundColor:'rgba(59,130,246,.75)',borderColor:'#3b82f6',borderWidth:1.5,borderRadius:5},
+        {label:'Season 2',data:s2Yields,backgroundColor:'rgba(168,85,247,.75)',borderColor:'#a855f7',borderWidth:1.5,borderRadius:5},
+      ]
+    },
+    options:{
+      plugins:{tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>ctx.raw!==null?ctx.dataset.label+': '+ctx.raw+' T/ha':'No data'}}},
+      scales:{y:{title:{display:true,text:'T/ha',color:'#7a8daa'},beginAtZero:true}}
+    }
+  });
+
+  // ── Full ranking table ──
+  const tableEl = document.getElementById('vp-table');
+  if(!tableEl) return;
+  if(!varieties.length){
+    tableEl.innerHTML='<div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">No plantation records match this filter</div><div class="empty-sub">Adjust the Season, Zone, or Year filters above.</div></div>';
+    return;
+  }
+  const rows = varieties.map((v,rank)=>{
+    const s = stats[v];
+    const avgY = s.yieldSamples.length ? (s.yieldSamples.reduce((a,b)=>a+b,0)/s.yieldSamples.length).toFixed(2) : '—';
+    const areaPct = totalArea>0 ? ((s.area/totalArea)*100).toFixed(1) : 0;
+    const medal = rank===0?'🥇':rank===1?'🥈':rank===2?'🥉':`${rank+1}`;
+    const yColor = s.yieldSamples.length ? (parseFloat(avgY)>=20?'var(--green)':parseFloat(avgY)>=15?'var(--teal)':parseFloat(avgY)>=10?'var(--gold)':'var(--orange)') : 'var(--text3)';
+    return `<tr>
+      <td style="font-size:15px;text-align:center;width:42px;">${medal}</td>
+      <td><div style="font-weight:700;color:var(--text);">${v}</div></td>
+      <td><strong style="color:${yColor};">${avgY}</strong>${s.yieldSamples.length?`<span style="font-size:9px;color:var(--text3);margin-left:4px;">(n=${s.yieldSamples.length})</span>`:''}</td>
+      <td>${s.area.toFixed(2)} ha
+        <div style="margin-top:3px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;width:80px;">
+          <div style="height:100%;width:${areaPct}%;background:var(--gold);border-radius:2px;"></div>
+        </div>
+        <span style="font-size:9px;color:var(--text3);">${areaPct}%</span>
+      </td>
+      <td>${s.plots}</td>
+      <td style="font-size:11px;color:var(--text2);">${s.s1Area.toFixed(2)} ha</td>
+      <td style="font-size:11px;color:var(--text2);">${s.s2Area.toFixed(2)} ha</td>
+    </tr>`;
+  }).join('');
+  tableEl.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr>
+      <th>#</th>
+      <th>Variety</th>
+      <th>Avg Yield (T/ha)</th>
+      <th>Total Area (ha)</th>
+      <th>Plots</th>
+      <th>S1 Area (ha)</th>
+      <th>S2 Area (ha)</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+
+  renderVarietyPestHeat(plants, seasonF, zoneF, yearF);
+}
+
+// ── Variety x Pest cross-analysis heat table ──
+function renderVarietyPestHeat(plants, seasonF, zoneF, yearF){
+  const heatEl = document.getElementById('vp-heat-table');
+  if(!heatEl) return;
+
+  function getYear(d){ return d ? new Date(d).getFullYear().toString() : null; }
+
+  // Map grower -> set of varieties they planted (filtered)
+  const growerVarieties = {};
+  plants.forEach(r=>{
+    const v = r.variety || 'Unknown';
+    (growerVarieties[r.grower] = growerVarieties[r.grower] || new Set()).add(v);
+  });
+
+  // Filter pest records by zone/year filters (season handled separately for trend)
+  const pestRecsAll = STATE.pestRecords.filter(r=>{
+    const gz = STATE.growers.find(g=>g.name===r.grower)?.zone || '';
+    if(zoneF && gz !== zoneF) return false;
+    if(yearF){
+      const v0 = r.visits?.[0];
+      if(!v0?.date || getYear(v0.date)!==yearF) return false;
+    }
+    return true;
+  });
+  const pestRecs = seasonF ? pestRecsAll.filter(r=>r.season===seasonF) : pestRecsAll;
+
+  const sevScore = {Low:1, Moderate:2, High:3};
+
+  // Build a matrix for a given set of records: matrix[variety][pest] = {sum,count,obs:[{recordId,grower,pest,sev,pct,date,visitNo}]}
+  function buildMatrix(recs){
+    const m = {};
+    const pestsSeen = new Set();
+    recs.forEach(r=>{
+      const varieties = growerVarieties[r.grower];
+      if(!varieties || !varieties.size) return;
+      (r.visits||[]).forEach(v=>{
+        Object.entries(v.pests||{}).forEach(([pest,pd])=>{
+          if(!pd.sev || !sevScore[pd.sev]) return;
+          pestsSeen.add(pest);
+          varieties.forEach(variety=>{
+            m[variety] = m[variety] || {};
+            m[variety][pest] = m[variety][pest] || {sum:0,count:0,obs:[]};
+            m[variety][pest].sum += sevScore[pd.sev];
+            m[variety][pest].count += 1;
+            m[variety][pest].obs.push({recordId:r.id, grower:r.grower, pest, sev:pd.sev, pct:pd.pct, date:v.date, visitNo:v.visitNo});
+          });
+        });
+      });
+    });
+    return {m, pestsSeen};
+  }
+
+  const {m:matrix, pestsSeen} = buildMatrix(pestRecs);
+  const varietiesSeen = new Set(Object.values(growerVarieties).flatMap(s=>[...s]));
+
+  // S1/S2 matrices for trend arrows (only meaningful when no season filter applied,
+  // or to compare against the filtered season's counterpart)
+  const {m:s1Matrix} = buildMatrix(pestRecsAll.filter(r=>r.season==='Season 1'));
+  const {m:s2Matrix} = buildMatrix(pestRecsAll.filter(r=>r.season==='Season 2'));
+
+  const varieties = [...varietiesSeen].sort();
+  const pests = [...pestsSeen].sort((a,b)=>{
+    // order diseases then pests, alphabetically within group, matching DISEASES/PESTS lists
+    const allOrder=[...DISEASES,...PESTS];
+    return allOrder.indexOf(a)-allOrder.indexOf(b);
+  });
+
+  if(!varieties.length || !pests.length){
+    heatEl.innerHTML='<div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-title">No pest/disease data to cross-analyse</div><div class="empty-sub">Record pest observations against growers with known varieties to populate this table.</div></div>';
+    return;
+  }
+
+  function cellColor(score){
+    if(score===null) return {bg:'rgba(255,255,255,.02)', fg:'var(--text3)'};
+    if(score>=2.5) return {bg:'rgba(239,68,68,.55)', fg:'#fff'};
+    if(score>=2)   return {bg:'rgba(239,68,68,.28)', fg:'var(--text)'};
+    if(score>=1.5) return {bg:'rgba(249,115,22,.28)', fg:'var(--text)'};
+    if(score>=1)   return {bg:'rgba(34,197,94,.22)', fg:'var(--text)'};
+    return {bg:'rgba(255,255,255,.02)', fg:'var(--text3)'};
+  }
+
+  // Sample-size badge: dim/flag low-confidence cells (n=1) vs solid (n>=3)
+  function sampleBadge(count){
+    if(!count) return '';
+    if(count===1) return `<sup title="Based on a single observation — low confidence" style="font-size:8px;color:var(--text3);font-weight:400;margin-left:2px;">n=1</sup>`;
+    if(count<3)   return `<sup title="${count} observations" style="font-size:8px;color:var(--text3);font-weight:400;margin-left:2px;">n=${count}</sup>`;
+    return `<sup title="${count} observations" style="font-size:8px;color:var(--text2);font-weight:600;margin-left:2px;">n=${count}</sup>`;
+  }
+
+  // Trend arrow comparing S1 vs S2 avg severity
+  function trendArrow(variety, pest){
+    const c1 = s1Matrix[variety]?.[pest];
+    const c2 = s2Matrix[variety]?.[pest];
+    if(!c1 || !c2) return '';
+    const s1 = c1.sum/c1.count, s2 = c2.sum/c2.count;
+    const diff = s2 - s1;
+    if(Math.abs(diff) < 0.15) return `<span title="Stable S1→S2 (${s1.toFixed(1)}→${s2.toFixed(1)})" style="color:var(--text3);font-size:9px;margin-left:3px;">→</span>`;
+    if(diff > 0) return `<span title="Worsened S1→S2 (${s1.toFixed(1)}→${s2.toFixed(1)})" style="color:var(--red);font-size:9px;margin-left:3px;">▲</span>`;
+    return `<span title="Improved S1→S2 (${s1.toFixed(1)}→${s2.toFixed(1)})" style="color:var(--green);font-size:9px;margin-left:3px;">▼</span>`;
+  }
+
+  // Stash observation data globally for drill-down modal
+  window._vpHeatObs = window._vpHeatObs || {};
+  window._vpHeatObs = {}; // reset on each render
+
+  const thStyle='padding:8px 10px;background:rgba(255,255,255,.03);color:var(--text2);font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-family:var(--font-mono);text-align:center;white-space:nowrap;border:1px solid var(--border);';
+  const tdStyle='padding:8px 10px;text-align:center;font-size:11px;font-weight:700;border:1px solid var(--border);white-space:nowrap;';
+
+  let headerRow = `<th style="${thStyle};text-align:left;position:sticky;left:0;background:var(--card2);z-index:2;">Variety</th>`;
+  pests.forEach(p=>{ headerRow += `<th style="${thStyle}" title="${p}">${PEST_ICONS[p]||''} ${p.length>16?p.slice(0,14)+'…':p}</th>`; });
+  headerRow += `<th style="${thStyle}">Most Susceptible To</th>`;
+
+  let bodyRows = varieties.map(variety=>{
+    let row = `<td style="${tdStyle};text-align:left;font-weight:700;color:var(--text);position:sticky;left:0;background:var(--card);z-index:1;">${variety}</td>`;
+    let topPest=null, topScore=-1;
+    pests.forEach(pest=>{
+      const cell = matrix[variety]?.[pest];
+      const score = cell ? cell.sum/cell.count : null;
+      if(score!==null && score>topScore){ topScore=score; topPest=pest; }
+      const {bg,fg} = cellColor(score);
+      const label = score!==null ? score.toFixed(1) : '—';
+      const title = cell ? `${variety} × ${pest}: avg severity ${score.toFixed(2)} (n=${cell.count}) — click for details` : `${variety} × ${pest}: no observations`;
+      const trend = score!==null ? trendArrow(variety,pest) : '';
+      const badge = cell ? sampleBadge(cell.count) : '';
+      let cursorStyle='', clickAttr='';
+      if(cell && cell.obs.length){
+        const key = variety+'||'+pest;
+        window._vpHeatObs[key] = cell.obs;
+        cursorStyle='cursor:pointer;';
+        clickAttr=`onclick="showVpHeatDrilldown('${variety.replace(/'/g,"\\'")}','${pest.replace(/'/g,"\\'")}')"`;
+      }
+      row += `<td style="${tdStyle};background:${bg};color:${fg};${cursorStyle}" title="${title}" ${clickAttr}>${label}${badge}${trend}</td>`;
+    });
+    const summary = topPest ? `${PEST_ICONS[topPest]||''} ${topPest} <span style="color:var(--text3);font-weight:400;">(${topScore.toFixed(1)})</span>` : '<span style="color:var(--text3);font-weight:400;">—</span>';
+    row += `<td style="${tdStyle};text-align:left;font-size:10px;white-space:nowrap;">${summary}</td>`;
+    return `<tr>${row}</tr>`;
+  }).join('');
+
+  heatEl.innerHTML = `<div class="table-wrap"><table style="border-collapse:collapse;min-width:${280+pests.length*90}px;">
+    <thead><tr>${headerRow}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table></div>
+  <div style="display:flex;align-items:center;gap:14px;margin-top:10px;font-size:10px;color:var(--text3);font-family:var(--font-mono);flex-wrap:wrap;">
+    <span style="font-weight:700;color:var(--text2);">SEVERITY:</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:14px;border-radius:3px;background:rgba(34,197,94,.22);display:inline-block;"></span> Low (1.0–1.4)</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:14px;border-radius:3px;background:rgba(249,115,22,.28);display:inline-block;"></span> Moderate (1.5–1.9)</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:14px;border-radius:3px;background:rgba(239,68,68,.28);display:inline-block;"></span> High (2.0–2.4)</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:14px;border-radius:3px;background:rgba(239,68,68,.55);display:inline-block;"></span> Severe (2.5–3.0)</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:14px;border-radius:3px;background:rgba(255,255,255,.02);border:1px solid var(--border);display:inline-block;"></span> No data</span>
+    <span style="border-left:1px solid var(--border);height:14px;"></span>
+    <span style="font-weight:700;color:var(--text2);">TREND (S1→S2):</span>
+    <span><span style="color:var(--red);">▲</span> Worsened</span>
+    <span><span style="color:var(--green);">▼</span> Improved</span>
+    <span><span style="color:var(--text3);">→</span> Stable</span>
+    <span style="border-left:1px solid var(--border);height:14px;"></span>
+    <span><sup style="color:var(--text3);">n=1</sup> Sample size — click a cell for details</span>
+  </div>`;
+}
+
+// ── Drill-down modal: list underlying pest observations for a Variety × Pest cell ──
+function showVpHeatDrilldown(variety, pest){
+  const key = variety+'||'+pest;
+  const obs = (window._vpHeatObs||{})[key] || [];
+  const bodyEl = document.getElementById('vp-drilldown-body');
+  const titleEl = document.getElementById('vp-drilldown-title');
+  if(!bodyEl || !titleEl) return;
+  titleEl.innerHTML = `${PEST_ICONS[pest]||''} ${pest} <span style="color:var(--text3);font-weight:400;">on</span> ${variety}`;
+  if(!obs.length){
+    bodyEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🐛</div><div class="empty-title">No observations found</div></div>';
+  } else {
+    const sevColor = {Low:'var(--green)',Moderate:'var(--orange)',High:'var(--red)'};
+    const sorted=[...obs].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    bodyEl.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Date</th><th>Grower</th><th>Visit</th><th>Severity</th><th>Affected %</th><th></th></tr></thead>
+      <tbody>${sorted.map(o=>`<tr>
+        <td style="font-family:var(--font-mono);font-size:11px;">${o.date?fmtDate(o.date):'—'}</td>
+        <td>${o.grower}</td>
+        <td>${o.visitNo||1}</td>
+        <td><span class="badge" style="background:${sevColor[o.sev]}22;color:${sevColor[o.sev]};">${o.sev}</span></td>
+        <td>${o.pct!=null?o.pct+'%':'—'}</td>
+        <td><button class="btn btn-ghost btn-icon btn-sm" onclick="closeModal('vp-drilldown-modal');showSection('pests');"><i class="fas fa-arrow-right" title="Go to Pests &amp; Diseases"></i></button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div style="font-size:11px;color:var(--text2);margin-top:10px;">
+      ${obs.length} observation${obs.length===1?'':'s'} · avg severity score
+      <strong>${(obs.reduce((s,o)=>s+({Low:1,Moderate:2,High:3}[o.sev]||0),0)/obs.length).toFixed(2)}</strong>
+    </div>`;
+  }
+  openModal('vp-drilldown-modal');
+}
+
+// ============================================================
 //  SETTINGS
 // ============================================================
 function renderSettings(){
   renderVarietyList();
   const gasInput=document.getElementById('gas-url-input');
   if(gasInput) gasInput.value=GAS_URL;
+  initOutbreakSettingsUI();
+}
+function initOutbreakSettingsUI(){
+  const cfg = STATE.outbreakSettings || {windowDays:14, sevThreshold:'High', pctThreshold:50};
+  const sevOrder = {Low:1, Moderate:2, High:3};
+  const sevSlider=document.getElementById('ob-sev-slider');
+  const pctSlider=document.getElementById('ob-pct-slider');
+  const windowSlider=document.getElementById('ob-window-slider');
+  if(!sevSlider) return;
+  sevSlider.value = sevOrder[cfg.sevThreshold] || 3;
+  pctSlider.value = cfg.pctThreshold ?? 50;
+  windowSlider.value = cfg.windowDays || 14;
+  updateOutbreakSettingsPreview();
+}
+function updateOutbreakSettingsPreview(){
+  const sevLabels = {1:'Low+',2:'Moderate+',3:'High only'};
+  const sevVal = parseInt(document.getElementById('ob-sev-slider')?.value)||3;
+  const pctVal = parseInt(document.getElementById('ob-pct-slider')?.value)||0;
+  const windowVal = parseInt(document.getElementById('ob-window-slider')?.value)||14;
+  const sevEl=document.getElementById('ob-sev-val'); if(sevEl) sevEl.textContent=sevLabels[sevVal]||'High only';
+  const pctEl=document.getElementById('ob-pct-val'); if(pctEl) pctEl.textContent=pctVal+'%';
+  const winEl=document.getElementById('ob-window-val'); if(winEl) winEl.textContent=windowVal+' day'+(windowVal===1?'':'s');
+}
+function saveOutbreakSettings(){
+  const sevLabels = {1:'Low', 2:'Moderate', 3:'High'};
+  const sevVal = parseInt(document.getElementById('ob-sev-slider')?.value)||3;
+  const pctVal = parseInt(document.getElementById('ob-pct-slider')?.value)||50;
+  const windowVal = parseInt(document.getElementById('ob-window-slider')?.value)||14;
+  STATE.outbreakSettings = {sevThreshold:sevLabels[sevVal], pctThreshold:pctVal, windowDays:windowVal};
+  saveLocal();
+  updateOutbreakSettingsPreview();
+  // Clear seen-alerts cache so the new thresholds are re-evaluated
+  localStorage.removeItem('outbreakAlertsSeen');
+  checkPestOutbreaks();
+  toast('Outbreak alert sensitivity updated ✓');
 }
 function saveGasUrl(){
   const url=(document.getElementById('gas-url-input')?.value||'').trim();
@@ -5461,16 +7654,38 @@ async function pullFromSheets(){
       if(r.success&&r.rows){
         if(s==='Growers') r.rows.forEach(row=>{
           if(!row.Grower_Name) return;
-          if(!STATE.growers.find(g=>g.name===row.Grower_Name)) STATE.growers.push({id:Date.now()+Math.random(),name:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',contact:row.Contact||'',registrationDate:row.Registration_Date||'',status:row.Status||'Active',totalArea:parseFloat(row.Total_Area_Ha)||0,notes:row.Notes||''});
+          const existing = STATE.growers.findIndex(g=>g.name===row.Grower_Name);
+          const remoteObj = {id:existing>-1?STATE.growers[existing].id:(Date.now()+Math.random()),name:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',contact:row.Contact||'',registrationDate:row.Registration_Date||'',status:row.Status||'Active',totalArea:parseFloat(row.Total_Area_Ha)||0,notes:row.Notes||'',_remoteTs:row.Last_Modified||0};
+          if(existing === -1){ STATE.growers.push(remoteObj); }
+          else {
+            const local = STATE.growers[existing];
+            const localTs = local._lastModified || 0;
+            const remoteTs = row.Last_Modified || 0;
+            if(remoteTs > localTs) STATE.growers[existing] = {...remoteObj, _lastModified: remoteTs};
+            else if(localTs > 0 && remoteTs > 0 && localTs !== remoteTs) queueConflict('Grower', row.Grower_Name, local, remoteObj);
+          }
         });
         if(s==='Plantations') r.rows.forEach(row=>{
           if(!row.Grower_Name||!row.Date_Planted) return;
-          if(!STATE.plantation.find(p=>p.grower===row.Grower_Name&&p.datePlanted===row.Date_Planted&&p.variety===row.Variety)) STATE.plantation.push({id:Date.now()+Math.random(),grower:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',variety:row.Variety||'',datePlanted:row.Date_Planted,area:parseFloat(row.Production_Area_Ha)||0,estYield:parseFloat(row.Estimated_Yield_T_Ha)||0,season:row.Season||'Season 1',fortnight:row.Fortnightly_Period||'Fortnight 1',comments:row.Officer_Comments||''});
+          const key = row.Grower_Name+'|'+row.Date_Planted+'|'+(row.Variety||'');
+          const existing = STATE.plantation.findIndex(p=>p.grower===row.Grower_Name&&p.datePlanted===row.Date_Planted&&p.variety===row.Variety);
+          const remoteObj = {id:existing>-1?STATE.plantation[existing].id:(Date.now()+Math.random()),grower:row.Grower_Name,zone:row.Zone||'',locality:row.Locality||'',variety:row.Variety||'',datePlanted:row.Date_Planted,area:parseFloat(row.Production_Area_Ha)||0,estYield:parseFloat(row.Estimated_Yield_T_Ha)||0,season:row.Season||'Season 1',fortnight:row.Fortnightly_Period||'Fortnight 1',comments:row.Officer_Comments||'',_remoteTs:row.Last_Modified||0};
+          if(existing === -1){ STATE.plantation.push(remoteObj); }
+          else {
+            const local = STATE.plantation[existing];
+            const localTs = local._lastModified || 0;
+            const remoteTs = row.Last_Modified || 0;
+            if(remoteTs > localTs) STATE.plantation[existing] = {...remoteObj, _lastModified: remoteTs};
+            else if(localTs > 0 && remoteTs > 0 && localTs !== remoteTs) queueConflict('Plantation', key, local, remoteObj);
+          }
         });
       }
     }
     saveLocal(); renderDashboard(); renderUsersList(); populateSelects();
     toast('Data pulled from Sheets ✓');
+    if (_conflictQueue.length) {
+      setTimeout(() => { showConflictModal(); toast(_conflictQueue.length + ' conflict(s) need review', 'warning'); }, 800);
+    }
   }catch(e){ toast('Pull failed: '+e.message,'error'); }
 }
 function addVariety(){
@@ -5484,7 +7699,33 @@ function addVariety(){
 function renderVarietyList(){
   const el=document.getElementById('variety-list');
   if(!el) return;
-  el.innerHTML=STATE.varieties.map((v,i)=>`<div class="variety-tag">${v}<span class="del" onclick="removeVariety(${i})">✕</span></div>`).join('');
+  const globalHd = STATE.harvestDays || 90;
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px;">` + STATE.varieties.map((v,i)=>{
+    const hd = STATE.varietyHarvestDays?.[v] ?? '';
+    return `<div style="display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:6px 10px;">
+      <span style="flex:1;font-weight:600;font-size:12px;color:var(--text);">${v}</span>
+      <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap;">Harvest cycle</span>
+      <input type="number" min="40" max="200" step="1" class="form-control" style="width:64px;font-size:11px;padding:4px 6px;text-align:center;"
+        placeholder="${globalHd}" value="${hd}"
+        title="Days from planting to harvest for ${v}. Leave blank to use the default (${globalHd}d)."
+        onchange="setVarietyHarvestDays('${v.replace(/'/g,"\\'")}', this.value)">
+      <span style="font-size:10px;color:var(--text3);">d</span>
+      <span class="del" style="cursor:pointer;opacity:.5;font-size:12px;color:var(--red);" onclick="removeVariety(${i})" title="Remove variety">✕</span>
+    </div>`;
+  }).join('') + `</div>
+  <div style="font-size:10px;color:var(--text3);margin-top:8px;line-height:1.5;">Set a custom harvest cycle (days from planting) per variety — used for the Harvest badge on Plantation rows. Leave blank to use the default of <strong>${globalHd} days</strong> (set via the Harvest Countdown slider on the Dashboard).</div>`;
+}
+function setVarietyHarvestDays(variety, val){
+  if(!STATE.varietyHarvestDays) STATE.varietyHarvestDays = {};
+  const days = parseInt(val);
+  if(!val || isNaN(days)){
+    delete STATE.varietyHarvestDays[variety];
+  } else {
+    STATE.varietyHarvestDays[variety] = Math.max(40, Math.min(200, days));
+  }
+  saveLocal();
+  renderPlantationTable();
+  toast(`Harvest cycle for "${variety}" ${STATE.varietyHarvestDays[variety] ? 'set to '+STATE.varietyHarvestDays[variety]+'d' : 'reset to default'} ✓`);
 }
 function removeVariety(i){ STATE.varieties.splice(i,1); saveLocal(); renderVarietyList(); populateSelects(); toast('Removed','warning'); }
 function createUserLocal(){
@@ -5667,8 +7908,9 @@ function handleImport(input){
   };
   reader.readAsText(file);
 }
-function clearAllData(){
-  if(!confirm('Delete ALL local data permanently? This cannot be undone.')) return;
+async function clearAllData(){
+  const ok = await confirmAction('<i class="fas fa-exclamation-triangle" style="color:var(--red);margin-right:6px;"></i> Delete <strong>ALL local data</strong> permanently? This cannot be undone.');
+  if(!ok) return;
   STATE={...DEFAULT_STATE}; saveLocal(); renderDashboard(); toast('All data cleared','warning');
 }
 
@@ -6143,6 +8385,471 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+// ============================================================
+// INDEX DB ENGINE — replaces localStorage for STATE (photos stay separate)
+// Transparent adapter: same get/set API, async under the hood.
+// Falls back silently to localStorage if IDB unavailable.
+// ============================================================
+const IDB = (function(){
+  const DB_NAME = 'pota_tracker_v4';
+  const STORE   = 'kv';
+  let _db = null;
+
+  function _open(){
+    if(_db) return Promise.resolve(_db);
+    return new Promise((res,rej)=>{
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore(STORE);
+      req.onsuccess = e => { _db=e.target.result; res(_db); };
+      req.onerror   = e => rej(e.target.error);
+    });
+  }
+
+  function get(key){
+    return _open().then(db => new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readonly');
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = ()=> res(req.result ?? null);
+      req.onerror   = ()=> rej(req.error);
+    }));
+  }
+
+  function set(key, val){
+    return _open().then(db => new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readwrite');
+      const req = tx.objectStore(STORE).put(val, key);
+      req.onsuccess = ()=> res(true);
+      req.onerror   = ()=> rej(req.error);
+    }));
+  }
+
+  function del(key){
+    return _open().then(db => new Promise((res,rej)=>{
+      const tx = db.transaction(STORE,'readwrite');
+      const req = tx.objectStore(STORE).delete(key);
+      req.onsuccess = ()=> res(true);
+      req.onerror   = ()=> rej(req.error);
+    }));
+  }
+
+  // One-time migration from localStorage
+  function migrate(){
+    const IDB_MIGRATED = 'pota_idb_migrated_v1';
+    if(localStorage.getItem(IDB_MIGRATED)) return Promise.resolve();
+    const keys = ['pota_state_v3','pota_gas_url_v3','pota_gas_secret_v1',
+                  'pota_sync_queue_v1','pota_current_user'];
+    const promises = keys.map(k=>{
+      const v = localStorage.getItem(k);
+      if(v != null) return set(k, v);
+      return Promise.resolve();
+    });
+    return Promise.all(promises).then(()=>{
+      localStorage.setItem(IDB_MIGRATED,'1');
+      const banner = document.getElementById('idb-banner');
+      if(banner){ banner.classList.add('show'); setTimeout(()=>banner.classList.remove('show'),3000); }
+    }).catch(()=>{});
+  }
+
+  return { get, set, del, migrate };
+})();
+
+// Async saveLocal — writes to IDB, keeps localStorage as hot cache for instant reads
+async function saveLocalAsync(){
+  const json = JSON.stringify(STATE);
+  try { localStorage.setItem('pota_state_v3', json); } catch(e){}
+  try { await IDB.set('pota_state_v3', json); } catch(e){}
+}
+
+// ============================================================
+// OBSERVATION TEMPLATE HELPER
+// ============================================================
+function injectTemplate(taId, text){
+  const ta = document.getElementById(taId);
+  if(!ta) return;
+  const cur = ta.value.trim();
+  const sep = cur ? (cur.endsWith('.') || cur.endsWith('!') || cur.endsWith('?') ? ' ' : '. ') : '';
+  ta.value = cur + sep + text;
+  ta.dispatchEvent(new Event('input',{bubbles:true}));
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
+// ============================================================
+// OFFLINE DETECTION
+// ============================================================
+(function(){
+  const pill = ()=> document.getElementById('offline-pill');
+  function updateOnlineStatus(){
+    const p = pill();
+    if(!p) return;
+    if(!navigator.onLine){
+      p.classList.add('show'); p.classList.remove('synced');
+      p.innerHTML = '<i class="fas fa-wifi-slash" style="font-size:10px;"></i> Offline';
+    } else {
+      p.classList.add('show','synced');
+      p.innerHTML = '<i class="fas fa-check-circle" style="font-size:10px;"></i> Online';
+      setTimeout(()=>{ p.classList.remove('show','synced'); }, 2500);
+    }
+  }
+  window.addEventListener('online',  updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  document.addEventListener('DOMContentLoaded', updateOnlineStatus);
+})();
+
+// ============================================================
+// PWA — Service Worker registration
+// ============================================================
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+
+  // Inline SW as a Blob — no separate sw.js file needed
+  const SW_SRC = `
+const CACHE = 'pota-v4-shell';
+const SHELL = [location.pathname || '/'];
+
+self.addEventListener('install', e=>{
+  e.waitUntil(
+    caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', e=>{
+  e.waitUntil(
+    caches.keys().then(keys=>Promise.all(
+      keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))
+    )).then(()=>self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', e=>{
+  const url = new URL(e.request.url);
+  // Network-first for GAS API calls; cache-first for everything else
+  if(url.hostname.includes('script.google.com') || url.hostname.includes('api.anthropic.com')){
+    e.respondWith(
+      fetch(e.request).catch(()=>
+        new Response(JSON.stringify({error:'offline'}),{headers:{'Content-Type':'application/json'}})
+      )
+    );
+    return;
+  }
+  e.respondWith(
+    caches.match(e.request).then(cached=>{
+      if(cached) return cached;
+      return fetch(e.request).then(resp=>{
+        if(resp && resp.status===200 && e.request.method==='GET'){
+          const clone=resp.clone();
+          caches.open(CACHE).then(c=>c.put(e.request,clone));
+        }
+        return resp;
+      });
+    })
+  );
+});
+`;
+
+  // Only register if served over HTTP (not file://)
+  if(location.protocol === 'file:') return;
+
+  const blob = new Blob([SW_SRC], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl, {scope: location.pathname})
+    .then(reg=>{
+      reg.addEventListener('updatefound',()=>{
+        const nw = reg.installing;
+        nw.addEventListener('statechange',()=>{
+          if(nw.state==='installed' && navigator.serviceWorker.controller){
+            toast('App updated — reload when ready','info');
+          }
+        });
+      });
+    })
+    .catch(()=>{});
+})();
+
+// ============================================================
+// VOICE ENGINE v2 — permission guide, interim preview, char counter, auto-cap
+// ============================================================
+(function(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let _recognition = null;
+  let _activeBtn   = null;
+  let _activeTA    = null;
+  let _activeInterim = null; // interim preview element
+  let _supported   = !!SpeechRecognition;
+
+  window.voiceSupported = _supported;
+
+  // ---- Helpers ------------------------------------------------
+
+  function _autoCap(str){
+    if(!str) return str;
+    // Capitalise first letter of string and after sentence-ending punctuation
+    return str.replace(/(^|[.!?]\s+)([a-z])/g, function(m,p1,p2){ return p1 + p2.toUpperCase(); });
+  }
+
+  function _stopRec(hideInterim){
+    if(_recognition){ try{ _recognition.stop(); }catch(e){} _recognition=null; }
+    if(_activeBtn){ _activeBtn.classList.remove('recording'); _activeBtn.title='Start voice input'; _activeBtn.innerHTML='<i class="fas fa-microphone"></i>'; }
+    if(_activeInterim && hideInterim){ _activeInterim.textContent=''; _activeInterim.classList.remove('visible'); }
+    _activeBtn=null; _activeTA=null; _activeInterim=null;
+  }
+
+  function _updateCharCounter(ta){
+    const wrap = ta.closest('.textarea-mic-wrap');
+    if(!wrap) return;
+    const counter = wrap.querySelector('.char-counter');
+    if(!counter) return;
+    const max = parseInt(ta.dataset.maxchars||'500');
+    const len = ta.value.length;
+    counter.textContent = len + ' / ' + max;
+    counter.classList.toggle('warn', len >= max*0.8 && len < max);
+    counter.classList.toggle('over', len >= max);
+  }
+
+  // Bootstrap a recognition instance
+  function _newRec(){
+    const rec = new SpeechRecognition();
+    rec.lang = 'en-US';
+    rec.continuous = true;
+    rec.interimResults = true;
+    return rec;
+  }
+
+  // ---- Permission error handler --------------------------------
+  function _handleVoiceError(e, btn){
+    _stopRec(false);
+    if(e.error === 'not-allowed' || e.error === 'permission-denied'){
+      window.openMicPermModal();
+    } else if(e.error === 'no-speech'){
+      toast('No speech detected — tap mic and speak clearly','warning');
+    } else if(e.error === 'audio-capture'){
+      toast('No microphone found or it\'s in use by another app','error');
+    } else if(e.error === 'network'){
+      toast('Voice recognition needs an internet connection','warning');
+    } else if(e.error === 'aborted'){
+      // user stopped manually — silent
+    } else {
+      toast('Voice error: ' + e.error,'error');
+    }
+  }
+
+  // ---- Public API ---------------------------------------------
+  window.toggleVoice = function(taId, btn){
+    if(!_supported){
+      toast('Voice input not supported in this browser','warning');
+      return;
+    }
+    const ta = document.getElementById(taId);
+    if(!ta) return;
+
+    // Stop if already recording
+    if(_recognition){
+      _stopRec(true);
+      return;
+    }
+
+    // Find interim preview element (sibling inside wrap)
+    const wrap = btn.closest('.textarea-mic-wrap') || btn.parentNode.closest('.textarea-mic-wrap');
+    const interimEl = wrap ? wrap.querySelector('.voice-interim') : null;
+
+    _recognition    = _newRec();
+    _activeBtn      = btn;
+    _activeTA       = ta;
+    _activeInterim  = interimEl;
+
+    btn.classList.add('recording');
+    btn.title = 'Tap to stop recording';
+    btn.innerHTML = '<i class="fas fa-stop-circle"></i>';
+    toast('🎙 Listening… speak now','info');
+
+    _recognition.onresult = function(e){
+      let final='', interim='';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        if(e.results[i].isFinal) final += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      // Show interim preview
+      if(interimEl){
+        if(interim){
+          interimEl.textContent = interim;
+          interimEl.classList.add('visible');
+        } else {
+          interimEl.textContent='';
+          interimEl.classList.remove('visible');
+        }
+      }
+      if(final){
+        const cur = ta.value;
+        const sep = (cur && !cur.endsWith(' ')) ? ' ' : '';
+        // Auto-capitalise: capitalise if textarea is empty or after sentence end
+        let appended = final.trim();
+        if(!cur.trim() || /[.!?]\s*$/.test(cur.trimEnd())){
+          appended = appended.charAt(0).toUpperCase() + appended.slice(1);
+        }
+        ta.value = cur + sep + appended;
+        ta.dispatchEvent(new Event('input',{bubbles:true}));
+        _updateCharCounter(ta);
+        // Clear interim after final commit
+        if(interimEl){ interimEl.textContent=''; interimEl.classList.remove('visible'); }
+      }
+    };
+
+    _recognition.onerror = function(e){ _handleVoiceError(e, btn); };
+
+    _recognition.onend = function(){
+      // Only clean up if we're still 'active' (not already stopped by user)
+      if(_activeBtn === btn){
+        _stopRec(true);
+      }
+    };
+
+    _recognition.start();
+  };
+
+  // ---- Permission guide modal --------------------------------
+  window.openMicPermModal = function(){
+    const m = document.getElementById('mic-perm-modal');
+    if(m){ m.classList.add('open'); }
+  };
+  window.closeMicPermModal = function(){
+    const m = document.getElementById('mic-perm-modal');
+    if(m){ m.classList.remove('open'); }
+  };
+  window.switchPermTab = function(browser){
+    document.querySelectorAll('.perm-tab').forEach(t=>t.classList.toggle('active', t.dataset.browser===browser));
+    document.querySelectorAll('.perm-browser-content > div').forEach(d=>d.classList.toggle('active', d.dataset.browser===browser));
+  };
+
+})();
+
+// ---- Inject mic buttons + char counters + permission modal ------
+document.addEventListener('DOMContentLoaded', function(){
+
+  // ---- Mic permission guide modal (injected once) -----------
+  if(!document.getElementById('mic-perm-modal')){
+    const html = `
+<div class="modal-overlay" id="mic-perm-modal" role="dialog" aria-modal="true" aria-labelledby="mic-perm-title">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title" id="mic-perm-title"><i class="fas fa-microphone-slash" style="color:var(--red);"></i> Microphone Access Blocked</div>
+      <button class="modal-close" onclick="closeMicPermModal()" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">
+        Your browser denied microphone access. This is a <strong style="color:var(--text);">browser or OS permission setting</strong>, not an app error.
+        Follow the steps for your browser below to re-enable it.
+      </p>
+      <div class="perm-browser-tabs">
+        <button class="perm-tab active" data-browser="chrome" onclick="switchPermTab('chrome')"><i class="fab fa-chrome"></i> Chrome</button>
+        <button class="perm-tab" data-browser="samsung" onclick="switchPermTab('samsung')"><i class="fas fa-mobile-alt"></i> Samsung</button>
+        <button class="perm-tab" data-browser="firefox" onclick="switchPermTab('firefox')"><i class="fab fa-firefox"></i> Firefox</button>
+        <button class="perm-tab" data-browser="safari" onclick="switchPermTab('safari')"><i class="fab fa-safari"></i> Safari</button>
+      </div>
+      <div class="perm-browser-content">
+        <div data-browser="chrome" class="active">
+          <div class="perm-step"><div class="perm-step-num">1</div><div class="perm-step-text">Tap the <strong>lock icon 🔒</strong> or <strong>ⓘ info icon</strong> in the address bar.</div></div>
+          <div class="perm-step"><div class="perm-step-num">2</div><div class="perm-step-text">Tap <strong>Permissions → Microphone</strong> and set it to <strong>Allow</strong>.</div></div>
+          <div class="perm-step"><div class="perm-step-num">3</div><div class="perm-step-text"><strong>Reload the page</strong> (pull down to refresh) — then tap the mic button again.</div></div>
+        </div>
+        <div data-browser="samsung">
+          <div class="perm-step"><div class="perm-step-num">1</div><div class="perm-step-text">Tap the <strong>lock icon</strong> or the <strong>three-dot menu ⋮</strong> in the browser, then tap <strong>Permissions</strong>.</div></div>
+          <div class="perm-step"><div class="perm-step-num">2</div><div class="perm-step-text">Find <strong>Microphone</strong> and switch it to <strong>Allow</strong>.</div></div>
+          <div class="perm-step"><div class="perm-step-num">3</div><div class="perm-step-text">If the option is greyed out, go to <strong>Android Settings → Apps → Samsung Internet → Permissions → Microphone → Allow</strong>.</div></div>
+          <div class="perm-step"><div class="perm-step-num">4</div><div class="perm-step-text"><strong>Reload the page</strong> and try again.</div></div>
+        </div>
+        <div data-browser="firefox">
+          <div class="perm-step"><div class="perm-step-num">1</div><div class="perm-step-text">Tap the <strong>lock icon 🔒</strong> in the address bar.</div></div>
+          <div class="perm-step"><div class="perm-step-num">2</div><div class="perm-step-text">Tap <strong>Edit Site Permissions → Microphone → Allow</strong>.</div></div>
+          <div class="perm-step"><div class="perm-step-num">3</div><div class="perm-step-text"><strong>Reload the page</strong> and try the mic again.</div></div>
+        </div>
+        <div data-browser="safari">
+          <div class="perm-step"><div class="perm-step-num">1</div><div class="perm-step-text">Go to <strong>iOS Settings → Safari → Camera & Microphone Access</strong> and turn it on.</div></div>
+          <div class="perm-step"><div class="perm-step-num">2</div><div class="perm-step-text">Back in Safari, tap <strong>aA</strong> in the address bar → <strong>Website Settings → Microphone → Allow</strong>.</div></div>
+          <div class="perm-step"><div class="perm-step-num">3</div><div class="perm-step-text"><strong>Reload the page</strong> and try again.</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px 12px;background:var(--gold-dim);border:1px solid rgba(240,165,0,.2);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5;">
+        <i class="fas fa-lightbulb" style="color:var(--gold);margin-right:6px;"></i>
+        <strong style="color:var(--gold);">Tip:</strong> If this page is opened as a <em>downloaded file</em> (file://), move it to a local server or open it from claude.ai — browsers block mic on file:// pages for security.
+      </div>
+    </div>
+    <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeMicPermModal()">Close</button>
+    </div>
+  </div>
+</div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  // ---- Inject mic buttons + char counter + interim preview ----
+  const MIC_TARGETS = [
+    { id:'g-notes',       max:500 },
+    { id:'pl-comments',   max:500 },
+    { id:'pd-comments',   max:500 },
+    { id:'ya-comments',   max:800 },
+    { id:'rpt-comments',  max:800 },
+    { id:'csm-notes',     max:500 },
+    { id:'ci-comments',   max:500 },
+  ];
+
+  MIC_TARGETS.forEach(function(cfg){
+    const ta = document.getElementById(cfg.id);
+    if(!ta) return;
+
+    ta.dataset.maxchars = cfg.max;
+
+    // ---- outer wrap (column: row + interim + meta) ----
+    const outerWrap = document.createElement('div');
+    outerWrap.className = 'textarea-mic-wrap';
+
+    // ---- mic row ----
+    const row = document.createElement('div');
+    row.className = 'textarea-mic-row';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mic-btn' + (window.voiceSupported ? '' : ' unsupported');
+    btn.title = window.voiceSupported ? 'Start voice input' : 'Voice input not supported';
+    btn.innerHTML = '<i class="fas fa-microphone"></i>';
+
+    if(window.voiceSupported){
+      btn.addEventListener('click', function(){ window.toggleVoice(cfg.id, btn); });
+    } else {
+      btn.addEventListener('click', function(){ window.openMicPermModal && window.openMicPermModal(); });
+    }
+
+    // ---- interim preview ----
+    const interim = document.createElement('div');
+    interim.className = 'voice-interim';
+
+    // ---- meta row (char counter) ----
+    const metaRow = document.createElement('div');
+    metaRow.className = 'voice-meta-row';
+    const counter = document.createElement('span');
+    counter.className = 'char-counter';
+    counter.textContent = '0 / ' + cfg.max;
+    metaRow.appendChild(counter);
+
+    // ---- assemble ----
+    const parent = ta.parentNode;
+    parent.insertBefore(outerWrap, ta);
+    row.appendChild(ta);
+    row.appendChild(btn);
+    outerWrap.appendChild(row);
+    outerWrap.appendChild(interim);
+    outerWrap.appendChild(metaRow);
+
+    // Live char counter update
+    ta.addEventListener('input', function(){
+      const len = ta.value.length;
+      const max = cfg.max;
+      counter.textContent = len + ' / ' + max;
+      counter.classList.toggle('warn', len >= max*0.8 && len < max);
+      counter.classList.toggle('over', len >= max);
+    });
+  });
+});
+
 </script>
 
 <!-- ===== CHANGE PASSWORD MODAL ===== -->
@@ -6245,6 +8952,20 @@ document.addEventListener('keydown', function(e){
   </div>
 </div>
 
+<!-- ===== VARIETY x PEST DRILL-DOWN MODAL ===== -->
+<div class="modal-overlay" id="vp-drilldown-modal" role="dialog" aria-modal="true" aria-labelledby="vp-drilldown-title">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <div class="modal-title" id="vp-drilldown-title"><i class="fas fa-bug" style="color:var(--red);"></i></div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('vp-drilldown-modal')" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="vp-drilldown-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('vp-drilldown-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ===== GLOBAL SEARCH MODAL ===== -->
 <div class="modal-overlay" id="global-search-modal" role="dialog" aria-modal="true" aria-labelledby="gsearch-title">
@@ -6309,5 +9030,49 @@ document.addEventListener('keydown', function(e){
     </div>
   </div>
 </div>
+<script>
+// ── PWA Manifest (injected as blob) ─────────────────────────────────────────
+(function(){
+  const manifest={
+    name:'PoTaTo Tracker v4.0',
+    short_name:'PoTaTo',
+    description:'Potato Cultivation Monitoring System — Mauritius',
+    start_url:location.href,
+    scope:location.pathname,
+    display:'standalone',
+    orientation:'portrait-primary',
+    background_color:'#07090f',
+    theme_color:'#f0a500',
+    icons:[
+      {src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><circle cx="96" cy="96" r="96" fill="%23f0a500"/><text x="50%25" y="55%25" dominant-baseline="middle" text-anchor="middle" font-size="120">🥔</text></svg>',sizes:'192x192',type:'image/svg+xml'},
+      {src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="%23f0a500"/><text x="50%25" y="55%25" dominant-baseline="middle" text-anchor="middle" font-size="320">🥔</text></svg>',sizes:'512x512',type:'image/svg+xml'}
+    ]
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  const el=document.getElementById('pwa-manifest-link');
+  if(el) el.href=URL.createObjectURL(blob);
+})();
+
+// ── Install prompt banner ────────────────────────────────────────────────────
+(function(){
+  let deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault(); deferredPrompt=e;
+    // Show a subtle toast-style install prompt after 8s
+    setTimeout(()=>{
+      const s=document.getElementById('toast-stack');
+      if(!s) return;
+      const el=document.createElement('div');
+      el.className='toast info';
+      el.style.cssText='cursor:pointer;max-width:300px;';
+      el.innerHTML='<i class="fas fa-download"></i><span>Add PoTaTo Tracker to home screen for offline use</span>';
+      el.addEventListener('click',()=>{ deferredPrompt?.prompt(); el.remove(); });
+      setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); },12000);
+      s.appendChild(el);
+    },8000);
+  });
+  window.addEventListener('appinstalled',()=>toast('PoTaTo Tracker installed ✓ — works offline now','success'));
+})();
+</script>
 </body>
 </html>
