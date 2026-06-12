@@ -2430,7 +2430,7 @@ async function identifyPestFromPhoto(photo){
   <div class="card fo-admin-hidden">
     <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;"><span><i class="fas fa-users-cog"></i> User Management</span><button class="btn btn-ghost" style="font-size:12px;padding:5px 10px;" onclick="openChangePasswordModal()"><i class="fas fa-key"></i> Change My Password</button></div>
     <div class="form-row-3">
-      <div class="form-group"><label class="form-label">Username</label><input class="form-control" id="nu-username" placeholder="username"></div>
+      <div class="form-group"><label class="form-label">Username</label><input class="form-control" id="nu-username" placeholder="no spaces e.g. jsmith" oninput="this.value=this.value.replace(/\s/g,'').toLowerCase()"></div>
       <div class="form-group"><label class="form-label">Full Name</label><input class="form-control" id="nu-fullname" placeholder="Full name"></div>
       <div class="form-group"><label class="form-label">Password</label><input class="form-control" id="nu-password" type="password" placeholder="Min 6 chars"></div>
     </div>
@@ -3525,6 +3525,8 @@ async function submitPasswordChange(){
       localUsr.password = hashed;
       localUsr.mustChangePassword = false;
       saveLocal();
+      // Fix 4: push new hash to GAS
+      if(GAS_URL) callGAS('createUser',{username:localUsr.username,fullName:localUsr.fullName,role:localUsr.role,zoneAccess:localUsr.zoneAccess,passwordHash:hashed}).catch(()=>{});
     }
     document.getElementById('change-pass-overlay').classList.remove('active');
     document.getElementById('login-screen').style.display = 'none';
@@ -8280,6 +8282,8 @@ async function createUserLocal(){
   const role=document.getElementById('nu-role')?.value||'Field Officer';
   const zoneAccess=document.getElementById('nu-zone')?.value||'All';
   if(!username||!password){ toast('Username and password required','error'); return; }
+  if(/\s/.test(username)){ toast('Username must not contain spaces','error'); return; }
+  if(!/^[a-z0-9_]+$/.test(username)){ toast('Username may only contain lowercase letters, numbers, and underscores','error'); return; }
   if(password.length<6){ toast('Password must be at least 6 chars','error'); return; }
   if(STATE.users.find(u=>u.username.toLowerCase()===username)){ toast('Username already exists','warning'); return; }
   // FIX: hash the password BEFORE storing locally so verifyPassword() works at login
@@ -8402,6 +8406,13 @@ async function changePassword() {
     toast('Password updated ✓', 'success');
     // If changing own password, update CURRENT_USER reference too
     if (isSelf) CURRENT_USER.password = hash;
+    // Fix 4: sync new password hash to GAS
+    if(GAS_URL){
+      const u = STATE.users[userIdx];
+      callGAS('createUser',{username:u.username,fullName:u.fullName,role:u.role,zoneAccess:u.zoneAccess,passwordHash:hash})
+        .then(r=>{ if(r.success) toast('Password synced to Sheets ✓','success'); })
+        .catch(()=>{ toast('Password saved locally — GAS sync failed (will retry on next sync)','warning'); });
+    }
   } catch(e) {
     toast('Failed to update password: ' + e.message, 'error');
   } finally {
@@ -8419,10 +8430,11 @@ function renderUsersList(){
     const actions = isSelf
       ? `<button class="user-action-btn" onclick="openChangePasswordModal()"><i class="fas fa-key"></i> Change</button>`
       : isAdmin
-        ? `<button class="user-action-btn" onclick="openChangePasswordModal('${u.username}')"><i class="fas fa-redo-alt"></i> Reset</button>`
+        ? `<button class="user-action-btn" onclick="openChangePasswordModal('${u.username}')"><i class="fas fa-redo-alt"></i> Reset</button>
+           <button class="user-action-btn" style="color:var(--red);" onclick="adminForceResetPassword('${u.username}')"><i class="fas fa-lock-open"></i> Force Reset</button>`
         : '—';
     return `<tr>
-      <td style="font-family:var(--font-mono);font-size:12px;">${u.username}${isSelf?' <span style="font-size:10px;color:var(--gold);">(you)</span>':''}</td>
+      <td style="font-family:var(--font-mono);font-size:12px;">${u.username}${isSelf?' <span style="font-size:10px;color:var(--gold);">(you)</span>':''}${u.mustChangePassword?' <span style="font-size:10px;color:var(--orange);" title="Must change password on next login">⚠ reset</span>':''}</td>
       <td>${u.fullName||'—'}</td><td>${u.role}</td><td>${u.zoneAccess}</td>
       <td><span style="font-size:11px;font-weight:700;color:${u.status==='Active'?'var(--green)':'var(--red)'};">${u.status}</span></td>
       <td style="white-space:nowrap;">${actions}</td></tr>`;
@@ -8433,6 +8445,22 @@ function renderUsersList(){
       <th scope="col">Zone</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th>
     </tr></thead>
     <tbody>${rows}</tbody></table></div>`;
+}
+
+// Fix 3: Admin force-reset — sets a known temp password and flags mustChangePassword
+async function adminForceResetPassword(targetUsername){
+  if(CURRENT_USER?.role !== 'Administrator'){ toast('Admins only','error'); return; }
+  const tempPass = 'Reset@' + Math.floor(1000+Math.random()*9000);
+  const ok = await confirmAction(`Force-reset password for <strong>${targetUsername}</strong>?<br>Temp password will be: <code style="color:var(--gold)">${tempPass}</code><br>User must change it on next login.`);
+  if(!ok) return;
+  const hash = await hashPassword(tempPass);
+  const idx = STATE.users.findIndex(u=>u.username===targetUsername);
+  if(idx===-1){ toast('User not found','error'); return; }
+  STATE.users[idx].password = hash;
+  STATE.users[idx].mustChangePassword = true;
+  saveLocal();
+  toast(`Password reset for ${targetUsername}. Temp: ${tempPass} — share securely.`, 'success');
+  if(GAS_URL) callGAS('createUser',{username:targetUsername,fullName:STATE.users[idx].fullName,role:STATE.users[idx].role,zoneAccess:STATE.users[idx].zoneAccess,passwordHash:hash}).catch(()=>{});
 }
 function exportAllData(){
   const a=document.createElement('a');
