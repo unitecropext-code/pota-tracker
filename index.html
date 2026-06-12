@@ -5320,7 +5320,27 @@ function initMap(){
   }
   if(map){ setTimeout(()=>map.invalidateSize(),100); renderMapLayers(); return; }
   map=L.map('map-container',{center:[-20.25,57.63],zoom:11});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(map);
+
+  // ── Basemap with automatic fallback chain ─────────────────────────────
+  // If the primary CARTO tile server is unreachable (corporate proxy, ad
+  // blocker, offline, etc.) the map would otherwise render as a flat grey
+  // square with no imagery. Detect tile-load failures and swap to a
+  // standard OSM tile source; if that also fails, show a small banner but
+  // keep the map fully interactive (zones/markers are vector layers and
+  // don't depend on the basemap at all).
+  let _tileFallbackTried=false;
+  const primaryTiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19});
+  primaryTiles.on('tileerror',()=>{
+    if(_tileFallbackTried) return;
+    _tileFallbackTried=true;
+    console.warn('CARTO basemap tiles failed to load — falling back to OSM standard tiles.');
+    map.removeLayer(primaryTiles);
+    const fallbackTiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors',subdomains:'abc',maxZoom:19});
+    fallbackTiles.on('tileerror',()=>showMapBasemapWarning());
+    fallbackTiles.addTo(map);
+  });
+  primaryTiles.addTo(map);
+
   drawnItems=new L.FeatureGroup(); map.addLayer(drawnItems);
   // Guard: Leaflet.Draw may have failed to load
   if(!window._leafletDrawFailed && typeof L.Control !== 'undefined' && typeof L.Control.Draw !== 'undefined'){
@@ -5339,6 +5359,30 @@ function initMap(){
   }
   renderMapLayers(); renderZoneStats(); renderMapSeverityBars(); renderDiseaseHeatLayer();
   setTimeout(()=>map.invalidateSize(),200);
+
+  // Diagnostics: helps confirm whether the "empty grey map" symptom is a
+  // basemap problem (tiles) or a data problem (no growers/plots loaded
+  // from GAS yet). Check the browser console after opening Zone Map.
+  console.log('[Zone Map] init —',
+    'growers:', STATE.growers.length,
+    '| plantation:', STATE.plantation.length,
+    '| pestRecords:', STATE.pestRecords.length,
+    '| GAS_URL set:', !!GAS_URL,
+    '| Leaflet.Draw loaded:', !window._leafletDrawFailed);
+  if(!STATE.growers.length && !STATE.plantation.length){
+    console.warn('[Zone Map] STATE.growers and STATE.plantation are both empty — only the static zone outlines will be visible. Check Settings → GAS URL and confirm ?action=getData is returning rows.');
+  }
+}
+function showMapBasemapWarning(){
+  if(document.getElementById('map-basemap-warning')) return;
+  const container=document.getElementById('map-container');
+  if(!container) return;
+  const w=document.createElement('div');
+  w.id='map-basemap-warning';
+  w.style.cssText='position:absolute;top:8px;left:8px;right:8px;z-index:1000;background:rgba(15,21,32,.92);border:1px solid rgba(240,165,0,.35);color:var(--gold);font-size:11px;padding:6px 10px;border-radius:8px;text-align:center;';
+  w.innerHTML='<i class="fas fa-triangle-exclamation"></i> Basemap imagery unavailable (network/CDN blocked) — zones, growers and plots below are still live and clickable.';
+  container.style.position='relative';
+  container.appendChild(w);
 }
 function updateDrawnShapesList(){
   const el=document.getElementById('drawn-shapes-list');
@@ -5371,9 +5415,9 @@ function renderMapLayers(){
       const zDesc={E1:'Moka District (West)',E2:'Moka-Flacq Border',E3:'Flacq District (Central)',E4:'Flacq District (SE Coast)'};
       const zoneGc=STATE.growers.filter(g=>g.zone===zone).length;
       const zoneArea=STATE.plantation.filter(p=>p.zone===zone).reduce((s,r)=>s+(r.area||0),0).toFixed(2);
-      const zPoly=L.polygon(coords,{color,weight:2.5,fillColor:color,fillOpacity:.08,dashArray:'6 4'});
-      zPoly.on('mouseover',function(){this.setStyle({weight:3.5,fillOpacity:.15,dashArray:''});});
-      zPoly.on('mouseout',function(){this.setStyle({weight:2.5,fillOpacity:.08,dashArray:'6 4'});});
+      const zPoly=L.polygon(coords,{color,weight:2.5,fillColor:color,fillOpacity:.16,dashArray:'6 4'});
+      zPoly.on('mouseover',function(){this.setStyle({weight:3.5,fillOpacity:.28,dashArray:''});});
+      zPoly.on('mouseout',function(){this.setStyle({weight:2.5,fillOpacity:.16,dashArray:'6 4'});});
       zPoly.bindPopup(`<div class="pop-name" style="color:${color};">Zone ${zone}</div><div style="font-size:11px;color:#aaa;margin-bottom:6px;">${zDesc[zone]||''}</div><div class="pop-row"><i class="fas fa-users" style="color:${color};"></i> ${zoneGc} growers</div><div class="pop-row"><i class="fas fa-ruler-combined" style="color:${color};"></i> ${zoneArea} ha planted</div><div style="margin-top:8px;"><button onclick="zoneCardClick('${zone}')" style="font-size:11px;padding:4px 10px;border-radius:6px;background:${color}22;border:1px solid ${color}44;color:${color};cursor:pointer;font-weight:600;">Zoom to zone</button></div>`);
       zPoly.addTo(zl);
       const lats=coords.map(c=>c[0]),lngs=coords.map(c=>c[1]);
@@ -7679,6 +7723,65 @@ async function pullFromSheets(){
             else if(localTs > 0 && remoteTs > 0 && localTs !== remoteTs) queueConflict('Plantation', key, local, remoteObj);
           }
         });
+        // BUG FIX #7: Pest_Disease and Yield_Assessment were fetched but the
+        // mapper had no handler blocks — rows were silently discarded.
+        if(s==='Pest_Disease') r.rows.forEach(row=>{
+          if(!row.Grower_Name||!row.Pest_Disease_Name) return;
+          if(!STATE.pestDisease) STATE.pestDisease = [];
+          const existing = STATE.pestDisease.findIndex(p=>
+            p.grower===row.Grower_Name &&
+            p.date===row.Date_Observed &&
+            p.name===row.Pest_Disease_Name
+          );
+          const remoteObj = {
+            id:           existing>-1 ? STATE.pestDisease[existing].id : (Date.now()+Math.random()),
+            grower:       row.Grower_Name,
+            zone:         row.Zone||'',
+            locality:     row.Locality||'',
+            date:         row.Date_Observed||'',
+            season:       row.Season||'',
+            name:         row.Pest_Disease_Name,
+            category:     row.Category||'Other',
+            severity:     row.Severity||'Moderate',
+            pct:          parseFloat(row.Severity_Pct)||0,
+            affectedArea: parseFloat(row.Affected_Area_Ha)||0,
+            controlMeasure: row.Control_Measure||'',
+            comments:     row.Officer_Comments||''
+          };
+          if(existing === -1) STATE.pestDisease.push(remoteObj);
+          else STATE.pestDisease[existing] = remoteObj;
+        });
+        if(s==='Yield_Assessment') r.rows.forEach(row=>{
+          if(!row.Grower_Name||!row.Assessment_Date) return;
+          if(!STATE.yieldAssessments) STATE.yieldAssessments = [];
+          const existing = STATE.yieldAssessments.findIndex(y=>
+            y.grower===row.Grower_Name &&
+            y.date===row.Assessment_Date &&
+            y.variety===row.Variety
+          );
+          const remoteObj = {
+            id:       existing>-1 ? STATE.yieldAssessments[existing].id : (Date.now()+Math.random()),
+            grower:   row.Grower_Name,
+            zone:     row.Zone||'',
+            locality: row.Locality||'',
+            variety:  row.Variety||'',
+            date:     row.Assessment_Date,
+            season:   row.Season||'',
+            area:     parseFloat(row.Area_Sqm)||0,
+            samples:  [
+              parseFloat(row.Sample1_Kg_Sqm)||0,
+              parseFloat(row.Sample2_Kg_Sqm)||0,
+              parseFloat(row.Sample3_Kg_Sqm)||0,
+              parseFloat(row.Sample4_Kg_Sqm)||0,
+              parseFloat(row.Sample5_Kg_Sqm)||0
+            ],
+            avgKgSqm: parseFloat(row.Avg_Kg_Sqm)||0,
+            yieldTHa: parseFloat(row.Yield_T_Ha)||0,
+            comments: row.Officer_Comments||''
+          };
+          if(existing === -1) STATE.yieldAssessments.push(remoteObj);
+          else STATE.yieldAssessments[existing] = remoteObj;
+        });
       }
     }
     saveLocal(); renderDashboard(); renderUsersList(); populateSelects();
@@ -8147,6 +8250,21 @@ function saveSeasonSummary() {
   closeModal('comp-summary-modal');
   renderComparative();
   toast(`Season summary saved for ${season} ${year} ✓`);
+
+  // BUG FIX #6: The GAS handler for saveSeasonSummary exists but was never
+  // called — summary was saved locally only.  Push to Sheets now.
+  if(GAS_URL) {
+    callGAS('saveSeasonSummary', {
+      year, season, plots, area, prod,
+      yield: yieldV,
+      pest: pest ? parseFloat(pest) : 0,
+      notes,
+      Recorded_By: CURRENT_USER?.username || ''
+    }).then(r => {
+      if(r.success) toast(`Season summary synced to Sheets ✓`);
+      else toast('Sheets sync failed: ' + (r.error || 'unknown'), 'warning');
+    }).catch(() => toast('Sheets sync failed (network)', 'warning'));
+  }
 }
 
 // ============================================================
