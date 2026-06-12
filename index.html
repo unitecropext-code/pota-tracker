@@ -1223,9 +1223,31 @@ async function identifyPestFromPhoto(photo){
       })
     });
     const data = await response.json();
+
+    // BUG FIX: surface real failure reasons. Previously any non-2xx
+    // response, API error object, or unparseable body fell straight
+    // through to a generic "Identification failed" with no detail —
+    // making it impossible to tell a network/CORS/auth problem apart
+    // from the model simply returning malformed JSON.
+    if(!response.ok || data.type === 'error'){
+      const apiMsg = data?.error?.message || `HTTP ${response.status}`;
+      console.error('[Pest ID] API error:', apiMsg, data);
+      throw new Error(apiMsg);
+    }
+
     const text = (data.content||[]).map(b=>b.text||'').join('').trim();
+    if(!text){
+      console.error('[Pest ID] Empty response body:', data);
+      throw new Error('Empty response from model');
+    }
     const clean = text.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
+    let parsed;
+    try{
+      parsed = JSON.parse(clean);
+    }catch(parseErr){
+      console.error('[Pest ID] Could not parse model response as JSON:', text);
+      throw new Error('Model response was not valid JSON');
+    }
 
     if(!parsed.match || parsed.match==='Unknown' || !allLabels.includes(parsed.match)){
       if(resEl){
@@ -1266,8 +1288,9 @@ async function identifyPestFromPhoto(photo){
     }
     toast('Identified: '+parsed.match+' ✓');
   }catch(err){
+    console.error('[Pest ID] identifyPestFromPhoto failed:', err);
     if(resEl){
-      resEl.innerHTML = '<i class="fas fa-triangle-exclamation" style="color:var(--red);"></i> Identification failed. Please select the pest/disease manually.';
+      resEl.innerHTML = `<i class="fas fa-triangle-exclamation" style="color:var(--red);"></i> Identification failed (${err.message||'unknown error'}). This feature requires running inside a Claude.ai artifact with API access — please select the pest/disease manually below.`;
     }
   }
 }
@@ -6654,6 +6677,106 @@ async function generateSeasonReportPDF(){
   });
   let topVarietyPest=null, topCount=0;
   Object.entries(varietyPestCounts).forEach(([k,c])=>{ if(c>topCount){topCount=c;topVarietyPest=k;} });
+
+  const sevScoreMap={Low:1,Moderate:2,High:3};
+
+  // ── NEW: Executive summary KPIs ──
+  const filteredGrowers = STATE.growers.filter(g=>!zoneFilter||g.zone===zoneFilter);
+  const totalGrowers = filteredGrowers.length;
+  const totalPlots   = s1Tot.plots + s2Tot.plots;
+  const totalArea    = s1Tot.area + s2Tot.area;
+  const totalProd    = s1Tot.prod + s2Tot.prod;
+  const overallAvgYieldVals = [s1AvgYield,s2AvgYield].filter(Boolean);
+  const overallAvgYield = avg(overallAvgYieldVals);
+
+  const ppiVisits = STATE.pestRecords.flatMap(r=>{
+    const gz = STATE.growers.find(g=>g.name===r.grower)?.zone||'';
+    if(zoneFilter && gz!==zoneFilter) return [];
+    return (r.visits||[]).filter(v=>yearFilter==='all'||getYear(v.date)===yearFilter);
+  });
+  const ppiScores = ppiVisits.flatMap(v=>Object.values(v.pests||{}).map(p=>sevScoreMap[p.sev]||0).filter(Boolean));
+  const ppiScore  = ppiScores.length ? Math.round((ppiScores.reduce((a,b)=>a+b,0)/ppiScores.length/3)*100) : 0;
+  const ppiLabel  = !ppiScores.length ? 'No Data' : ppiScore>=70 ? 'High Pressure' : ppiScore>=40 ? 'Moderate Pressure' : 'Low / Healthy';
+
+  // ── NEW: Zone performance breakdown ──
+  const ZONE_DISTRICT_LBL={E1:'Moka (West)',E2:'Moka/Flacq',E3:'Flacq (Central)',E4:'Flacq (SE Coast)'};
+  const zonesToShow = zoneFilter ? [zoneFilter] : ['E1','E2','E3','E4'];
+  const zoneRows = zonesToShow.map(z=>{
+    const zGrowers = STATE.growers.filter(g=>g.zone===z);
+    const zNames   = zGrowers.map(g=>g.name);
+    const zPlants  = STATE.plantation.filter(r=>r.zone===z&&(yearFilter==='all'||getYear(r.datePlanted)===yearFilter));
+    const zArea    = zPlants.reduce((s,r)=>s+(r.area||0),0);
+    const zProd    = zPlants.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield||20),0);
+    const zVisits  = STATE.pestRecords.filter(r=>zNames.includes(r.grower)).flatMap(r=>(r.visits||[]).filter(v=>yearFilter==='all'||getYear(v.date)===yearFilter));
+    const zScores  = zVisits.flatMap(v=>Object.values(v.pests||{}).map(p=>sevScoreMap[p.sev]||0).filter(Boolean));
+    const zAvgSev  = zScores.length ? zScores.reduce((a,b)=>a+b,0)/zScores.length : 0;
+    return { zone:z, district:ZONE_DISTRICT_LBL[z]||'', growers:zGrowers.length, plots:zPlants.length, area:zArea, prod:zProd, pest:zScores.length?sevLabel(zAvgSev):'No Data' };
+  });
+
+  // ── NEW: Variety performance ──
+  const varietyStats={};
+  STATE.plantation.filter(r=>(yearFilter==='all'||getYear(r.datePlanted)===yearFilter)&&(!zoneFilter||r.zone===zoneFilter)).forEach(r=>{
+    const v=r.variety||'Unknown';
+    if(!varietyStats[v]) varietyStats[v]={area:0,plots:0,s1Area:0,s2Area:0,yieldSamples:[]};
+    varietyStats[v].area+=(r.area||0); varietyStats[v].plots++;
+    if(r.season==='Season 1') varietyStats[v].s1Area+=(r.area||0); else varietyStats[v].s2Area+=(r.area||0);
+  });
+  STATE.yieldAssessments.filter(r=>(yearFilter==='all'||getYear(r.date)===yearFilter)&&(!zoneFilter||r.zone===zoneFilter)).forEach(r=>{
+    const v=r.variety||'Unknown';
+    if(!varietyStats[v]) varietyStats[v]={area:0,plots:0,s1Area:0,s2Area:0,yieldSamples:[]};
+    if(parseFloat(r.yieldHa)) varietyStats[v].yieldSamples.push(parseFloat(r.yieldHa));
+  });
+  const varietyRows = Object.entries(varietyStats).map(([v,s])=>({
+    variety:v, area:s.area, plots:s.plots, s1Area:s.s1Area, s2Area:s.s2Area,
+    avgYield: s.yieldSamples.length ? s.yieldSamples.reduce((a,b)=>a+b,0)/s.yieldSamples.length : null
+  })).sort((a,b)=>(b.avgYield||0)-(a.avgYield||0));
+
+  // ── NEW: Yield gap — actual vs estimated, latest assessment per grower ──
+  const ygByGrower={};
+  STATE.yieldAssessments.filter(r=>(yearFilter==='all'||getYear(r.date)===yearFilter)&&(!zoneFilter||r.zone===zoneFilter)).forEach(y=>{
+    if(!ygByGrower[y.grower]||y.date>ygByGrower[y.grower].date) ygByGrower[y.grower]=y;
+  });
+  const yieldGapRows = Object.values(ygByGrower).map(y=>{
+    const samples=(y.samples||[]).filter(s=>s>0);
+    if(!samples.length) return null;
+    const avgKgSqm=samples.reduce((a,b)=>a+b,0)/samples.length;
+    const actualTha=avgKgSqm*10;
+    const pRec=STATE.plantation.filter(r=>r.grower===y.grower).sort((a,b)=>b.id-a.id)[0];
+    const estTha=pRec?(pRec.estYield||STATE.defaultYield||20):(STATE.defaultYield||20);
+    return { grower:y.grower, zone:y.zone||pRec?.zone||'—', locality:y.locality||pRec?.locality||'—', actualTha, estTha, gap:actualTha-estTha };
+  }).filter(Boolean).sort((a,b)=>a.gap-b.gap);
+
+  // ── NEW: Pest & disease incident log (top 25 by severity, then most recent) ──
+  const incidentRows=[];
+  STATE.pestRecords.forEach(r=>{
+    const gz=STATE.growers.find(g=>g.name===r.grower)?.zone||'';
+    if(zoneFilter&&gz!==zoneFilter) return;
+    (r.visits||[]).forEach(v=>{
+      if(yearFilter!=='all'&&getYear(v.date)!==yearFilter) return;
+      Object.entries(v.pests||{}).forEach(([pest,pd])=>{
+        if(!pd.sev) return;
+        incidentRows.push({date:v.date||'',grower:r.grower,zone:gz,locality:r.locality||'',pest,sev:pd.sev,pct:pd.pct||0,control:r.controlMeasure||''});
+      });
+    });
+  });
+  incidentRows.sort((a,b)=>{
+    if((sevScoreMap[b.sev]||0)!==(sevScoreMap[a.sev]||0)) return (sevScoreMap[b.sev]||0)-(sevScoreMap[a.sev]||0);
+    return (b.date||'').localeCompare(a.date||'');
+  });
+  const topIncidents = incidentRows.slice(0,25);
+
+  // ── NEW: Harvest schedule by fortnight ──
+  const MONTH_LBL=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fortnightStats={};
+  STATE.plantation.filter(r=>r.datePlanted&&(yearFilter==='all'||getYear(r.datePlanted)===yearFilter)&&(!zoneFilter||r.zone===zoneFilter)).forEach(r=>{
+    const d=new Date(r.datePlanted);
+    const key=`${MONTH_LBL[d.getMonth()]} ${r.fortnight||'—'}`;
+    if(!fortnightStats[key]) fortnightStats[key]={plots:0,area:0,prod:0,_m:d.getMonth(),_f:r.fortnight==='Fortnight 1'?1:2};
+    fortnightStats[key].plots++;
+    fortnightStats[key].area+=(r.area||0);
+    fortnightStats[key].prod+=(r.area||0)*(r.estYield||STATE.defaultYield||20);
+  });
+  const fortnightRows=Object.entries(fortnightStats).map(([k,v])=>({label:k,...v})).sort((a,b)=>a._m-b._m||a._f-b._f);
 
   // ── Capture charts as images ──
   const chartIds=['comp-area-chart','comp-prod-chart','comp-yield-chart','comp-pest-chart','comp-yoy-chart'];
