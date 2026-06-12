@@ -8273,7 +8273,7 @@ function setVarietyHarvestDays(variety, val){
   toast(`Harvest cycle for "${variety}" ${STATE.varietyHarvestDays[variety] ? 'set to '+STATE.varietyHarvestDays[variety]+'d' : 'reset to default'} ✓`);
 }
 function removeVariety(i){ STATE.varieties.splice(i,1); saveLocal(); renderVarietyList(); populateSelects(); toast('Removed','warning'); }
-function createUserLocal(){
+async function createUserLocal(){
   const username=document.getElementById('nu-username')?.value.trim().toLowerCase();
   const fullName=document.getElementById('nu-fullname')?.value.trim();
   const password=document.getElementById('nu-password')?.value.trim();
@@ -8282,13 +8282,13 @@ function createUserLocal(){
   if(!username||!password){ toast('Username and password required','error'); return; }
   if(password.length<6){ toast('Password must be at least 6 chars','error'); return; }
   if(STATE.users.find(u=>u.username.toLowerCase()===username)){ toast('Username already exists','warning'); return; }
-  STATE.users.push({username,fullName,role,zoneAccess,password,status:'Active'});
+  // FIX: hash the password BEFORE storing locally so verifyPassword() works at login
+  const hash = await hashPassword(password);
+  STATE.users.push({username,fullName,role,zoneAccess,password:hash,status:'Active'});
   saveLocal(); renderUsersList(); toast('User "'+username+'" created ✓');
   ['nu-username','nu-fullname','nu-password'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  // Security Fix #2: never send plaintext password to GAS — send SHA-256 hash only
-  if(GAS_URL) hashPassword(password).then(hash=>{
-    callGAS('createUser',{username,fullName,role,zoneAccess,passwordHash:hash}).then(r=>{ if(r.success) toast('User synced to Sheets ✓'); });
-  });
+  // Send SHA-256 hash to GAS (never plaintext)
+  if(GAS_URL) callGAS('createUser',{username,fullName,role,zoneAccess,passwordHash:hash}).then(r=>{ if(r.success) toast('User synced to Sheets ✓'); });
 }
 
 // ============================================================
@@ -8520,6 +8520,7 @@ document.addEventListener('click',e=>{
 // ============================================================
 window.addEventListener('DOMContentLoaded',()=>{
   loadLocal();
+  migratePasswords(); // Heal any plaintext passwords left by old createUserLocal bug
   try{
     if(checkViewerTokenLogin()){
       document.getElementById('login-screen').style.display='none';
