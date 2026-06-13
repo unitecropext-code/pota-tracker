@@ -2976,7 +2976,9 @@ function getAccessibleZones(user){
   if(!za || za === 'All') return [...ALL_ZONES];
   if(ZONE_GROUPS[za]) return [...ZONE_GROUPS[za]];
   if(ALL_ZONES.includes(za)) return [za];
-  return [...ALL_ZONES];
+  // SECURITY FIX: unknown zoneAccess → return empty array, never expose all zones
+  console.warn('getAccessibleZones: unrecognised zoneAccess value:', za, '— access denied');
+  return [];
 }
 function hasFullZoneAccess(user){
   const za = user && user.zoneAccess;
@@ -6528,9 +6530,10 @@ function renderTrends(){
 //  PRODUCTION FORECAST
 // ============================================================
 function renderProduction(){
+  const _vp=getViewState().plantation;
   const tbody=document.getElementById('prod-tbody');
   const rows=MONTHS.map((m,mi)=>{
-    const plots=STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi);
+    const plots=_vp.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi);
     const area=plots.reduce((s,r)=>s+(r.area||0),0);
     const estProd=plots.reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0);
     const harvestDate=plots.length?new Date(new Date(plots[plots.length-1].datePlanted).getTime()+(STATE.harvestDays||90)*86400000).toLocaleDateString('default',{month:'short',year:'numeric'}):'—';
@@ -6547,11 +6550,12 @@ function renderProduction(){
   </tr>`).join('');
   const lgEl=document.getElementById('locality-yield-grid');
   if(lgEl){
-    const locs=[...new Set(STATE.plantation.map(r=>r.locality).filter(Boolean))].sort();
+    const _vs2=getViewState();
+    const locs=[...new Set(_vs2.plantation.map(r=>r.locality).filter(Boolean))].sort();
     lgEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
     ${locs.map(l=>{
-      const area=STATE.plantation.filter(p=>p.locality===l).reduce((s,r)=>s+(r.area||0),0);
-      const ya=STATE.yieldAssessments.filter(y=>y.locality===l);
+      const area=_vs2.plantation.filter(p=>p.locality===l).reduce((s,r)=>s+(r.area||0),0);
+      const ya=_vs2.yieldAssessments.filter(y=>y.locality===l);
       const avgYield=ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0;
       return `<div class="card" style="margin:0;"><div style="font-weight:700;margin-bottom:6px;">${l}</div>
         <div style="font-size:11px;color:var(--text2);">Area: <strong style="color:var(--gold);">${area.toFixed(2)} ha</strong></div>
@@ -6984,7 +6988,15 @@ function renderCampaignTable(){
   const season=document.getElementById('camp-season')?.value||'Season 1';
   const container=document.getElementById('campaign-table-container');
   if(!container) return;
-  const growerList=[...new Set(STATE.plantation.filter(p=>p.season===season).map(p=>p.grower))].sort();
+  const _cvs=getViewState();
+  // Update campaign table title to reflect current user's zone
+  const _campTitle=document.querySelector('#section-campaign .card-title');
+  if(_campTitle){
+    const _za=CURRENT_USER?.zoneAccess||'All';
+    const _zoneLabel=(_za==='All'||ZONE_GROUPS[_za])?(_za==='All'?'All Zones':_za+' Zones'):_za+' Zone';
+    _campTitle.innerHTML=`<i class="fas fa-table"></i> Potato Campaign Table — ${_zoneLabel}`;
+  }
+  const growerList=[...new Set(_cvs.plantation.filter(p=>p.season===season).map(p=>p.grower))].sort();
   if(!growerList.length){ container.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No plantation data for ${season}</div></div>`; return; }
   let html=`<div class="campaign-table-wrap"><table class="campaign-table"><thead><tr><th rowspan="2" style="min-width:120px;">Grower</th><th rowspan="2">Zone</th><th rowspan="2">Area (ha)</th>`;
   MONTHS.forEach(m=>{ html+=`<th colspan="2" style="text-align:center;">${m}</th>`; });
@@ -6995,8 +7007,8 @@ function renderCampaignTable(){
   MONTHS.forEach((_,mi)=>{ colTotals[mi*2]=0; colTotals[mi*2+1]=0; });
   let grandTotal=0;
   growerList.forEach(grower=>{
-    const g=STATE.growers.find(x=>x.name===grower);
-    const plots=STATE.plantation.filter(p=>p.grower===grower&&p.season===season);
+    const g=_cvs.growers.find(x=>x.name===grower);
+    const plots=_cvs.plantation.filter(p=>p.grower===grower&&p.season===season);
     const area=plots.reduce((s,r)=>s+(r.area||0),0);
     let rowTotal=0;
     html+=`<tr><td style="font-weight:600;">${grower}</td><td><span style="color:${ZONE_COLORS[g?.zone||'']||'#888'};font-weight:700;">${g?.zone||'—'}</span></td><td>${area.toFixed(2)}</td>`;
