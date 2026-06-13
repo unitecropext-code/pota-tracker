@@ -783,6 +783,361 @@ tr:hover .row-actions{opacity:1;}
 .step{flex:1;text-align:center;font-size:10px;font-weight:700;padding:7px 4px;color:var(--text3);border-bottom:2px solid var(--border);transition:all .2s;font-family:var(--font-mono);}
 .step.active{color:var(--gold);border-color:var(--gold);}
 .step.done{color:var(--green);border-color:var(--green);}
+
+/* -- Admin Reset Password Overlay -- */
+#admin-reset-pass-overlay {
+  position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10001;
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:16px;
+}
+#admin-reset-pass-overlay.active { display:flex; }
+.admin-reset-card {
+  background:var(--card);border:1px solid var(--border2);border-radius:20px;
+  padding:36px 32px;width:100%;max-width:480px;
+  box-shadow:0 24px 80px rgba(0,0,0,.9),0 0 60px rgba(168,85,247,.08);
+  animation:slideUp .35s var(--ease);max-height:90vh;overflow-y:auto;
+}
+.admin-reset-icon {
+  width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(168,85,247,.04));
+  border:1px solid rgba(168,85,247,.3);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.admin-reset-title { font-family:var(--font-display);font-size:18px;font-weight:700; }
+.admin-reset-sub   { font-size:11px;color:var(--text3);margin-top:3px; }
+.arp-tab {
+  flex:1;padding:9px 12px;border-radius:9px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .2s;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text3);
+}
+.arp-tab:hover { background:rgba(255,255,255,.06);color:var(--text2); }
+.arp-tab-active { background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.3);color:var(--purple); }
+
+
+/* ╔══════════════════════════════════════════════════════════╗
+   ║  PoTaTo Tracker — Visual Redesign v7.0 (2026-06-13)    ║
+   ║  Enhanced animations, mobile UX, glassmorphism polish   ║
+   ╚══════════════════════════════════════════════════════════╝ */
+
+/* ── Sidebar: glassmorphism + gradient border + smooth nav ── */
+#sidebar {
+  background: rgba(9,11,18,.97) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255,255,255,.06) !important;
+  box-shadow: 4px 0 40px rgba(0,0,0,.5) !important;
+}
+#sidebar::after {
+  content:'';
+  position:absolute;top:0;right:0;width:1px;height:100%;
+  background:linear-gradient(180deg,transparent,rgba(240,165,0,.18),rgba(168,85,247,.12),transparent);
+  pointer-events:none;
+}
+
+.nav-item {
+  transition: all .18s cubic-bezier(.4,0,.2,1) !important;
+  border-radius: 10px !important;
+  margin: 1px 8px !important;
+  padding: 9px 12px !important;
+  font-size: 13px !important;
+  letter-spacing: .01em;
+  position: relative;
+  overflow: hidden;
+}
+.nav-item::before {
+  content:'';
+  position:absolute;inset:0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.025));
+  opacity:0; transition: opacity .2s;
+  border-radius: inherit;
+}
+.nav-item:hover::before { opacity:1; }
+.nav-item:hover {
+  background: rgba(255,255,255,.055) !important;
+  color: var(--text) !important;
+  transform: translateX(3px);
+}
+.nav-item.active {
+  background: linear-gradient(135deg,rgba(240,165,0,.18),rgba(240,165,0,.06)) !important;
+  box-shadow: 0 2px 12px rgba(240,165,0,.12), inset 0 0 0 1px rgba(240,165,0,.15) !important;
+  transform: translateX(3px);
+}
+.nav-item.active::after {
+  content:'';
+  position:absolute;left:0;top:25%;height:50%;width:3px;
+  background:var(--gold);border-radius:0 3px 3px 0;
+}
+.nav-label { padding: 10px 20px 3px !important; font-size: 8.5px !important; letter-spacing: 2.5px; }
+
+/* ── Sidebar-bottom user pill ── */
+.sidebar-bottom { padding: 12px 8px !important; }
+.user-pill {
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  transition: background .2s !important;
+  padding: 8px 10px !important;
+}
+.user-pill:hover { background: rgba(255,255,255,.07) !important; }
+.user-avatar {
+  width: 32px !important; height: 32px !important;
+  border-radius: 9px !important;
+  background: linear-gradient(135deg,var(--gold),var(--orange)) !important;
+  font-weight: 800 !important; font-size: 14px !important;
+  color: #000 !important;
+  flex-shrink: 0;
+}
+
+/* ── Cards: lifted glass effect ── */
+.card {
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.055) !important;
+  background: rgba(14,17,28,.92) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,.25) !important;
+  transition: box-shadow .25s ease, transform .2s ease !important;
+  overflow: hidden;
+}
+.card:hover {
+  box-shadow: 0 8px 36px rgba(0,0,0,.38), 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+.card-accent { height: 3px !important; border-radius: 3px 3px 0 0; margin: 0 0 16px 0 !important; }
+.card-title {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Stat cards: vibrant hover ── */
+.stat-card {
+  border-radius: 16px !important;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease !important;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content:'';
+  position:absolute;inset:0;
+  background: radial-gradient(ellipse at 70% 30%, rgba(255,255,255,.06), transparent 70%);
+  pointer-events:none;
+}
+.stat-card:hover { transform: translateY(-5px) scale(1.02) !important; }
+.stat-card:active { transform: translateY(-2px) scale(.99) !important; }
+.stat-val { font-size: clamp(22px,4vw,32px) !important; font-weight: 800 !important; }
+.stat-icon {
+  font-size: 20px !important;
+  width: 42px !important; height: 42px !important;
+  border-radius: 12px !important;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Buttons: modern tactile feel ── */
+.btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: .01em;
+  transition: all .18s cubic-bezier(.4,0,.2,1) !important;
+  position: relative; overflow: hidden;
+}
+.btn::after {
+  content:'';
+  position:absolute;inset:0;
+  background:rgba(255,255,255,.08);
+  opacity:0;
+  transition: opacity .15s;
+  border-radius: inherit;
+}
+.btn:hover::after { opacity:1; }
+.btn:active { transform: scale(.96) !important; }
+.btn-gold {
+  background: linear-gradient(135deg,var(--gold),var(--orange)) !important;
+  color: #000 !important;
+  box-shadow: 0 4px 16px rgba(240,165,0,.25) !important;
+}
+.btn-gold:hover { box-shadow: 0 6px 24px rgba(240,165,0,.38) !important; }
+
+/* ── Form inputs: glowing focus ── */
+.form-control, .login-input {
+  border-radius: 10px !important;
+  border: 1.5px solid var(--border) !important;
+  background: rgba(255,255,255,.03) !important;
+  transition: border-color .18s, box-shadow .18s, background .18s !important;
+  font-size: 13px !important;
+}
+.form-control:focus, .login-input:focus {
+  border-color: rgba(240,165,0,.45) !important;
+  background: rgba(255,255,255,.05) !important;
+  box-shadow: 0 0 0 3px rgba(240,165,0,.1) !important;
+  outline: none !important;
+}
+select.form-control { cursor: pointer; }
+
+/* ── Mobile nav: better pill indicator ── */
+#mobile-nav {
+  border-top: 1px solid rgba(255,255,255,.06) !important;
+  background: rgba(6,8,14,.98) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) !important;
+  gap: 0 !important;
+}
+.mob-nav-item {
+  border-radius: 12px !important;
+  padding: 6px 4px !important;
+  transition: all .18s cubic-bezier(.34,1.56,.64,1) !important;
+  position: relative;
+}
+.mob-nav-item.active {
+  background: rgba(240,165,0,.1) !important;
+  color: var(--gold) !important;
+}
+.mob-nav-item.active::before {
+  content:'';
+  position:absolute;top:5px;left:50%;transform:translateX(-50%);
+  width:20px;height:3px;border-radius:2px;
+  background:var(--gold);
+}
+.mob-nav-item:active { transform: scale(.88) !important; }
+.mob-nav-item i { font-size: 18px !important; transition: transform .18s; }
+.mob-nav-item.active i { transform: scale(1.1); }
+
+/* ── Toast: modern pill style ── */
+.toast {
+  border-radius: 14px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  animation: toastIn .3s cubic-bezier(.34,1.56,.64,1) !important;
+}
+@keyframes toastIn {
+  from { opacity:0; transform:translateY(14px) scale(.9); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ── Topbar ── */
+#topbar {
+  background: rgba(6,8,14,.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255,255,255,.05) !important;
+  box-shadow: 0 2px 24px rgba(0,0,0,.3) !important;
+}
+
+/* ── Chart containers: subtle glow ── */
+.chart-wrap { border-radius: 10px; overflow: hidden; }
+
+/* ── Login screen: better card ── */
+.login-card {
+  border-radius: 24px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: 0 32px 80px rgba(0,0,0,.8), 0 0 60px rgba(240,165,0,.06) !important;
+  animation: cardEntrance .5s cubic-bezier(.34,1.56,.64,1) !important;
+}
+@keyframes cardEntrance {
+  from { opacity:0; transform: translateY(24px) scale(.95); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.login-label { font-size: 11px !important; font-weight: 700 !important; letter-spacing: .04em; }
+
+/* ── Admin btn grid (admin panel) ── */
+.admin-btn {
+  border-radius: 16px !important;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease !important;
+}
+.admin-btn:hover { transform: translateY(-5px) scale(1.05) !important; }
+.admin-btn-icon { border-radius: 14px !important; }
+
+/* ── FAB: bigger shadow ── */
+#fab {
+  border-radius: 16px !important;
+  box-shadow: 0 6px 28px rgba(240,165,0,.35) !important;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .2s !important;
+}
+#fab:hover { transform: rotate(45deg) scale(1.08) !important; box-shadow: 0 10px 36px rgba(240,165,0,.45) !important; }
+
+/* ── Badges: pill style ── */
+.badge { border-radius: 6px !important; font-size: 10px !important; font-weight: 700 !important; }
+
+/* ── Sync pill ── */
+.sync-pill {
+  border-radius: 10px !important;
+  transition: all .2s !important;
+}
+.sync-pill:hover { background: rgba(255,255,255,.07) !important; }
+
+/* ── Modal overlay: deeper blur ── */
+.modal-overlay {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+.modal-card {
+  border-radius: 20px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: 0 32px 80px rgba(0,0,0,.7) !important;
+}
+
+/* ── Visit panel tabs ── */
+.visit-tab {
+  border-radius: 9px !important;
+  transition: all .18s ease !important;
+  font-weight: 600 !important;
+}
+.visit-tab:hover { background: rgba(255,255,255,.06) !important; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.22); }
+
+/* ── Mobile-first touch improvements ── */
+@media (max-width:899px) {
+  #main { padding: 16px 12px 90px !important; }
+  .stats-grid { gap: 10px !important; }
+  .card { margin-bottom: 12px !important; border-radius: 14px !important; }
+  .stat-card { border-radius: 14px !important; }
+  h2, .section-header { font-size: 18px !important; }
+  .form-control, .login-input { font-size: 16px !important; } /* Prevent iOS zoom */
+  .btn { min-height: 40px; }
+  .modal-card { border-radius: 20px !important; }
+}
+@media (max-width:480px) {
+  #main { padding: 12px 10px 88px !important; }
+  .card { border-radius: 12px !important; }
+  .login-card { border-radius: 20px !important; padding: 24px 18px !important; }
+}
+
+/* ── Smooth section transitions ── */
+.section { animation: sectionFade .25s ease !important; }
+@keyframes sectionFade {
+  from { opacity:0; transform: translateY(8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* ── Table: zebra striping on hover ── */
+.table-responsive table tbody tr {
+  transition: background .12s;
+}
+.table-responsive table tbody tr:hover {
+  background: rgba(255,255,255,.04) !important;
+}
+
+/* ── Admin nav item purple pulse on first show ── */
+@keyframes navPulse {
+  0%,100%  { box-shadow: none; }
+  50% { box-shadow: 0 0 12px rgba(168,85,247,.4); }
+}
+#nav-admin-reset[style*="flex"] {
+  animation: navPulse 2s ease 1s 2;
+}
+/* ── END v7.0 Redesign CSS ── */
+
 </style>
 <style>.photo-upload-area{border:2px dashed var(--border2);border-radius:9px;padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,.02);font-size:12px;color:var(--text2);}.photo-upload-area:hover{border-color:var(--gold);background:var(--gold-dim);color:var(--gold);}
 /* ===== GLOBAL SEARCH MODAL ===== */
@@ -1203,144 +1558,42 @@ function renderCustomDisplays() {
   ).join('') || '';
 }
 
-// ============================================================
-//  AI PEST PHOTO IDENTIFICATION
-// ============================================================
-let _pdPhoto = null;
 
-async function handlePdPhoto(input){
-  if(!input||!input.files||!input.files.length) return;
-  const f = input.files[0];
-  const valid = ['image/jpeg','image/png','image/heic','image/heif','image/webp'];
-  if(!valid.includes(f.type) && !f.name.match(/\.(jpg|jpeg|png|heic|heif|webp)$/i)){
-    toast('Unsupported image format','warning'); input.value=''; return;
+
+
+
+// -- Artifact text safety guard (clears error strings) --
+(function() {
+  var NEEDLE   = /This feature requires running inside a Claude\.ai artifact[^.]*\./gi;
+  var FALLBACK = "AI identification failed -- please select the pest/disease manually.";
+  function sanitiseEl(el) {
+    if (!el || !el.textContent) return;
+    if (NEEDLE.test(el.textContent)) {
+      NEEDLE.lastIndex = 0;
+      el.textContent = el.textContent.replace(NEEDLE, FALLBACK).replace(/^[\s\-:]+/, "").trim();
+    }
   }
-  let photo;
-  try{
-    photo = await _resizeImage(f, PHOTO_RESIZE, 0.82);
-  }catch(err){ toast('Could not read photo','error'); input.value=''; return; }
-  _pdPhoto = photo;
-
-  // Preview
-  const wrap = document.getElementById('pd-photo-preview');
-  if(wrap){
-    wrap.innerHTML='';
-    const div=document.createElement('div'); div.className='photo-thumb-wrap';
-    const img=document.createElement('img'); img.src=photo.dataUrl; img.alt=photo.name||'photo';
-    const btn=document.createElement('button'); btn.className='photo-thumb-remove'; btn.type='button';
-    btn.innerHTML='\u00d7'; btn.title='Remove photo';
-    btn.addEventListener('click',(e)=>{ e.stopPropagation(); clearPdPhoto(); });
-    div.appendChild(img); div.appendChild(btn);
-    wrap.appendChild(div);
-  }
-  input.value='';
-
-  identifyPestFromPhoto(photo);
-}
-
-function clearPdPhoto(){
-  _pdPhoto=null;
-  const wrap=document.getElementById('pd-photo-preview'); if(wrap) wrap.innerHTML='';
-  const res=document.getElementById('pd-ai-result'); if(res){ res.style.display='none'; res.innerHTML=''; }
-}
-
-async function identifyPestFromPhoto(photo){
-  const resEl=document.getElementById('pd-ai-result');
-  if(resEl){
-    resEl.style.display='block';
-    resEl.innerHTML='<i class="fas fa-spinner fa-spin" style="color:var(--gold);"></i> Identifying pest…';
-  }
-  const allLabels=[...DISEASES,...PESTS];
-  const base64 = photo.dataUrl.split(',')[1];
-
-  try{
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: [
-            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
-            { type: "text", text: `You are an agricultural extension assistant helping identify potato pests and diseases from a field photo. Choose the single best-matching option from this exact list (use the exact spelling): ${JSON.stringify(allLabels)}. Also estimate a severity rating from this exact list: ["Low","Moderate","High"], and an estimated affected percentage (0-100, choose nearest of: 0,5,10,25,40,50,60,75,90,100). Respond with ONLY a JSON object, no preamble, no markdown fences, in this exact shape: {"match":"<one of the list above, or \\"Unknown\\" if nothing matches>","confidence":"<Low|Medium|High>","severity":"<Low|Moderate|High>","affectedPct":<number>,"reasoning":"<1-2 sentence explanation>"}` }
-          ]
-        }]
-      })
+  function sanitiseAll() {
+    ["pest-ai-error","ai-error","ai-status"].forEach(function(id) {
+      sanitiseEl(document.getElementById(id));
     });
-    const data = await response.json();
-
-    // BUG FIX: surface real failure reasons. Previously any non-2xx
-    // response, API error object, or unparseable body fell straight
-    // through to a generic "Identification failed" with no detail —
-    // making it impossible to tell a network/CORS/auth problem apart
-    // from the model simply returning malformed JSON.
-    if(!response.ok || data.type === 'error'){
-      const apiMsg = data?.error?.message || `HTTP ${response.status}`;
-      console.error('[Pest ID] API error:', apiMsg, data);
-      throw new Error(apiMsg);
-    }
-
-    const text = (data.content||[]).map(b=>b.text||'').join('').trim();
-    if(!text){
-      console.error('[Pest ID] Empty response body:', data);
-      throw new Error('Empty response from model');
-    }
-    const clean = text.replace(/```json|```/g,'').trim();
-    let parsed;
-    try{
-      parsed = JSON.parse(clean);
-    }catch(parseErr){
-      console.error('[Pest ID] Could not parse model response as JSON:', text);
-      throw new Error('Model response was not valid JSON');
-    }
-
-    if(!parsed.match || parsed.match==='Unknown' || !allLabels.includes(parsed.match)){
-      if(resEl){
-        resEl.innerHTML = `<i class="fas fa-circle-question" style="color:var(--text3);"></i> Could not confidently identify a pest/disease from this photo${parsed.reasoning?': '+parsed.reasoning:''}. Please select manually below.`;
-      }
-      return;
-    }
-
-    // Pre-fill severity / affected % on the matched pest card
-    const id = parsed.match.replace(/[\s\(\)\/]/g,'_');
-    const sevSel = document.getElementById('sev-'+id);
-    const pctSel = document.getElementById('pct-'+id);
-    const severity = ['Low','Moderate','High'].includes(parsed.severity) ? parsed.severity : 'Moderate';
-    let pct = Number(parsed.affectedPct);
-    if(isNaN(pct)) pct = 25;
-    const pctOptions=[0,5,10,25,40,50,60,75,90,100];
-    pct = pctOptions.reduce((a,b)=>Math.abs(b-pct)<Math.abs(a-pct)?b:a);
-
-    if(sevSel){ sevSel.value=severity; calcYieldImpact(); updatePestCardStyle(id); }
-    if(pctSel){ pctSel.value=String(pct); }
-
-    // Switch to the right tab (disease vs pest) so the user sees the filled card
-    const isPest = PESTS.includes(parsed.match);
-    const card = document.getElementById('pc-'+id);
-    if(card){ card.scrollIntoView({behavior:'smooth',block:'center'}); card.style.boxShadow='0 0 0 2px var(--gold)'; setTimeout(()=>{ card.style.boxShadow=''; },2000); }
-
-    if(resEl){
-      const confColor = {Low:'var(--text3)',Medium:'var(--orange)',High:'var(--green)'}[parsed.confidence]||'var(--text3)';
-      resEl.innerHTML = `<div style="display:flex;align-items:flex-start;gap:8px;">
-        <i class="fas fa-wand-magic-sparkles" style="color:var(--gold);margin-top:1px;"></i>
-        <div>
-          <div><strong>${PEST_ICONS[parsed.match]||''} ${parsed.match}</strong> — confidence: <span style="color:${confColor};font-weight:700;">${parsed.confidence||'—'}</span></div>
-          <div style="color:var(--text2);margin-top:3px;">Pre-filled severity: <strong>${severity}</strong> · affected: <strong>${pct}%</strong></div>
-          ${parsed.reasoning?`<div style="color:var(--text3);margin-top:4px;font-size:11px;">${parsed.reasoning}</div>`:''}
-          <div style="color:var(--text3);margin-top:4px;font-size:11px;">Review and adjust before saving.</div>
-        </div>
-      </div>`;
-    }
-    toast('Identified: '+parsed.match+' ✓');
-  }catch(err){
-    console.error('[Pest ID] identifyPestFromPhoto failed:', err);
-    if(resEl){
-      resEl.innerHTML = `<i class="fas fa-triangle-exclamation" style="color:var(--red);"></i> Identification failed (${err.message||'unknown error'}). This feature requires running inside a Claude.ai artifact with API access — please select the pest/disease manually below.`;
-    }
+    document.querySelectorAll("*").forEach(function(el) { if (el.children.length === 0) sanitiseEl(el); });
   }
-}
+  var _obs = new MutationObserver(function(muts) {
+    muts.forEach(function(m) {
+      m.addedNodes.forEach(function(node) {
+        if (node.nodeType === 1) { sanitiseEl(node); node.querySelectorAll && node.querySelectorAll("*").forEach(function(el) { if (el.children.length === 0) sanitiseEl(el); }); }
+        else if (node.nodeType === 3) { sanitiseEl(node.parentElement); }
+      });
+      if (m.type === "characterData") sanitiseEl(m.target.parentElement);
+    });
+  });
+  document.addEventListener("DOMContentLoaded", function() {
+    sanitiseAll();
+    _obs.observe(document.body, { childList: true, subtree: true, characterData: true });
+  });
+})();
+// -- end artifact text safety guard --
 </script>
 </head>
 <body>
@@ -1401,7 +1654,7 @@ async function identifyPestFromPhoto(photo){
       <div id="login-error"></div>
       <button class="login-btn" onclick="doLogin()" id="login-btn-el">Sign In</button>
       <div class="login-spinner" id="login-spinner"></div>
-      <div class="login-version">PoTa Tracker v4.0 &middot; Mauritius</div>
+      <div class="login-version">PoTa Tracker v7.1 &middot; Mauritius</div>
       <div class="login-hint" id="login-hint-box" style="display:none;"></div>
     </div>
 
@@ -1520,6 +1773,7 @@ async function identifyPestFromPhoto(photo){
     <div class="nav-section">
       <div class="nav-label">System</div>
       <div class="nav-item" id="nav-settings" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
+      <div class="nav-item" id="nav-admin-reset" style="display:none;" onclick="openAdminResetOverlay()" title="Reset a user's password (Administrator only)"><i class="fas fa-user-lock" style="color:var(--purple);"></i> <span style="color:var(--purple);">Reset User Password</span></div>
     </div>
   </div>
   <div class="sidebar-bottom">
@@ -1839,16 +2093,6 @@ async function identifyPestFromPhoto(photo){
         <div class="visit-tab" data-visit="3" onclick="switchVisitTab(3)"><i class="fas fa-calendar-check"></i> Visit 3 <span class="badge badge-blue" id="v3-badge" style="display:none">New</span></div>
       </div>
       <div class="visit-panel active" id="visit-panel-1">
-        <div class="form-group">
-          <label class="form-label"><i class="fas fa-camera" style="color:var(--teal);margin-right:4px;"></i> Smart Pest Photo Identification</label>
-          <div class="photo-upload-area" id="pd-photo-area" onclick="document.getElementById('pd-photo-input').click()" style="padding:12px;">
-            <i class="fas fa-cloud-upload-alt" style="font-size:18px;color:var(--text3);margin-bottom:4px;"></i>
-            <div style="font-size:11px;color:var(--text2);">Click to snap / upload a photo for automatic identification</div>
-          </div>
-          <input type="file" id="pd-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePdPhoto(this)">
-          <div id="pd-photo-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-          <div id="pd-ai-result" style="display:none;margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--card2);font-size:12px;"></div>
-        </div>
         <div class="form-row-2">
           <div class="form-group"><label class="form-label">Grower *</label><select id="pd-grower" class="form-control" onchange="autofillPdLocality()"><option value="">Select grower…</option></select></div>
           <div class="form-group"><label class="form-label">Locality</label><input id="pd-locality" class="form-control" placeholder="Auto-filled from grower"></div>
@@ -3553,6 +3797,8 @@ async function doLogin(){
   }
 
   setLoginBusy(true);
+  // Safety net: always re-enable button after 20 s even if something hangs
+  const _safetyTimer = setTimeout(() => setLoginBusy(false), 20000);
   let result = null;
 
   try {
@@ -3582,7 +3828,10 @@ async function doLogin(){
         };
       }
     }
+  } catch(loginErr) {
+    console.error('doLogin unexpected error:', loginErr);
   } finally {
+    clearTimeout(_safetyTimer);
     // ── Always re-enable the button, no matter what happened ──
     setLoginBusy(false);
   }
@@ -3632,6 +3881,11 @@ async function initApp(){
   document.getElementById('user-name-display').textContent = CURRENT_USER.fullName || CURRENT_USER.username;
   document.getElementById('user-role-display').textContent = CURRENT_USER.role || 'Field Officer';
   document.getElementById('user-avatar').textContent = (CURRENT_USER.fullName || CURRENT_USER.username).charAt(0).toUpperCase();
+  // Show admin-only nav items
+  var _adminNavReset = document.getElementById('nav-admin-reset');
+  if (_adminNavReset) _adminNavReset.style.display = CURRENT_USER.role === 'Administrator' ? 'flex' : 'none';
+  var _adminNavLabel = document.getElementById('nav-label-admin');
+  if (_adminNavLabel) _adminNavLabel.style.display = CURRENT_USER.role === 'Administrator' ? 'block' : 'none';
   if(GAS_URL) updateSyncStatus('saved');
 
   // ── VIEWER ROLE: nav items visible, restricted sections show Access Denied ─
@@ -5234,7 +5488,6 @@ async function savePestRecord(){
   checkPestOutbreaks();
   document.getElementById('pd-grower').value=''; document.getElementById('pd-locality').value='';
   document.querySelectorAll('.pest-select').forEach(s=>s.value=s.options[0].value);
-  clearPdPhoto();
   if(document.getElementById('pd-comments')) document.getElementById('pd-comments').value='';
   document.getElementById('visit-panel-2').innerHTML=''; document.getElementById('visit-panel-3').innerHTML='';
   ['v2-badge','v3-badge'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
@@ -9113,7 +9366,7 @@ self.addEventListener('activate', e=>{
 self.addEventListener('fetch', e=>{
   const url = new URL(e.request.url);
   // Network-first for GAS API calls; cache-first for everything else
-  if(url.hostname.includes('script.google.com') || url.hostname.includes('api.anthropic.com')){
+  if(url.hostname.includes('script.google.com')){
     e.respondWith(
       fetch(e.request).catch(()=>
         new Response(JSON.stringify({error:'offline'}),{headers:{'Content-Type':'application/json'}})
@@ -9359,7 +9612,7 @@ document.addEventListener('DOMContentLoaded', function(){
       </div>
       <div style="margin-top:14px;padding:10px 12px;background:var(--gold-dim);border:1px solid rgba(240,165,0,.2);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5;">
         <i class="fas fa-lightbulb" style="color:var(--gold);margin-right:6px;"></i>
-        <strong style="color:var(--gold);">Tip:</strong> If this page is opened as a <em>downloaded file</em> (file://), move it to a local server or open it from claude.ai — browsers block mic on file:// pages for security.
+        <strong style="color:var(--gold);">Tip:</strong> If this page is opened as a <em>downloaded file</em> (file://), host it on a local web server — browsers block mic access on file:// pages for security.
       </div>
     </div>
     <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;">
@@ -9663,5 +9916,261 @@ document.addEventListener('DOMContentLoaded', function(){
   window.addEventListener('appinstalled',()=>toast('PoTaTo Tracker installed ✓ — works offline now','success'));
 })();
 </script>
+<!-- Admin Reset Password Overlay (v6.3) -->
+<div id="admin-reset-pass-overlay">
+  <div class="admin-reset-card">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
+      <div class="admin-reset-icon">&#128737;</div>
+      <div>
+        <div class="admin-reset-title">Reset User Password</div>
+        <div class="admin-reset-sub">Administrator action &#8212; changes take effect immediately</div>
+      </div>
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="arp-user-select">Select User</label>
+      <div style="position:relative;">
+        <select class="login-input" id="arp-user-select"
+                style="appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px;"
+                onchange="arpOnUserSelect(this.value)">
+          <option value="">&#8212; loading users&#8230; &#8212;</option>
+        </select>
+        <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:11px;">&#9660;</span>
+      </div>
+      <div id="arp-user-badge" style="display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;">
+          <div><span style="color:var(--text3);">Full Name</span><br><strong id="arp-badge-name" style="color:var(--text);">&#8212;</strong></div>
+          <div><span style="color:var(--text3);">Role</span><br><strong id="arp-badge-role" style="color:var(--gold);">&#8212;</strong></div>
+          <div><span style="color:var(--text3);">Zone Access</span><br><strong id="arp-badge-zone" style="color:var(--teal);">&#8212;</strong></div>
+          <div><span style="color:var(--text3);">Status</span><br><strong id="arp-badge-status">&#8212;</strong></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="arp-tab arp-tab-active" id="arp-tab-manual" onclick="arpSetMode('manual')">
+        <i class="fa-solid fa-keyboard" style="margin-right:6px;font-size:11px;"></i>Set Password
+      </button>
+      <button class="arp-tab" id="arp-tab-auto" onclick="arpSetMode('auto')">
+        <i class="fa-solid fa-wand-magic-sparkles" style="margin-right:6px;font-size:11px;"></i>Generate Temp
+      </button>
+    </div>
+    <div id="arp-mode-manual">
+      <div class="login-field">
+        <label class="login-label" for="arp-new-pass">New Password</label>
+        <div style="position:relative;">
+          <input class="login-input" type="password" id="arp-new-pass" placeholder="Min 8 characters" autocomplete="new-password" oninput="arpOnPassInput(this.value)" style="padding-right:44px;">
+          <button onclick="arpTogglePassVis('arp-new-pass','arp-eye1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;"><i id="arp-eye1" class="fa-solid fa-eye"></i></button>
+        </div>
+        <div class="pass-strength-wrap"><div class="pass-strength-bar" id="arp-strength-bar"></div></div>
+        <div class="pass-strength-text" id="arp-strength-text"></div>
+      </div>
+      <div class="login-field">
+        <label class="login-label" for="arp-confirm-pass">Confirm Password</label>
+        <div style="position:relative;">
+          <input class="login-input" type="password" id="arp-confirm-pass" placeholder="Re-enter new password" autocomplete="new-password" style="padding-right:44px;">
+          <button onclick="arpTogglePassVis('arp-confirm-pass','arp-eye2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;"><i id="arp-eye2" class="fa-solid fa-eye"></i></button>
+        </div>
+      </div>
+    </div>
+    <div id="arp-mode-auto" style="display:none;">
+      <div style="padding:16px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:12px;margin-bottom:16px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;">Generated Temporary Password</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <code id="arp-gen-pass" style="flex:1;font-family:var(--font-mono);font-size:15px;color:var(--purple);letter-spacing:2px;word-break:break-all;">&#8212;</code>
+          <button onclick="arpGenerateTemp()" title="Generate new" style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);color:var(--purple);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:13px;flex-shrink:0;transition:all .2s;" onmouseover="this.style.background='rgba(168,85,247,.2)'" onmouseout="this.style.background='rgba(168,85,247,.12)'"><i class="fa-solid fa-rotate"></i></button>
+          <button onclick="arpCopyTemp()" title="Copy to clipboard" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:13px;flex-shrink:0;transition:all .2s;" onmouseover="this.style.background='rgba(59,130,246,.2)'" onmouseout="this.style.background='rgba(59,130,246,.1)'"><i class="fa-solid fa-copy"></i></button>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);line-height:1.6;">Share this password securely with the user. They should change it on next login.</div>
+      </div>
+    </div>
+    <div id="arp-error" style="color:var(--red);font-size:12px;min-height:18px;margin-bottom:10px;text-align:center;"></div>
+    <button class="login-btn" id="arp-submit-btn" onclick="arpSubmitReset()">
+      <span id="arp-btn-text">Reset Password</span>
+      <div class="login-spinner" id="arp-spinner"></div>
+    </button>
+    <button onclick="closeAdminResetOverlay()" style="width:100%;margin-top:10px;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:11px;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">Cancel</button>
+  </div>
+</div>
+
+<script>
+// -- ADMIN RESET USER PASSWORD (v6.3) --
+// Requires: AppState.user.role === "Administrator", AppState.sessionToken,
+//           GAS_URL, sha256(), showToast()
+// AppState shim — maps the legacy AppState API to live CURRENT_USER / SESSION_TOKEN globals
+Object.defineProperty(window, 'AppState', {
+  get: function() {
+    return {
+      user: CURRENT_USER || {},
+      sessionToken: SESSION_TOKEN || ''
+    };
+  },
+  configurable: true
+});
+var _arpUsers = [], _arpMode = "manual", _arpTempPass = "";
+
+async function openAdminResetOverlay() {
+  if (!window.AppState || AppState.user?.role !== "Administrator") {
+    if (typeof showToast === "function") showToast("Access denied -- Administrators only.", "error");
+    return;
+  }
+  document.getElementById("arp-error").textContent = "";
+  var np = document.getElementById("arp-new-pass"); if (np) np.value = "";
+  var cp = document.getElementById("arp-confirm-pass"); if (cp) cp.value = "";
+  arpOnPassInput(""); arpSetMode("manual");
+  var ov = document.getElementById("admin-reset-pass-overlay");
+  ov.style.display = "flex"; ov.classList.add("active");
+  await arpLoadUsers();
+}
+
+function closeAdminResetOverlay() {
+  var ov = document.getElementById("admin-reset-pass-overlay");
+  ov.style.display = "none"; ov.classList.remove("active");
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  var ov = document.getElementById("admin-reset-pass-overlay");
+  if (ov) ov.addEventListener("click", function(e) { if (e.target === ov) closeAdminResetOverlay(); });
+});
+
+async function arpLoadUsers() {
+  var sel = document.getElementById("arp-user-select");
+  sel.innerHTML = "<option value=\"\">-- loading... --</option>";
+  try {
+    var payload = { action: "listUsers", sessionToken: AppState.sessionToken, callerRole: AppState.user.role };
+    var url = (window.GAS_URL || "") + "?action=listUsers&data=" + encodeURIComponent(JSON.stringify(payload));
+    var res = await fetch(url), json = await res.json();
+    if (!json.success) throw new Error(json.error || "Failed to load users.");
+    _arpUsers = json.users || [];
+    var adminUser = (AppState.user.username || "").toLowerCase();
+    sel.innerHTML = "<option value=\"\">-- select a user --</option>";
+    _arpUsers.forEach(function(u) {
+      if (u.username.toLowerCase() === adminUser) return;
+      var opt = document.createElement("option");
+      opt.value = u.username;
+      opt.textContent = u.fullName + " (" + u.username + ")" +
+        (u.status !== "Active" ? " [INACTIVE]" : "") +
+        (u.role === "Administrator" ? " [ADMIN]" : "");
+      sel.appendChild(opt);
+    });
+    sel.focus();
+  } catch (err) {
+    sel.innerHTML = "<option value=\"\">-- error loading users --</option>";
+    document.getElementById("arp-error").textContent = "Could not load user list: " + (err.message || err);
+  }
+}
+
+function arpOnUserSelect(username) {
+  var badge = document.getElementById("arp-user-badge");
+  var errEl = document.getElementById("arp-error");
+  errEl.textContent = "";
+  if (!username) { badge.style.display = "none"; return; }
+  var user = _arpUsers.find(function(u) { return u.username === username; });
+  if (!user) { badge.style.display = "none"; return; }
+  document.getElementById("arp-badge-name").textContent   = user.fullName   || "--";
+  document.getElementById("arp-badge-role").textContent   = user.role       || "--";
+  document.getElementById("arp-badge-zone").textContent   = user.zoneAccess || "--";
+  var st = document.getElementById("arp-badge-status");
+  st.textContent = user.status || "--";
+  st.style.color = user.status === "Active" ? "var(--green)" : "var(--red)";
+  badge.style.display = "block";
+  if (user.role === "Administrator") {
+    errEl.textContent = "Warning: This is an Administrator account -- GAS will block the reset.";
+    errEl.style.color = "var(--orange)";
+  } else { errEl.style.color = "var(--red)"; }
+  if (_arpMode === "auto") arpGenerateTemp();
+}
+
+function arpSetMode(mode) {
+  _arpMode = mode;
+  document.getElementById("arp-mode-manual").style.display = mode === "manual" ? "block" : "none";
+  document.getElementById("arp-mode-auto").style.display   = mode === "auto"   ? "block" : "none";
+  document.getElementById("arp-tab-manual").className = "arp-tab" + (mode === "manual" ? " arp-tab-active" : "");
+  document.getElementById("arp-tab-auto").className   = "arp-tab" + (mode === "auto"   ? " arp-tab-active" : "");
+  if (mode === "auto" && !_arpTempPass) arpGenerateTemp();
+}
+
+function arpGenerateTemp() {
+  var up="ABCDEFGHJKLMNPQRSTUVWXYZ", lo="abcdefghjkmnpqrstuvwxyz", nu="23456789", sy="@#$%!";
+  var all = up + lo + nu + sy;
+  var p = up[Math.floor(Math.random()*up.length)] + lo[Math.floor(Math.random()*lo.length)] +
+          nu[Math.floor(Math.random()*nu.length)] + sy[Math.floor(Math.random()*sy.length)];
+  for (var i = 0; i < 8; i++) p += all[Math.floor(Math.random()*all.length)];
+  _arpTempPass = p.split("").sort(function() { return Math.random() - .5; }).join("");
+  document.getElementById("arp-gen-pass").textContent = _arpTempPass;
+}
+
+async function arpCopyTemp() {
+  if (!_arpTempPass) return;
+  try {
+    await navigator.clipboard.writeText(_arpTempPass);
+    if (typeof showToast === "function") showToast("Temporary password copied to clipboard", "success");
+  } catch(e) {
+    var ta = document.createElement("textarea"); ta.value = _arpTempPass;
+    ta.style.cssText = "position:fixed;opacity:0;"; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+    if (typeof showToast === "function") showToast("Copied!", "success");
+  }
+}
+
+function arpTogglePassVis(inputId, iconId) {
+  var inp = document.getElementById(inputId), ico = document.getElementById(iconId);
+  if (!inp) return;
+  inp.type = inp.type === "password" ? "text" : "password";
+  if (ico) ico.className = inp.type === "password" ? "fa-solid fa-eye" : "fa-solid fa-eye-slash";
+}
+
+function arpOnPassInput(value) {
+  var sc = [value.length>=8,/[A-Z]/.test(value),/[a-z]/.test(value),/[0-9]/.test(value),/[^A-Za-z0-9]/.test(value)].filter(Boolean).length;
+  var cols = ["","#ef4444","#f97316","#f0a500","#22c55e","#14b8a6"];
+  var labs = ["","Very weak","Weak","Fair","Strong","Very strong"];
+  var bar = document.getElementById("arp-strength-bar"), tx = document.getElementById("arp-strength-text");
+  if (bar) { bar.style.width = value.length ? (sc*20)+"%" : "0%"; bar.style.background = cols[sc] || "#ef4444"; }
+  if (tx)  { tx.textContent = value.length ? labs[sc] : ""; tx.style.color = cols[sc] || ""; }
+}
+
+async function arpSubmitReset() {
+  var errEl = document.getElementById("arp-error"), btn = document.getElementById("arp-submit-btn"),
+      bTx = document.getElementById("arp-btn-text"), spin = document.getElementById("arp-spinner"),
+      selVal = (document.getElementById("arp-user-select")?.value || "").trim();
+  function showErr(msg) { errEl.textContent = msg; errEl.style.color = "var(--red)"; }
+  function setLoad(on) { if(btn) btn.disabled=on; if(spin) spin.style.display=on?"block":"none"; if(bTx) bTx.style.display=on?"none":"inline"; }
+  errEl.textContent = "";
+  if (!selVal) { showErr("Please select a user."); return; }
+  var plain = "";
+  if (_arpMode === "manual") {
+    var np = document.getElementById("arp-new-pass")?.value || "";
+    var cp = document.getElementById("arp-confirm-pass")?.value || "";
+    if (!np)            { showErr("Please enter a new password."); return; }
+    if (np.length < 8)  { showErr("Password must be at least 8 characters."); return; }
+    if (np !== cp)      { showErr("Passwords do not match."); return; }
+    var rules = [np.length>=8,/[A-Z]/.test(np),/[a-z]/.test(np),/[0-9]/.test(np),/[^A-Za-z0-9]/.test(np)];
+    if (!rules.every(Boolean)) { showErr("Password does not meet all requirements."); return; }
+    plain = np;
+  } else {
+    if (!_arpTempPass) arpGenerateTemp();
+    plain = _arpTempPass;
+  }
+  setLoad(true);
+  try {
+    var hash = await sha256(plain);
+    var payload = { action:"resetPassword", targetUsername:selVal, newPasswordHash:hash,
+                    sessionToken:AppState.sessionToken, callerUsername:AppState.user.username,
+                    callerRole:AppState.user.role };
+    var url = (window.GAS_URL||"") + "?action=resetPassword&data=" + encodeURIComponent(JSON.stringify(payload));
+    var res = await fetch(url), json = await res.json();
+    if (!json.success) { showErr(json.error || "Password reset failed on server."); return; }
+    closeAdminResetOverlay();
+    var u = _arpUsers.find(function(x){return x.username===selVal;});
+    var nm = u ? (u.fullName || u.username) : selVal;
+    if (typeof showToast === "function") showToast(
+      _arpMode==="auto" ? "Temp password set for "+nm+" -- share it securely" : "Password reset for "+nm, "success"
+    );
+    _arpTempPass = "";
+  } catch(err) {
+    console.error("[arpSubmitReset]", err);
+    showErr("Network error -- please check your connection and try again.");
+  } finally { setLoad(false); }
+}
+</script>
+
 </body>
 </html>
