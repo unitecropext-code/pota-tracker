@@ -1654,7 +1654,7 @@ function renderCustomDisplays() {
       <div id="login-error"></div>
       <button class="login-btn" onclick="doLogin()" id="login-btn-el">Sign In</button>
       <div class="login-spinner" id="login-spinner"></div>
-      <div class="login-version">PoTa Tracker v7.1 &middot; Mauritius</div>
+      <div class="login-version">PoTa Tracker v7.2 &middot; Mauritius</div>
       <div class="login-hint" id="login-hint-box" style="display:none;"></div>
     </div>
 
@@ -1741,7 +1741,7 @@ function renderCustomDisplays() {
 </svg>
       <div>
         <div class="logo-text">PoTa <span>Tracker</span></div>
-        <div class="logo-sub">v4.0 &middot; Mauritius</div>
+        <div class="logo-sub">v7.2 &middot; Mauritius</div>
       </div>
     </div>
   </div>
@@ -7171,7 +7171,7 @@ function saveTableAsPDF(){
   <h1>🥔 PoTa Tracker — Season Comparison Table</h1>
   <div class="meta">Filter: ${yearFilter} · ${zoneFilter} &nbsp;|&nbsp; Generated: ${new Date().toLocaleString()}</div>
   ${tableEl.outerHTML}
-  <div class="footer">PoTa Tracker v4.0 — MAUFP</div>
+  <div class="footer">PoTa Tracker v7.2 — Crop Extension Division-FAREI</div>
   </body></html>`);
   w.document.close();
   setTimeout(()=>{ w.print(); },400);
@@ -7541,7 +7541,7 @@ async function generateSeasonReportPDF(){
   <h2>Detailed Comparison Table</h2>
   ${tableHtml}
 
-  <div class="footer">PoTa Tracker v4.0 — Ministry of Agro Industry &amp; Food Security · Generated automatically</div>
+  <div class="footer">PoTa Tracker v7.2 — Crop Extension Division-FAREI · Generated automatically</div>
   </body></html>`);
   w.document.close();
   setTimeout(()=>{ w.print(); },600);
@@ -8490,7 +8490,7 @@ async function printReport(){
     </div>
   </div>
   <div class="cover-footer">
-    <span>PoTa Tracker v7.3 — ${pr_institution}</span>
+    <span>PoTa Tracker v7.2 — ${pr_institution}</span>
     <span>CONFIDENTIAL — FOR OFFICIAL USE ONLY</span>
   </div>
 </div>
@@ -8505,7 +8505,7 @@ async function printReport(){
     ${pr_execNotes ? `<p style="margin-top:10px;font-size:12.5px;line-height:1.75;border-top:1px solid #e8d9b8;padding-top:10px;">${pr_execNotes}</p>` : ''}
   </div>
   <p style="font-size:11.5px;color:#6b7a90;line-height:1.7;margin-top:10px;">
-    This report was prepared by the <strong>${pr_department}</strong> under the <strong>${pr_institution}</strong>. It covers all plantation records, pest and disease surveillance data, yield assessment findings, and extension activities recorded via the PoTa Tracker field monitoring system (v7.3). The findings are intended to inform policy planning, extension programming, and marketing interventions for the potato sub-sector in Mauritius.
+    This report was prepared by the <strong>${pr_department}</strong> under the <strong>${pr_institution}</strong>. It covers all plantation records, pest and disease surveillance data, yield assessment findings, and extension activities recorded via the PoTa Tracker field monitoring system (v7.2). The findings are intended to inform policy planning, extension programming, and marketing interventions for the potato sub-sector in Mauritius.
   </p>
 </div>
 
@@ -8592,7 +8592,7 @@ async function printReport(){
 ════════════════════════════════════════════════════════ -->
 <div class="rpt-page">
   <div class="report-footer">
-    <span>PoTa Tracker v7.3 — ${pr_institution} — ${pr_department}</span>
+    <span>PoTa Tracker v7.2 — ${pr_institution} — ${pr_department}</span>
     <span>Generated: ${pr_genDate} &nbsp;|&nbsp; Prepared by: ${pr_officer}</span>
   </div>
 </div>
@@ -10591,7 +10591,7 @@ document.addEventListener('DOMContentLoaded', function(){
 // ── PWA Manifest (injected as blob) ─────────────────────────────────────────
 (function(){
   const manifest={
-    name:'PoTaTo Tracker v4.0',
+    name:'PoTaTo Tracker v7.2',
     short_name:'PoTaTo',
     description:'Potato Cultivation Monitoring System — Mauritius',
     start_url:location.href,
