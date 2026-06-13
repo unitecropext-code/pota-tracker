@@ -3570,7 +3570,7 @@ const DEFAULT_STATE = {
   users:[
     {username:'superadmin',fullName:'Super Administrator',role:'Administrator',zoneAccess:'All',password:'620eb8e0293efc0fe7cf90b4e3d0adffc0d3c2c355dba4e2ec1aba3cfa12a0d3',status:'Active'},
     {username:'admin',fullName:'Administrator',role:'Administrator',zoneAccess:'All',password:'e25c89e38b245b4b9de181b5459aca54d35f9a478403e58d5b30b2519c6a8998',status:'Active'},
-    {username:'eoseokg',fullName:'Keshav Gangadin',role:'Field Officer',zoneAccess:'East',password:'bee234b7915a91f6e7f9d96729ffc8a41c773dce8ec3630534d3d56b2b4927db',status:'Active'},
+    {username:'eoseokg',fullName:'Keshav Gangadin',role:'Field Officer',zoneAccess:'E1',password:'bee234b7915a91f6e7f9d96729ffc8a41c773dce8ec3630534d3d56b2b4927db',status:'Active'},
     {username:'esokr',fullName:'Keshav Ramheet',role:'Field Officer',zoneAccess:'North',password:'5269b1fc0dc20b92e48edbf0947fcf616ee25dd71ab83889be76799c05279d91',status:'Active'},
     {username:'officer1',fullName:'Field Officer 1',role:'Field Officer',zoneAccess:'All',password:'b2e13f08f3531d709cf6f2df5a0944c2fd1d16d911097a0e242d83286897815d',status:'Active'},
     {username:'officer2',fullName:'Field Officer 2',role:'Field Officer',zoneAccess:'All',password:'5edc47458028acdcf73df965fac6af56c4ec86525aae084838ea22e075a1cde2',status:'Active'},
@@ -4992,7 +4992,7 @@ function updateLocalityDropdown(zoneId, locId){
   (ZONE_LOCALITIES[zone]||[]).forEach(l=>{ sel.innerHTML+=`<option value="${l}">${l}</option>`; });
 }
 function populateSelects(){
-  const gOpts = STATE.growers.map(g=>`<option value="${g.name}">${g.name}</option>`).join('');
+  const gOpts = getViewState().growers.map(g=>`<option value="${g.name}">${g.name}</option>`).join('');
   const vOpts = STATE.varieties.map(v=>`<option value="${v}">${v}</option>`).join('');
   ['pl-grower','pd-grower','ya-grower'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">Select grower…</option>'+gOpts; });
   // ya-variety is still a single select; pl-variety now lives inside plot rows
@@ -5147,7 +5147,7 @@ function autofillYaLocality(){
   if(g&&g.zone){ document.getElementById('ya-zone').value=g.zone; updateLocalityDropdown('ya-zone','ya-locality'); setTimeout(()=>{ document.getElementById('ya-locality').value=g.locality||''; },50); }
 }
 function populateFilterLocality(){
-  const allLoc=[...new Set(STATE.growers.map(g=>g.locality).filter(Boolean))].sort();
+  const allLoc=[...new Set(getViewState().growers.map(g=>g.locality).filter(Boolean))].sort();
   const el=document.getElementById('filter-locality');
   if(el) el.innerHTML='<option value="">All Localities</option>'+allLoc.map(l=>`<option value="${l}">${l}</option>`).join('');
 }
@@ -5209,14 +5209,14 @@ function filterGrowers(){
   const q=(document.getElementById('grower-search')?.value||'').toLowerCase();
   const loc=document.getElementById('filter-locality')?.value||'';
   const zone=document.getElementById('filter-zone')?.value||'';
-  let rows=STATE.growers;
+  let rows=getViewState().growers;
   if(q) rows=rows.filter(g=>g.name.toLowerCase().includes(q)||(g.locality||'').toLowerCase().includes(q));
   if(loc) rows=rows.filter(g=>g.locality===loc);
   if(zone) rows=rows.filter(g=>g.zone===zone);
   renderGrowersTable(rows);
 }
 function renderGrowersTable(rows){
-  rows=rows||STATE.growers;
+  rows=rows||getViewState().growers;
   const el=document.getElementById('grower-count-badge'); if(el) el.textContent=rows.length;
   const tbody=document.getElementById('growers-table');
   if(!rows.length){ tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No growers yet</div></div></td></tr>`; return; }
@@ -5323,7 +5323,7 @@ async function savePlantation(){
   if(GAS_URL){ for(const rec of saved) syncToGAS('savePlantation',{Grower_Name:rec.grower,Zone:rec.zone,Locality:rec.locality,Variety:rec.variety,Date_Planted:rec.datePlanted,Production_Area_Ha:rec.area,Season:rec.season,Fortnightly_Period:getFortnight(rec.datePlanted),Estimated_Yield_T_Ha:rec.estYield,Officer_Comments:rec.comments,Recorded_By:CURRENT_USER?.username||''},true); toast(saved.length+' plot'+(saved.length>1?'s':'')+' saved','success'); }
 }
 function filteredPlantation(){
-  let rows=STATE.plantation;
+  let rows=getViewState().plantation;
   const q=(document.getElementById('plant-search')?.value||'').toLowerCase();
   const varF=document.getElementById('filter-variety')?.value||'';
   const locF=document.getElementById('filter-plant-locality')?.value||'';
@@ -5389,9 +5389,10 @@ function renderPlantationTable(){
     </div></td>
   </tr>`).join('');
   const fGrid=document.getElementById('fort-grid');
+  const _fp=getViewState().plantation;
   if(fGrid) fGrid.innerHTML=MONTHS.map((m,mi)=>{
-    const f1=STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 1').length;
-    const f2=STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 2').length;
+    const f1=_fp.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 1').length;
+    const f2=_fp.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi&&r.fortnight==='Fortnight 2').length;
     return `<div class="fort-cell ${(f1||f2)?'has-data':''}">
       <div class="fort-month">${m}</div>
       <div class="fort-count">${f1+f2}</div>
@@ -5584,7 +5585,7 @@ async function savePestRecord(){
   }
 }
 function renderPestTable(){
-  let rows=STATE.pestRecords;
+  let rows=getViewState().pestRecords;
   const gf=document.getElementById('pest-filter-grower')?.value||'';
   const sf=document.getElementById('pest-filter-season')?.value||'';
   if(gf) rows=rows.filter(r=>r.grower===gf);
@@ -5949,10 +5950,11 @@ function clearYieldForm(){
   clearYaPhotos();
 }
 function renderYieldTable(){
-  const badge=document.getElementById('yield-count-badge'); if(badge) badge.textContent=STATE.yieldAssessments.length;
+  const _ys=getViewState().yieldAssessments;
+  const badge=document.getElementById('yield-count-badge'); if(badge) badge.textContent=_ys.length;
   const tbody=document.getElementById('yield-table');
-  if(!STATE.yieldAssessments.length){ tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-title">No yield assessments yet</div></div></td></tr>`; return; }
-  tbody.innerHTML=STATE.yieldAssessments.map(r=>`<tr>
+  if(!_ys.length){ tbody.innerHTML=`<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">⚖️</div><div class="empty-title">No yield assessments yet</div></div></td></tr>`; return; }
+  tbody.innerHTML=_ys.map(r=>`<tr>
     <td>${r.date||'—'}</td><td><strong>${r.grower}</strong></td><td>${r.locality||'—'}</td>
     <td>${r.variety||'—'}</td><td>${r.area}</td><td>${r.avg}</td>
     <td>${r.yieldArpent}</td><td style="color:var(--gold);font-weight:700;">${r.yieldHa}</td>
