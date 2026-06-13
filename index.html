@@ -2333,13 +2333,13 @@ function renderCustomDisplays() {
       <div class="form-group"><label class="form-label">Author Title / Designation</label><input id="rpt-title" class="form-control" placeholder="e.g. Potato Production Officer"></div>
     </div>
     <div class="form-row-2">
-      <div class="form-group"><label class="form-label">Institution Name</label><input id="rpt-institution" class="form-control" placeholder="e.g. Ministry of Agro Industry &amp; Food Security" value="Ministry of Agro Industry &amp; Food Security, Mauritius"></div>
-      <div class="form-group"><label class="form-label">Department / Division</label><input id="rpt-department" class="form-control" placeholder="e.g. Potato Production Unit" value="Potato Production Unit (PoTa)"></div>
+      <div class="form-group"><label class="form-label">Institution Name</label><input id="rpt-institution" class="form-control" placeholder="e.g. Ministry of Agro Industry &amp; Food Security" value="FAREI"></div>
+      <div class="form-group"><label class="form-label">Department / Division</label><input id="rpt-department" class="form-control" placeholder="e.g. Potato Production Unit" value="Crop Extension Division"></div>
     </div>
     <div class="form-group"><label class="form-label">Executive Summary / Key Highlights</label><textarea id="rpt-comments" class="form-control" rows="3" placeholder="Key observations, notable events, or policy notes for the executive summary…"></textarea></div>
     <div class="form-group"><label class="form-label">Agro-Climatic Conditions</label><textarea id="rpt-climate" class="form-control" rows="2" placeholder="e.g. Seasonal rainfall was 320 mm, temperature range 18–28°C, two cyclone warnings issued…"></textarea></div>
     <div class="form-group"><label class="form-label">Extension Activities</label><textarea id="rpt-extension" class="form-control" rows="2" placeholder="e.g. 3 field days conducted, 45 growers trained on IPM, 2 demo plots established…"></textarea></div>
-    <div class="form-group"><label class="form-label">Marketing &amp; Economics Notes</label><textarea id="rpt-marketing" class="form-control" rows="2" placeholder="e.g. Average farm-gate price Rs 18/kg, exports to regional markets, AREU price trend data…"></textarea></div>
+    <div class="form-group"><label class="form-label">Marketing &amp; Economics Notes</label><textarea id="rpt-marketing" class="form-control" rows="2" placeholder="e.g. Average farm-gate price Rs 18/kg, exports to regional markets, FAREI price trend data…"></textarea></div>
     <div class="form-group"><label class="form-label">Challenges Observed</label><textarea id="rpt-challenges" class="form-control" rows="2" placeholder="e.g. Water stress in E3, late blight outbreak in S2, shortage of certified seed…"></textarea></div>
     <div class="form-group"><label class="form-label">Recommendations</label><textarea id="rpt-recommendations" class="form-control" rows="2" placeholder="e.g. Increase irrigation infrastructure in E3, scale up IPM training, introduce new variety trials…"></textarea></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -4891,7 +4891,25 @@ function showSection(id){
   if(id==='production')   safeRender(()=>renderProduction(),'Production');
   if(id==='comparative')  safeRender(()=>renderComparative(),'Comparative');
   if(id==='campaign')     safeRender(()=>renderCampaignTable(),'Campaign');
-  if(id==='variety-perf') safeRender(()=>renderVarietyPerf(),'Variety Perf');
+  if(id==='variety-perf'){
+    // Lock zone filter for non-admin users
+    const _vpZoneSel = document.getElementById('vp-zone');
+    if(_vpZoneSel){
+      const _za = CURRENT_USER?.zoneAccess || 'All';
+      const _isRestricted = _za !== 'All' && !ZONE_GROUPS[_za];
+      if(_isRestricted){
+        _vpZoneSel.value = _za;
+        _vpZoneSel.disabled = true;
+        _vpZoneSel.style.opacity = '0.5';
+        _vpZoneSel.style.cursor = 'not-allowed';
+      } else {
+        _vpZoneSel.disabled = false;
+        _vpZoneSel.style.opacity = '';
+        _vpZoneSel.style.cursor = '';
+      }
+    }
+    safeRender(()=>renderVarietyPerf(),'Variety Perf');
+  }
   if(id==='settings')     safeRender(()=>{ renderSettings(); renderUsersList(); },'Settings');
   if(window.innerWidth<900) document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0,0);
@@ -6507,13 +6525,14 @@ function renderMapSeverityBars(){
 // ============================================================
 function renderTrends(){
   requestAnimationFrame(()=>{
-    const prod=MONTHS.map((_,mi)=>STATE.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi).reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0));
+    const _ts = getViewState();
+    const prod=MONTHS.map((_,mi)=>_ts.plantation.filter(r=>r.datePlanted&&new Date(r.datePlanted).getMonth()===mi).reduce((s,r)=>s+(r.area||0)*(r.estYield||STATE.defaultYield),0));
     mkChart('chart-trend',{type:'line',data:{labels:MONTHS,datasets:[{label:'Est. Production (T)',data:prod,borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,.07)',fill:true,tension:.35,pointBackgroundColor:'#f0a500',pointRadius:3}]}});
-    const locs=[...new Set(STATE.plantation.map(r=>r.locality).filter(Boolean))];
-    const yieldData=locs.map(l=>{ const ya=STATE.yieldAssessments.filter(r=>r.locality===l); return ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0; });
+    const locs=[...new Set(_ts.plantation.map(r=>r.locality).filter(Boolean))];
+    const yieldData=locs.map(l=>{ const ya=_ts.yieldAssessments.filter(r=>r.locality===l); return ya.length?ya.reduce((s,r)=>s+parseFloat(r.yieldHa||0),0)/ya.length:0; });
     mkChart('chart-locality-yield',{type:'bar',data:{labels:locs,datasets:[{label:'Avg Yield (T/ha)',data:yieldData,backgroundColor:CHART_COLORS.map(c=>c+'bb'),borderRadius:4}]},options:{plugins:{legend:{display:false}}}});
     const pestTrend=MONTHS.map((_,mi)=>{
-      const recs=STATE.pestRecords.filter(r=>r.visits&&r.visits[0]&&r.visits[0].date&&new Date(r.visits[0].date).getMonth()===mi);
+      const recs=_ts.pestRecords.filter(r=>r.visits&&r.visits[0]&&r.visits[0].date&&new Date(r.visits[0].date).getMonth()===mi);
       if(!recs.length) return 0;
       let tot=0,cnt=0;
       recs.forEach(r=>(r.visits||[]).forEach(v=>Object.values(v.pests||{}).forEach(p=>{ if(p.sev){ tot+={Low:33,Moderate:66,High:100}[p.sev]||0; cnt++; } })));
@@ -6521,7 +6540,7 @@ function renderTrends(){
     });
     mkChart('chart-pest-trend',{type:'line',data:{labels:MONTHS,datasets:[{label:'Avg Severity Score',data:pestTrend,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.07)',fill:true,tension:.35,pointBackgroundColor:'#ef4444',pointRadius:3}]}});
     const wData=new Array(52).fill(0);
-    STATE.plantation.forEach(r=>{ if(r.datePlanted){ const d=new Date(r.datePlanted); const start=new Date(d.getFullYear(),0,1); const w=Math.floor((d-start)/(7*86400000)); if(w>=0&&w<52) wData[w]+=r.area||0; } });
+    _ts.plantation.forEach(r=>{ if(r.datePlanted){ const d=new Date(r.datePlanted); const start=new Date(d.getFullYear(),0,1); const w=Math.floor((d-start)/(7*86400000)); if(w>=0&&w<52) wData[w]+=r.area||0; } });
     mkChart('chart-fort-overview',{type:'bar',data:{labels:Array.from({length:52},(_,i)=>'W'+(i+1)),datasets:[{label:'Area Planted (ha)',data:wData,backgroundColor:'rgba(240,165,0,.6)',borderRadius:2}]},options:{scales:{x:{ticks:{maxTicksLimit:13}}}}});
   });
 }
@@ -7040,10 +7059,11 @@ function exportCampaignCsv(){
   let csv='Grower,Zone,Area(ha)';
   MONTHS.forEach(m=>{ csv+=`,${m} F1,${m} F2`; });
   csv+=',Total\n';
-  const growers=[...new Set(STATE.plantation.filter(p=>p.season===season).map(p=>p.grower))].sort();
+  const _ecvs=getViewState();
+  const growers=[...new Set(_ecvs.plantation.filter(p=>p.season===season).map(p=>p.grower))].sort();
   growers.forEach(grower=>{
-    const g=STATE.growers.find(x=>x.name===grower);
-    const area=STATE.plantation.filter(p=>p.grower===grower&&p.season===season).reduce((s,r)=>s+(r.area||0),0);
+    const g=_ecvs.growers.find(x=>x.name===grower);
+    const area=_ecvs.plantation.filter(p=>p.grower===grower&&p.season===season).reduce((s,r)=>s+(r.area||0),0);
     let row=`${grower},${g?.zone||''},${area.toFixed(2)}`;
     let total=0;
     MONTHS.forEach(m=>{ [1,2].forEach(f=>{ const v=STATE.campaignData[getCampKey(season,g?.zone||'',grower,m,f)]||'0'; row+=','+v; total+=parseFloat(v)||0; }); });
@@ -7056,9 +7076,10 @@ async function saveCampaignToSheets(){
   if(!GAS_URL){ toast('Set GAS URL first','error'); return; }
   const season=document.getElementById('camp-season')?.value||'Season 1';
   let ok=0,fail=0;
-  const growers=[...new Set(STATE.plantation.filter(p=>p.season===season).map(p=>p.grower))];
+  const _scvs=getViewState();
+  const growers=[...new Set(_scvs.plantation.filter(p=>p.season===season).map(p=>p.grower))];
   for(const grower of growers){
-    const g=STATE.growers.find(x=>x.name===grower);
+    const g=_scvs.growers.find(x=>x.name===grower);
     for(const m of MONTHS) for(const f of [1,2]){
       const k=getCampKey(season,g?.zone||'',grower,m,f), v=STATE.campaignData[k];
       if(v){ const r=await callGAS('saveCampaign',{Season:season,Zone:g?.zone||'',Grower_Name:grower,Fortnightly_Period:`${m} F${f}`,Yield_T_Ha:v,Production_Area_Ha:STATE.plantation.filter(p=>p.grower===grower&&p.season===season).reduce((s,r)=>s+(r.area||0),0),Recorded_By:CURRENT_USER?.username||''}); r.success?ok++:fail++; }
@@ -7665,8 +7686,8 @@ function generateReport(){
   const zone        = _rptField('rpt-zone','');
   const officer     = _rptField('rpt-officer', CURRENT_USER?.fullName||CURRENT_USER?.username||'—');
   const authorTitle = _rptField('rpt-title','Potato Production Officer');
-  const institution = _rptField('rpt-institution','Ministry of Agro Industry & Food Security, Mauritius');
-  const department  = _rptField('rpt-department','Potato Production Unit (PoTa)');
+  const institution = _rptField('rpt-institution','FAREI');
+  const department  = _rptField('rpt-department','Crop Extension Division');
   const execNotes   = _rptField('rpt-comments','');
   const climateText = _rptField('rpt-climate','No agro-climatic data entered for this period.');
   const extensionTx = _rptField('rpt-extension','No extension activities recorded for this period.');
@@ -8305,8 +8326,8 @@ async function printReport(){
   const pr_zone        = _rf('rpt-zone')         || '';
   const pr_officer     = _rf('rpt-officer')      || (CURRENT_USER?.fullName||CURRENT_USER?.username||'—');
   const pr_title       = _rf('rpt-title')        || 'Potato Production Officer';
-  const pr_institution = _rf('rpt-institution')  || 'Ministry of Agro Industry & Food Security, Mauritius';
-  const pr_department  = _rf('rpt-department')   || 'Potato Production Unit (PoTa)';
+  const pr_institution = _rf('rpt-institution')  || 'FAREI';
+  const pr_department  = _rf('rpt-department')   || 'Crop Extension Division';
   const pr_execNotes   = _rf('rpt-comments')     || '';
   const pr_climate     = _rf('rpt-climate')      || 'No agro-climatic data entered for this period.';
   const pr_extension   = _rf('rpt-extension')    || 'No extension activities recorded for this period.';
@@ -8644,17 +8665,18 @@ function renderVarietyPerf(){
   const zoneF   = document.getElementById('vp-zone')?.value   || '';
   const yearF   = document.getElementById('vp-year')?.value   || '';
 
-  // ── Filter plantation records ──
+  // ── Filter plantation records (scope to current user's zone first) ──
   function getYear(d){ return d ? new Date(d).getFullYear().toString() : null; }
-  const plants = STATE.plantation.filter(r=>{
+  const _vpState = getViewState();
+  const plants = _vpState.plantation.filter(r=>{
     if(seasonF && r.season !== seasonF) return false;
     if(zoneF   && r.zone   !== zoneF)   return false;
     if(yearF   && getYear(r.datePlanted) !== yearF) return false;
     return true;
   });
 
-  // ── Filter yield assessments ──
-  const yields = STATE.yieldAssessments.filter(r=>{
+  // ── Filter yield assessments (scoped) ──
+  const yields = _vpState.yieldAssessments.filter(r=>{
     if(seasonF && r.season !== seasonF) return false;
     if(zoneF   && r.zone   !== zoneF)   return false;
     if(yearF   && getYear(r.date) !== yearF) return false;
@@ -8859,9 +8881,10 @@ function renderVarietyPestHeat(plants, seasonF, zoneF, yearF){
     (growerVarieties[r.grower] = growerVarieties[r.grower] || new Set()).add(v);
   });
 
-  // Filter pest records by zone/year filters (season handled separately for trend)
-  const pestRecsAll = STATE.pestRecords.filter(r=>{
-    const gz = STATE.growers.find(g=>g.name===r.grower)?.zone || '';
+  // Filter pest records by zone/year filters — scoped to current user's zone
+  const _heatState = getViewState();
+  const pestRecsAll = _heatState.pestRecords.filter(r=>{
+    const gz = _heatState.growers.find(g=>g.name===r.grower)?.zone || '';
     if(zoneF && gz !== zoneF) return false;
     if(yearF){
       const v0 = r.visits?.[0];
